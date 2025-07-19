@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Từ Vựng Tiếng Hàn</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modes.css">
+    <link rel="stylesheet" href="css/popup.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-actions">
+            <button class="action-btn add-word-btn" id="add-word-btn">
+                <span class="btn-icon">➕</span>
+                <span>Thêm Từ</span>
+            </button>
+            <button class="action-btn window-toggle-btn" id="window-toggle-btn">
+                <span class="btn-icon">🪟</span>
+                <span>Cửa Sổ</span>
+            </button>
+        </div>
+        <div class="developer-info hidden">
+            <div class="developer-content">
+                <img class="developer-avatar" src="avatar.png" alt="Avatar">
+                <div class="developer-text">
+                    <div class="developer-label">Developed by</div>
+                    <div class="developer-name">양휘 - RinNguyen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Thêm/Sửa Từ Vựng -->
+        <div class="modal hidden" id="word-modal">
+            <div class="modal-content">
+                <button id="close-modal-btn" class="btn btn-secondary"
+                    style="position: absolute; top: 10px; right: 10px;">✖</button>
+                <h2>Thêm/Sửa Từ Vựng</h2>
+                <div class="form-group">
+                    <input type="text" id="korean-input" class="form-input" placeholder="Nhập từ tiếng Hàn">
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="pronunciation-input" class="form-input"
+                            placeholder="Nhập phiên âm (romaja)" spellcheck="false">
+                        <label><input type="checkbox" id="lookup-pronunciation" checked></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="vietnamese-input" class="form-input" placeholder="Nhập nghĩa tiếng Việt"
+                            spellcheck="false">
+                        <label><input type="checkbox" id="lookup-vietnamese" checked></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                        <textarea id="example-input" class="form-textarea" rows="4"
+                            placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false"></textarea>
+                        <label><input type="checkbox" id="lookup-example" checked></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                        <textarea id="note-input" class="form-textarea" rows="4" placeholder="Nhập chú ý (nếu có)"
+                            spellcheck="false"></textarea>
+                        <label><input type="checkbox" id="lookup-note" checked></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="category-input" class="form-input" placeholder="Nhập danh mục"
+                        list="category-suggestions" spellcheck="false">
+                    <datalist id="category-suggestions"></datalist>
+                </div>
+                <div class="form-message" id="form-message"></div>
+                <div class="form-controls">
+                    <button class="btn btn-primary" id="lookup-word-btn">Tra cứu</button>
+                    <button class="btn btn-secondary" id="save-word-btn">Lưu</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-progress-row">
+            <div class="stats">
+                <div class="stat-item">
+                    <span id="current-count">0</span> / <span id="total-count">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="category-selector">
+            <select id="category-select" class="form-input">
+                <option value="all">Tất cả</option>
+            </select>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" id="study-mode-btn">Học Từ</button>
+            <button class="mode-btn" id="quiz-mode-btn">Kiểm Tra</button>
+            <button class="mode-btn" id="flashcard-mode-btn">Flashcard</button>
+            <button class="mode-btn" id="game-mode-btn">Game</button>
+            <button class="mode-btn" id="unknown-mode-btn">Chú ý</button>
+            <button class="mode-btn" id="manage-mode-btn">Quản Lý</button>
+        </div>
+
+        <div id="control-buttons" class="controls">
+            <button id="shuffle-btn" class="btn btn-primary">🔀 Trộn Từ</button>
+            <button id="reset-btn" class="btn btn-secondary">🔄 Làm Lại</button>
+            <button id="prev-btn" class="btn btn-accent">⏪ Từ Trước</button>
+            <button id="next-btn" class="btn btn-accent">Từ Tiếp ⏭️</button>
+        </div>
+
+        <!-- Study Mode -->
+        <div id="study-mode" class="hidden">
+            <div class="flip-card" id="study-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="empty-state hidden" id="study-empty-state">
+                            <div class="empty-state-icon">📚</div>
+                            <div class="empty-state-message" id="study-empty-message"></div>
+                        </div>
+                        <div class="category" id="study-category"></div>
+                        <div class="korean-word" id="study-korean"></div>
+                        <div class="pronunciation" id="study-pronunciation"></div>
+                        <div class="vietnamese" id="study-vietnamese"></div>
+                        <div class="flip-hint">Nhấn để xem ví dụ</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="category" id="study-back-category"></div>
+                        <div class="example" id="study-example">
+                            <div class="study-example-korean" id="study-example-korean"></div>
+                            <div class="study-example-vietnamese" id="study-example-vietnamese"></div>
+                        </div>
+                        <div class="flip-hint">Nhấn để xem từ</div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button id="play-tts-btn" class="btn btn-primary">🔊 Phát âm</button>
+                <button id="edit-word-btn" class="btn btn-accent">Sửa</button>
+            </div>
+        </div>
+
+        <!-- Quiz Mode -->
+        <div id="quiz-mode" class="hidden">
+            <div class="category-selector-display">
+                <select id="quiz-display-mode">
+                    <option value="word">Từ</option>
+                    <option value="meaning">Nghĩa</option>
+                </select>
+            </div>
+            <div class="card">
+                <div class="empty-state hidden" id="quiz-empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-message" id="quiz-empty-message"></div>
+                </div>
+                <span class="category" id="quiz-category"></span>
+                <div class="korean-word" id="quiz-korean"></div>
+                <div id="quiz-vietnamese" class="hidden"></div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <div class="quiz-result" id="quiz-result"></div>
+            </div>
+            <button id="play-tts-quiz-btn" class="btn btn-primary">🔊 Phát âm</button>
+        </div>
+
+        <!-- Flashcard Mode -->
+        <div id="flashcard-mode" class="hidden">
+            <div class="category-selector-display">
+                <select id="flashcard-display-mode">
+                    <option value="word">Từ</option>
+                    <option value="meaning">Nghĩa</option>
+                </select>
+            </div>
+            <div id="flashcard" class="card flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <span class="category" id="flashcard-category"></span>
+                        <div class="korean-word" id="flashcard-korean"></div>
+                        <div class="pronunciation" id="flashcard-pronunciation"></div>
+                        <div class="vietnamese hidden" id="flashcard-vietnamese"></div>
+                        <div class="flip-hint">Nhấn để xem nghĩa</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="korean-word hidden" id="flashcard-back-korean"></div>
+                        <div class="pronunciation hidden" id="flashcard-back-pronunciation"></div>
+                        <div class="vietnamese" id="flashcard-back-vietnamese"></div>
+                        <div class="flip-hint">Nhấn để quay lại</div>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <button id="mark-correct-btn" class="btn btn-primary">✅ Biết</button>
+                <button id="mark-wrong-btn" class="btn btn-secondary">❌ Chưa Biết</button>
+                <button id="play-tts-flashcard-btn" class="btn btn-accent">🔊 Phát âm</button>
+            </div>
+        </div>
+
+        <div id="game-mode" class="hidden">
+            <div class="game-tabs">
+                <button class="tab-btn active" id="matching-tab-btn">Ghép Từ</button>
+                <button class="tab-btn" id="fill-tab-btn">Điền Từ</button>
+                <button class="btn btn-accent" id="reset-game-btn">🔄 Làm Lại Ghép Từ</button>
+                <button class="btn btn-accent hidden" id="reset-fill-game-btn">🔄 Làm Lại Điền Từ</button>
+            </div>
+            <div id="matching-game" class="game-content">
+                <div class="matching-container">
+                    <div class="matching-column" id="korean-column"></div>
+                    <div class="matching-column" id="vietnamese-column"></div>
+                </div>
+                <div id="matching-result" class="game-result"></div>
+            </div>
+            <div id="fill-game" class="game-content hidden">
+                <div id="fill-sentence"></div>
+                <div id="fill-options" class="fill-options"></div>
+                <div id="fill-result" class="game-result"></div>
+            </div>
+        </div>
+
+        <!-- Unknown Words Mode -->
+        <div id="unknown-mode" class="hidden">
+            <div class="card">
+                <div class="vocab-list" id="unknown-list"></div>
+            </div>
+        </div>
+
+        <!-- Manage Mode -->
+        <div id="manage-mode" class="hidden">
+            <div class="card">
+                <h2>Danh Sách Từ Vựng</h2>
+                <div class="vocab-controls">
+                    <div class="search-group">
+                        <input type="text" id="vocab-search" class="form-input" placeholder="Tìm kiếm từ vựng..."
+                            spellcheck="false">
+                    </div>
+                    <button class="btn btn-secondary" id="delete-all-btn">🗑️ Xóa Tất Cả</button>
+                </div>
+                <div class="vocab-list" id="vocab-list"></div>
+            </div>
+            <div class="card">
+                <h2>Tải Lên Danh Sách Từ Vựng</h2>
+                <div class="form-group">
+                    <label for="vocab-list-input">
+                        Danh sách từ (mỗi dòng: từ tiếng Hàn`phiên âm`nghĩa tiếng Việt`ví dụ - tùy chọn):
+                    </label>
+                    <textarea id="vocab-list-input" class="form-textarea" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="list-category-input">Danh mục cho danh sách:</label>
+                    <input type="text" id="list-category-input" class="form-input" list="category-suggestions"
+                        spellcheck="false">
+                </div>
+                <div class="form-controls">
+                    <button class="btn btn-primary" id="upload-list-btn">Tải Lên</button>
+                </div>
+                <div class="form-message" id="upload-message"></div>
+            </div>
+
+            <div class="card">
+                <h2>Nhập/Xuất Từ Vựng</h2>
+                <div class="form-group">
+                    <label for="import-file">Chọn file để nhập (mỗi dòng: từ tiếng Hàn.phiên âm.nghĩa tiếng Việt.danh
+                        mục):</label>
+                    <input type="file" id="import-file" class="form-input" accept=".txt">
+                </div>
+                <div class="controls">
+                    <button id="import-file-btn" class="btn btn-primary">Nhập File</button>
+                    <button id="export-all-btn" class="btn btn-secondary">Xuất Tất Cả</button>
+                </div>
+                <div id="import-message" class="form-message"></div>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" id="open-api-key-modal-btn">Cài Đặt API Key</button>
+            </div>
+        </div>
+
+        <div id="api-key-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Quản Lý API Key Gemini</h2>
+                <div class="form-group">
+                    <input type="text" id="api-key-input" class="form-input" placeholder="Thêm API Key">
+                </div>
+                <div id="api-key-list" class="vocab-list"></div>
+                <div id="api-key-message" class="form-message"></div>
+                <div class="form-controls">
+                    <button id="save-api-key-btn" class="btn btn-primary">Lưu</button>
+                    <button id="close-api-key-modal-btn" class="btn btn-secondary">✖</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./js/events.js"></script>
+    <script src="./js/db.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/modes.js"></script>
+    <script src="./js/ui.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,525 @@
+/**
+ * UI module for updating interface elements
+ * Handles display updates for all modes and components
+ */
+
+// Update category selector dropdown
+function updateCategorySelector() {
+    const select = document.getElementById('category-select');
+    if (!select) return;
+    const categories = [...new Map(window.allVocab.map(word => [window.normalizeCategory(word.category), window.normalizeCategory(word.category)])).values()].sort();
+    const currentValue = select.value;
+
+    select.innerHTML = '<option value="all">Tất cả</option>';
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        select.appendChild(option);
+    });
+
+    select.value = categories.includes(currentValue) || currentValue === 'all' ? currentValue : 'all';
+    window.selectedCategory = select.value === 'all' ? 'all' : window.normalizeCategory(select.value);
+    window.filterVocabByCategory();
+    window.saveState();
+}
+
+// Update category suggestions datalist
+function updateCategorySuggestions() {
+    const datalist = document.getElementById('category-suggestions');
+    if (!datalist) return;
+    const categories = [...new Map(window.allVocab.map(word => [window.normalizeCategory(word.category), window.normalizeCategory(word.category)])).values()].sort();
+    datalist.innerHTML = '';
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        datalist.appendChild(option);
+    });
+}
+
+// Update progress statistics
+function updateStats() {
+    const filteredVocab = window.selectedCategory === 'all'
+        ? [...window.allVocab]
+        : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+
+    if (!window.modeStates[window.currentMode] && window.currentMode !== 'game') {
+        document.getElementById('current-count').textContent = 0;
+        document.getElementById('total-count').textContent = 0;
+        document.getElementById('progress-fill').style.width = '0%';
+        return;
+    }
+
+    if (window.currentMode === 'game') {
+        const currentState = window.modeStates.game[window.modeStates.game.currentTab];
+        document.getElementById('current-count').textContent = currentState.matchedPairs?.length || currentState.correctCount || 0;
+        document.getElementById('total-count').textContent = currentState.shuffledVocab?.length || filteredVocab.length || 0;
+        document.getElementById('progress-fill').style.width = currentState.shuffledVocab?.length > 0 ? ((currentState.matchedPairs?.length || currentState.correctCount || 0) / currentState.shuffledVocab.length * 100) + '%' : '0%';
+        return;
+    }
+
+    const currentState = window.modeStates[window.currentMode];
+    document.getElementById('current-count').textContent = currentState.shuffledVocab.length > 0 ? currentState.currentIndex + 1 : 0;
+    document.getElementById('total-count').textContent = currentState.shuffledVocab.length;
+    const progress = currentState.shuffledVocab.length > 0 ? ((currentState.currentIndex + 1) / currentState.shuffledVocab.length) * 100 : 0;
+    document.getElementById('progress-fill').style.width = progress + '%';
+}
+
+// Update vocabulary list in manage mode
+function updateVocabList() {
+    const vocabList = document.getElementById('vocab-list');
+    if (!vocabList) return;
+
+    vocabList.innerHTML = '';
+
+    let filteredVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+
+    filteredVocab = filteredVocab.filter(word =>
+        word.korean.toLowerCase().includes(window.searchQuery.toLowerCase()) ||
+        word.vietnamese.toLowerCase().includes(window.searchQuery.toLowerCase())
+    );
+
+    if (filteredVocab.length === 0) {
+        vocabList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <div class="empty-state-message">
+                    Không có từ vựng nào trong danh mục "${window.selectedCategory === 'all' ? 'Tất cả' : window.selectedCategory}".<br />
+                    Hãy thêm từ mới hoặc kiểm tra tìm kiếm!
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    filteredVocab.forEach(word => {
+        const vocabItem = document.createElement('div');
+        vocabItem.className = 'vocab-item';
+
+        const vocabInfo = document.createElement('div');
+        vocabInfo.className = 'vocab-info';
+        vocabInfo.innerHTML = `
+        <div class="vocab-korean">${word.korean}</div>
+        <div class="vocab-pronunciation">(${word.pronunciation})</div>
+        <div class="vocab-vietnamese">${word.vietnamese}</div>
+        <div class="vocab-category">${word.category}</div>
+        `;
+
+        const vocabActions = document.createElement('div');
+        vocabActions.className = 'vocab-actions';
+        vocabActions.style.flexDirection = 'column';
+        vocabActions.style.gap = '6px';
+
+        const topActions = document.createElement('div');
+        topActions.style.display = 'flex';
+        topActions.style.gap = '8px';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-primary';
+        editBtn.textContent = 'Sửa';
+        editBtn.addEventListener('click', () => window.editWord(word));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-secondary';
+        deleteBtn.textContent = 'Xóa';
+        deleteBtn.addEventListener('click', () => {
+            if (confirm(`Bạn có chắc muốn xóa từ "${word.korean}"?`)) {
+                window.deleteWord(word.id).then(() => {
+                    window.loadVocabulary().then(() => {
+                        window.filterVocabByCategory();
+                        updateVocabList();
+                        window.saveState();
+                    });
+                }).catch(err => console.error('Error deleting word:', err));
+            }
+        });
+
+        topActions.appendChild(editBtn);
+        topActions.appendChild(deleteBtn);
+
+        const bottomActions = document.createElement('div');
+        bottomActions.style.display = 'flex';
+        bottomActions.style.gap = '8px';
+
+        const exampleBtn = document.createElement('button');
+        exampleBtn.className = 'btn btn-accent';
+        exampleBtn.textContent = 'Ví dụ';
+        exampleBtn.addEventListener('click', () => {
+            let back = vocabItem.querySelector('.vocab-back');
+            if (!back) {
+                back = document.createElement('div');
+                back.className = 'vocab-back';
+                back.style.padding = '18px';
+                back.style.background = '#fffbe6';
+                back.style.borderRadius = '12px';
+                back.style.marginTop = '10px';
+                back.style.width = '100%';
+                let han = '';
+                let viet = '';
+                if (word.example && word.example.includes(' - ')) {
+                    [han, viet] = word.example.split(' - ', 2);
+                } else {
+                    han = word.example || '';
+                    viet = '';
+                }
+                back.innerHTML = `
+                <div class="example">
+                <div style="font-size:1.3em;font-weight:bold;margin-bottom:8px;">${han || 'Chưa có ví dụ'}</div>
+                <div style="font-style:italic;color:#555;">${viet}</div>
+                </div>
+                <button class="btn btn-secondary back-btn" style="margin-top:12px;">Quay lại</button>
+                `;
+                vocabItem.appendChild(back);
+
+                back.querySelector('.back-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    vocabItem.classList.remove('flipped');
+                    vocabInfo.style.display = '';
+                    vocabActions.style.display = '';
+                    back.style.display = 'none';
+                });
+            }
+            const isFlipped = vocabItem.classList.toggle('flipped');
+            if (isFlipped) {
+                vocabInfo.style.display = 'none';
+                vocabActions.style.display = 'none';
+                back.style.display = '';
+            } else {
+                vocabInfo.style.display = '';
+                vocabActions.style.display = '';
+                back.style.display = 'none';
+            }
+        });
+
+        const noteBtn = document.createElement('button');
+        noteBtn.className = 'btn btn-info';
+        noteBtn.textContent = 'Note';
+        noteBtn.addEventListener('click', () => {
+            let noteBack = vocabItem.querySelector('.vocab-note-back');
+            if (!noteBack) {
+                noteBack = document.createElement('div');
+                noteBack.className = 'vocab-note-back';
+                noteBack.style.padding = '18px';
+                noteBack.style.background = '#e3f2fd';
+                noteBack.style.borderRadius = '12px';
+                noteBack.style.marginTop = '10px';
+                noteBack.style.width = '100%';
+                noteBack.innerHTML = `
+                <div class="example">
+                    <div style="color:#555;">${word.note ? word.note : 'Chưa có ghi chú'}</div>
+                </div>
+                <button class="btn btn-secondary note-back-btn" style="margin-top:12px;">Quay lại</button>
+                `;
+                vocabItem.appendChild(noteBack);
+
+                noteBack.querySelector('.note-back-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    vocabItem.classList.remove('flipped-note');
+                    vocabInfo.style.display = '';
+                    vocabActions.style.display = '';
+                    noteBack.style.display = 'none';
+                });
+            }
+            const isFlipped = vocabItem.classList.toggle('flipped-note');
+            if (isFlipped) {
+                vocabInfo.style.display = 'none';
+                vocabActions.style.display = 'none';
+                noteBack.style.display = '';
+            } else {
+                vocabInfo.style.display = '';
+                vocabActions.style.display = '';
+                noteBack.style.display = 'none';
+            }
+        });
+
+        bottomActions.appendChild(exampleBtn);
+        bottomActions.appendChild(noteBtn);
+
+        vocabActions.appendChild(topActions);
+        vocabActions.appendChild(bottomActions);
+
+        vocabItem.appendChild(vocabInfo);
+        vocabItem.appendChild(vocabActions);
+        vocabList.appendChild(vocabItem);
+    });
+}
+
+// Update unknown words list
+function updateUnknownList() {
+    const unknownList = document.getElementById('unknown-list');
+    if (!unknownList) return;
+
+    const headerHTML = `
+        <div class="unknown-header">
+            <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
+            ${window.unknownWords.length > 0 ? `<span class="unknown-count">${window.unknownWords.length} từ</span>` : ''}
+        </div>
+    `;
+    if (window.unknownWords.length === 0) {
+        unknownList.innerHTML = headerHTML + `
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <div class="empty-state-message">
+                    Chưa có từ nào trong danh sách chưa biết.<br />
+                    Hãy đánh dấu những từ khó trong chế độ Flashcard!
+                </div>
+            </div>
+        `;
+    } else {
+        let wordsHTML = '';
+        window.unknownWords.forEach(word => {
+            wordsHTML += `
+                <div class="vocab-item unknown-item">
+                    <div class="vocab-info unknown-info">
+                        <div class="korean-text">${word.korean}</div>
+                        <div class="pronunciation-text">(${word.pronunciation})</div>
+                        <div class="vietnamese-text">${word.vietnamese}</div>
+                    </div>
+                    <div class="vocab-actions">
+                        <button class="btn btn-secondary delete-unknown-btn" data-id="${word.id}">Xóa</button>
+                    </div>
+                </div>
+            `;
+        });
+        unknownList.innerHTML = headerHTML + wordsHTML;
+    }
+
+    const clearButton = document.getElementById('clear-unknown-btn');
+    if (clearButton) {
+        clearButton.onclick = function () {
+            if (confirm('Bạn có chắc muốn xóa tất cả từ chưa biết?')) {
+                window.deleteAllUnknownWords().then(() => {
+                    window.loadUnknownWords();
+                });
+            }
+        };
+    }
+
+    document.querySelectorAll('.delete-unknown-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const wordId = parseInt(e.target.getAttribute('data-id'));
+            const word = window.unknownWords.find(w => w.id === wordId);
+            if (confirm(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chưa biết không?`)) {
+                window.deleteUnknownWord(wordId).then(() => {
+                    window.loadUnknownWords();
+                }).catch(err => {
+                    console.error('Error deleting unknown word:', err);
+                    document.getElementById('form-message').textContent = 'Lỗi khi xóa từ chưa biết!';
+                });
+            }
+        });
+    });
+}
+
+// Update API key list
+function updateApiKeyList() {
+    const apiKeyList = document.getElementById('api-key-list');
+    if (!apiKeyList) return;
+
+    apiKeyList.innerHTML = '';
+
+    if (window.apiKeys.length === 0) {
+        apiKeyList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔑</div>
+                <div class="empty-state-message">Chưa có API Key nào. Hãy thêm key mới!</div>
+                <div class="empty-state-message"><a href="https://aistudio.google.com/apikey" target="_blank" style="text-decoration: none;">Nhấn vào đây để lấy API Key</a></div>
+            </div>
+        `;
+        return;
+    }
+
+    window.apiKeys.forEach((keyObj, index) => {
+        const keyItem = document.createElement('div');
+        keyItem.className = 'vocab-item';
+        const displayKey = keyObj.key.length > 6 ? `${keyObj.key.slice(0, 3)}•••••${keyObj.key.slice(-5)}` : keyObj.key;
+        keyItem.innerHTML = `
+            <div class="vocab-info">
+                <div>Key: ${displayKey}</div>
+                <div>Số yêu cầu: ${keyObj.requestCount}</div>
+                <div>Trạng thái: ${keyObj.lastRateLimit === 0 ? 'Sẵn sàng' : `Đạt giới hạn lúc ${new Date(keyObj.lastRateLimit).toLocaleTimeString()}`}</div>
+            </div>
+            <div class="vocab-actions">
+                <button class="btn btn-secondary delete-api-key-btn" data-index="${index}">Xóa</button>
+            </div>
+        `;
+        apiKeyList.appendChild(keyItem);
+    });
+
+    document.querySelectorAll('.delete-api-key-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            if (confirm('Bạn có chắc muốn xóa API Key này?')) {
+                window.deleteApiKey(index);
+            }
+        });
+    });
+}
+
+// Display current word based on mode
+function displayCurrentWord() {
+    if (!window.modeStates[window.currentMode] && window.currentMode !== 'unknown' && window.currentMode !== 'manage') {
+        console.error(`Invalid currentMode: ${window.currentMode}`);
+        return;
+    }
+
+    if (window.currentMode === 'unknown' || window.currentMode === 'manage') {
+        updateStats();
+        return;
+    }
+
+    const currentState = window.modeStates[window.currentMode];
+    const noVocabMessage = window.selectedCategory === 'all' ? 'Chưa có từ vựng' : `Chưa có từ vựng trong danh mục "${window.selectedCategory}"`;
+
+    if (currentState.shuffledVocab.length === 0) {
+        if (window.currentMode === 'study') {
+            const studyEmptyState = document.getElementById('study-empty-state');
+            if (studyEmptyState) studyEmptyState.classList.remove('hidden');
+            const studyEmptyMessage = document.getElementById('study-empty-message');
+            if (studyEmptyMessage) studyEmptyMessage.textContent = noVocabMessage;
+            ['study-category', 'study-korean', 'study-pronunciation', 'study-vietnamese', 'study-back-category', 'study-example'].forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem) elem.classList.add('hidden');
+            });
+        } else if (window.currentMode === 'quiz') {
+            const quizEmptyState = document.getElementById('quiz-empty-state');
+            const quizEmptyMessage = document.getElementById('quiz-empty-message');
+            const quizKorean = document.getElementById('quiz-korean');
+            const quizVietnamese = document.getElementById('quiz-vietnamese');
+            const quizOptions = document.getElementById('quiz-options');
+            const quizResult = document.getElementById('quiz-result');
+
+            if (quizKorean) quizKorean.textContent = '';
+            if (quizVietnamese) quizVietnamese.textContent = '';
+            if (quizOptions) quizOptions.innerHTML = '';
+            if (quizResult) quizResult.innerHTML = '';
+
+            if (window.modeStates.quiz.shuffledVocab.length === 0) {
+                if (quizEmptyState) quizEmptyState.classList.remove('hidden');
+                if (quizEmptyMessage) {
+                    quizEmptyMessage.textContent = window.selectedCategory === 'all' ? 'Chưa có từ vựng' : `Chưa có từ vựng trong danh mục "${window.selectedCategory}"`;
+                }
+                ['quiz-category', 'quiz-options', 'quiz-result'].forEach(id => {
+                    const elem = document.getElementById(id);
+                    if (elem) elem.classList.add('hidden');
+                });
+            } else {
+                if (quizEmptyState) quizEmptyState.classList.add('hidden');
+                ['quiz-category', 'quiz-options', 'quiz-result'].forEach(id => {
+                    const elem = document.getElementById(id);
+                    if (elem) elem.classList.remove('hidden');
+                });
+                window.displayQuiz(window.modeStates.quiz.shuffledVocab[window.modeStates.quiz.currentIndex]);
+            }
+        } else if (window.currentMode === 'flashcard') {
+            ['flashcard-category', 'flashcard-korean', 'flashcard-pronunciation', 'flashcard-vietnamese',
+                'flashcard-back-korean', 'flashcard-back-pronunciation', 'flashcard-back-vietnamese'].forEach(id => {
+                    const elem = document.getElementById(id);
+                    if (elem) elem.textContent = id === 'flashcard-korean' ? noVocabMessage : '';
+                });
+        }
+        updateStats();
+        return;
+    }
+
+    if (window.currentMode === 'study') {
+        const studyEmptyState = document.getElementById('study-empty-state');
+        if (studyEmptyState) studyEmptyState.classList.add('hidden');
+        ['study-category', 'study-korean', 'study-pronunciation', 'study-vietnamese', 'study-back-category', 'study-example'].forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) elem.classList.remove('hidden');
+        });
+        const word = currentState.shuffledVocab[currentState.currentIndex];
+        const studyCategory = document.getElementById('study-category');
+        if (studyCategory) studyCategory.textContent = word.category;
+        const studyKorean = document.getElementById('study-korean');
+        if (studyKorean) studyKorean.textContent = word.korean;
+        const studyPronunciation = document.getElementById('study-pronunciation');
+        if (studyPronunciation) studyPronunciation.textContent = word.pronunciation;
+        const studyVietnamese = document.getElementById('study-vietnamese');
+        if (studyVietnamese) studyVietnamese.textContent = word.vietnamese;
+        const studyBackCategory = document.getElementById('study-back-category');
+        if (studyBackCategory) studyBackCategory.textContent = word.category;
+        const studyExample = document.getElementById('study-example');
+        if (studyExample) {
+            const example = word.example || '';
+            let koreanSentence = '';
+            let vietnameseSentence = '';
+            if (example && example.includes(' - ')) {
+                [koreanSentence, vietnameseSentence] = example.split(' - ', 2);
+            } else {
+                koreanSentence = example;
+            }
+            const koreanDiv = document.getElementById('study-example-korean');
+            const vietnameseDiv = document.getElementById('study-example-vietnamese');
+            if (koreanDiv) koreanDiv.textContent = koreanSentence.trim() || 'Chưa có câu ví dụ';
+            if (vietnameseDiv) vietnameseDiv.textContent = vietnameseSentence.trim();
+        }
+        const studyCard = document.getElementById('study-card');
+        if (studyCard) studyCard.classList.remove('flipped');
+        if (studyCard) studyCard.addEventListener('click', window.flipStudyCard);
+    } else if (window.currentMode === 'quiz') {
+        const quizEmptyState = document.getElementById('quiz-empty-state');
+        if (quizEmptyState) quizEmptyState.classList.add('hidden');
+        ['quiz-category', 'quiz-options', 'quiz-result'].forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) elem.classList.remove('hidden');
+        });
+        if (window.modeStates.quiz.shuffledVocab.length > 0) {
+            window.displayQuiz(window.modeStates.quiz.shuffledVocab[window.modeStates.quiz.currentIndex]);
+        }
+    } else if (window.currentMode === 'flashcard') {
+        const word = currentState.shuffledVocab[currentState.currentIndex];
+        const flashcardCategory = document.getElementById('flashcard-category');
+        if (flashcardCategory) flashcardCategory.textContent = word.category;
+        const flashcardKorean = document.getElementById('flashcard-korean');
+        if (flashcardKorean) flashcardKorean.textContent = word.korean;
+        const flashcardPronunciation = document.getElementById('flashcard-pronunciation');
+        if (flashcardPronunciation) flashcardPronunciation.textContent = word.pronunciation;
+        const flashcardVietnamese = document.getElementById('flashcard-vietnamese');
+        if (flashcardVietnamese) flashcardVietnamese.textContent = word.vietnamese;
+        const flashcardBackKorean = document.getElementById('flashcard-back-korean');
+        if (flashcardBackKorean) flashcardBackKorean.textContent = word.korean;
+        const flashcardBackPronunciation = document.getElementById('flashcard-back-pronunciation');
+        if (flashcardBackPronunciation) flashcardBackPronunciation.textContent = word.pronunciation;
+        const flashcardBackVietnamese = document.getElementById('flashcard-back-vietnamese');
+        if (flashcardBackVietnamese) flashcardBackVietnamese.textContent = word.vietnamese;
+
+        if (currentState.flashcardDisplayMode === 'word') {
+            if (flashcardKorean) flashcardKorean.classList.remove('hidden');
+            if (flashcardPronunciation) flashcardPronunciation.classList.remove('hidden');
+            if (flashcardVietnamese) flashcardVietnamese.classList.add('hidden');
+            if (flashcardBackKorean) flashcardBackKorean.classList.add('hidden');
+            if (flashcardBackPronunciation) flashcardBackPronunciation.classList.add('hidden');
+            if (flashcardBackVietnamese) flashcardBackVietnamese.classList.remove('hidden');
+            const frontHint = document.querySelector('#flashcard .flip-card-front .flip-hint');
+            if (frontHint) frontHint.textContent = 'Nhấn để xem nghĩa';
+            const backHint = document.querySelector('#flashcard .flip-card-back .flip-hint');
+            if (backHint) backHint.textContent = 'Nhấn để xem từ';
+        } else {
+            if (flashcardKorean) flashcardKorean.classList.add('hidden');
+            if (flashcardPronunciation) flashcardPronunciation.classList.add('hidden');
+            if (flashcardVietnamese) flashcardVietnamese.classList.remove('hidden');
+            if (flashcardBackKorean) flashcardBackKorean.classList.remove('hidden');
+            if (flashcardBackPronunciation) flashcardBackPronunciation.classList.remove('hidden');
+            if (flashcardBackVietnamese) flashcardBackVietnamese.classList.add('hidden');
+            const frontHint = document.querySelector('#flashcard .flip-card-front .flip-hint');
+            if (frontHint) frontHint.textContent = 'Nhấn để xem từ';
+            const backHint = document.querySelector('#flashcard .flip-card-back .flip-hint');
+            if (backHint) backHint.textContent = 'Nhấn để xem nghĩa';
+        }
+        const flashcard = document.getElementById('flashcard');
+        if (flashcard) flashcard.classList.remove('flipped');
+    }
+
+    updateStats();
+}
+
+// Export functions to global scope
+window.updateCategorySelector = updateCategorySelector;
+window.updateCategorySuggestions = updateCategorySuggestions;
+window.updateStats = updateStats;
+window.updateVocabList = updateVocabList;
+window.updateUnknownList = updateUnknownList;
+window.updateApiKeyList = updateApiKeyList;
+window.displayCurrentWord = displayCurrentWord;

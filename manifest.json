@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Học Từ Vựng Tiếng Hàn",
+  "version": "1.0",
+  "description": "A browser extension to learn Korean vocabulary with study, quiz, flashcard, and game modes.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon2.png",
+      "48": "icon2.png",
+      "128": "icon2.png"
+    }
+  },
+  "permissions": [
+    "windows",
+    "webRequest",
+    "tabs"
+  ],
+  "icons": {
+    "16": "icon2.png",
+    "48": "icon2.png",
+    "128": "icon2.png"
+  }
+}

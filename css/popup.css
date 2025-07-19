@@ -1,0 +1,198 @@
+Main popup styles and layout
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    width: 600px;
+    min-height: 500px;
+}
+
+.container {
+    padding: 15px;
+    max-width: 100%;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: space-between;
+}
+
+.developer-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.developer-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.developer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.developer-text {
+    flex: 1;
+}
+
+.developer-label {
+    font-size: 0.8em;
+    opacity: 0.8;
+    margin-bottom: 2px;
+}
+
+.developer-name {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.stats-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stats {
+    flex-shrink: 0;
+}
+
+.stat-item {
+    font-weight: bold;
+    color: #495057;
+    font-size: 14px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.category-selector {
+    margin-bottom: 15px;
+}
+
+.category-selector select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.category-selector select:focus {
+    outline: none;
+    border-color: #4ecdc4;
+}
+
+.mode-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.controls .btn {
+    flex: 1;
+    min-width: 80px;
+    font-size: 12px;
+    padding: 8px 6px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.card h2 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 450px) {
+    .mode-selector {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .controls {
+        flex-direction: column;
+    }
+    
+    .controls .btn {
+        flex: none;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* Window mode styles */
+@media (min-width: 600px) {
+    body {
+        width: 620px;
+        min-height: 640px;
+    }
+    
+    .container {
+        padding: 20px;
+    }
+    
+    .mode-selector {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .controls .btn {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+}
