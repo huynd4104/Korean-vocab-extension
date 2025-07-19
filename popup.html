@@ -14,59 +14,60 @@
 
 <body>
     <div class="container">
-        <div class="header-actions">
-            <button class="action-btn add-word-btn" id="add-word-btn">
-                <span class="btn-icon">➕</span>
-                <span>Thêm Từ</span>
-            </button>
-            <button class="action-btn window-toggle-btn" id="window-toggle-btn">
-                <span class="btn-icon">🪟</span>
-                <span>Cửa Sổ</span>
-            </button>
-        </div>
-        <div class="developer-info hidden">
-            <div class="developer-content">
-                <img class="developer-avatar" src="avatar.png" alt="Avatar">
-                <div class="developer-text">
-                    <div class="developer-label">Developed by</div>
-                    <div class="developer-name">양휘 - RinNguyen</div>
+        <div class="header-row">
+            <div class="header-actions card-panel">
+                <button class="action-btn add-word-btn" id="add-word-btn">
+                    <span class="btn-icon">➕</span>
+                    <span>Thêm Từ</span>
+                </button>
+                <button class="action-btn window-toggle-btn" id="window-toggle-btn">
+                    <span class="btn-icon">🪟</span>
+                    <span>Cửa Sổ</span>
+                </button>
+            </div>
+            <div class="developer-info card-panel hidden">
+                <div class="developer-content">
+                    <img class="developer-avatar" src="avatar.png" alt="Avatar">
+                    <div class="developer-text">
+                        <div class="developer-label">Developed by</div>
+                        <div class="developer-name">양휘 - RinNguyen</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Modal Thêm/Sửa Từ Vựng -->
-        <div class="modal hidden" id="word-modal">
-            <div class="modal-content">
-                <button id="close-modal-btn" class="btn btn-secondary"
-                    style="position: absolute; top: 10px; right: 10px;">✖</button>
+        <div class="modal word-modal hidden" id="word-modal">
+            <div class="modal-content word-modal-content">
+                <button id="close-modal-btn" class="btn btn-secondary modal-close-btn">✖</button>
                 <h2>Thêm/Sửa Từ Vựng</h2>
                 <div class="form-group">
                     <input type="text" id="korean-input" class="form-input" placeholder="Nhập từ tiếng Hàn">
                 </div>
                 <div class="form-group">
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="form-input-group">
                         <input type="text" id="pronunciation-input" class="form-input"
                             placeholder="Nhập phiên âm (romaja)" spellcheck="false">
                         <label><input type="checkbox" id="lookup-pronunciation" checked></label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="form-input-group">
                         <input type="text" id="vietnamese-input" class="form-input" placeholder="Nhập nghĩa tiếng Việt"
                             spellcheck="false">
                         <label><input type="checkbox" id="lookup-vietnamese" checked></label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
-                        <textarea id="example-input" class="form-textarea" rows="4"
+                    <div class="form-input-group">
+                        <textarea id="example-input" class="form-textarea"
                             placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false"></textarea>
                         <label><input type="checkbox" id="lookup-example" checked></label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
-                        <textarea id="note-input" class="form-textarea" rows="4" placeholder="Nhập chú ý (nếu có)"
+                    <div class="form-input-group">
+                        <textarea id="note-input" class="form-textarea" placeholder="Nhập chú ý (nếu có)"
                             spellcheck="false"></textarea>
                         <label><input type="checkbox" id="lookup-note" checked></label>
                     </div>

@@ -278,18 +278,31 @@
 .category-selector-display {
     margin-bottom: 15px;
     text-align: center;
+    background: var(--glass-bg);
+    backdrop-filter: var(--surface-blur);
+    -webkit-backdrop-filter: var(--surface-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+    min-width: 200px;
 }
 
 .category-selector-display select {
     padding: 8px 12px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
     font-size: 14px;
-    background: white;
+    background: rgba(255, 255, 255, 0.9);
     cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .category-selector-display select:focus {
     outline: none;
     border-color: #4ecdc4;
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+    transform: translateY(-1px);
 }

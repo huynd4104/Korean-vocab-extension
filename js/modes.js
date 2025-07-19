@@ -88,6 +88,8 @@ function setMode(mode) {
     }
 
     const developerInfo = document.querySelector('.developer-info');
+    const categorySelectors = document.querySelectorAll('.category-selector-display');
+    
     if (developerInfo) {
         if (mode === 'study' || mode === 'game' || mode === 'unknown' || mode === 'manage') {
             developerInfo.classList.remove('hidden');
@@ -95,6 +97,18 @@ function setMode(mode) {
             developerInfo.classList.add('hidden');
         }
     }
+
+    categorySelectors.forEach(selector => {
+        if ((mode === 'quiz' || mode === 'flashcard') && selector.closest(`#${mode}-mode`)) {
+            selector.classList.remove('hidden');
+            selector.style.position = 'absolute';
+            selector.style.top = '20px';
+            selector.style.right = '20px';
+        } else {
+            selector.removeAttribute('style');
+            selector.classList.add('hidden');
+        }
+    });
 
     window.displayCurrentWord();
     window.saveState();
