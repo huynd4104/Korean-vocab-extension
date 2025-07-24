@@ -313,47 +313,76 @@ function updateUnknownList() {
 
 // Update API key list
 function updateApiKeyList() {
-    const apiKeyList = document.getElementById('api-key-list');
-    if (!apiKeyList) return;
+    const apiKeyListDiv = document.getElementById('api-key-list');
+    if (!apiKeyListDiv) return;
 
-    apiKeyList.innerHTML = '';
+    apiKeyListDiv.innerHTML = ''; // Xóa nội dung cũ
 
-    if (window.apiKeys.length === 0) {
-        apiKeyList.innerHTML = `
+    if (window.apiKeys && window.apiKeys.length > 0) {
+        window.apiKeys.forEach((keyData, index) => {
+            const apiKeyItem = document.createElement('div');
+            apiKeyItem.classList.add('api-key-item');
+            apiKeyItem.classList.add('vocab-item');
+
+            // Định dạng ngày
+            const dateObj = keyData.dateAdded ? new Date(keyData.dateAdded) : null;
+            let formattedDate = 'N/A';
+            const statusText = keyData.lastRateLimit && (Date.now() - keyData.lastRateLimit < 60000)
+                ? '<span style="color: #ff6b6b; font-weight: 600;">Giới hạn truy cập</span>'
+                : '<span style="color: #4ecdc4; font-weight: 600;">Hoạt động</span>';
+            const requestCountText = typeof keyData.requestCount === 'number' ? `Số yêu cầu: ${keyData.requestCount}` : 'Số yêu cầu: N/A';
+
+            if (dateObj) {
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, '0');
+                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+
+                formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            }
+
+            apiKeyItem.innerHTML = `
+                <div class="vocab-info">
+                    <div class="api-key-display">
+                        <span class="key-label" style="font-weight: bold;">Key ${index + 1}:</span>
+                        <span class="api-key-value">${keyData.key.substring(0, 3)}•••••${keyData.key.substring(keyData.key.length - 5)}</span>
+                    </div>
+                    <div class="key-details" style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                        <div>Ngày thêm: ${formattedDate}</div> <div>${requestCountText}</div>
+                        <div>Trạng thái: ${statusText}</div>
+                    </div>
+                </div>
+                <div class="vocab-buttons">
+                    <button class="btn btn-secondary btn-small delete-key-btn" data-index="${index}">Xóa</button>
+                </div>
+            `;
+            apiKeyListDiv.appendChild(apiKeyItem);
+        });
+
+        // Gắn lại sự kiện cho các nút xóa
+        apiKeyListDiv.querySelectorAll('.delete-key-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const indexToDelete = event.target.dataset.index;
+                if (confirm('Bạn có chắc chắn muốn xóa API Key này không?')) {
+                    window.deleteApiKey(parseInt(indexToDelete)).catch(error => {
+                        console.error('Lỗi khi xóa API Key:', error);
+                        alert('Không thể xóa API Key. Vui lòng thử lại.');
+                    });
+                }
+            });
+        });
+
+    } else {
+        apiKeyListDiv.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">🔑</div>
                 <div class="empty-state-message">Chưa có API Key nào. Hãy thêm key mới!</div>
-                <div class="empty-state-message"><a href="https://aistudio.google.com/apikey" target="_blank" style="text-decoration: none;">Nhấn vào đây để lấy API Key</a></div>
+                <div class="empty-state-message"><a href="https://aistudio.google.com/apikey" target="_blank" style="text-decoration: none;">Nhấn vào đây hoặc tiêu đề để lấy API Key</a></div>
             </div>
         `;
-        return;
     }
-
-    window.apiKeys.forEach((keyObj, index) => {
-        const keyItem = document.createElement('div');
-        keyItem.className = 'vocab-item';
-        const displayKey = keyObj.key.length > 6 ? `${keyObj.key.slice(0, 3)}•••••${keyObj.key.slice(-5)}` : keyObj.key;
-        keyItem.innerHTML = `
-            <div class="vocab-info">
-                <div>Key: ${displayKey}</div>
-                <div>Số yêu cầu: ${keyObj.requestCount}</div>
-                <div>Trạng thái: ${keyObj.lastRateLimit === 0 ? 'Sẵn sàng' : `Đạt giới hạn lúc ${new Date(keyObj.lastRateLimit).toLocaleTimeString()}`}</div>
-            </div>
-            <div class="vocab-actions">
-                <button class="btn btn-secondary delete-api-key-btn" data-index="${index}">Xóa</button>
-            </div>
-        `;
-        apiKeyList.appendChild(keyItem);
-    });
-
-    document.querySelectorAll('.delete-api-key-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const index = parseInt(e.target.getAttribute('data-index'));
-            if (confirm('Bạn có chắc muốn xóa API Key này?')) {
-                window.deleteApiKey(index);
-            }
-        });
-    });
 }
 
 // Display current word based on mode

@@ -414,7 +414,8 @@ function saveApiKey(key) {
         const newKey = {
             key: key,
             requestCount: 0,
-            lastRateLimit: 0
+            lastRateLimit: 0,
+            dateAdded: Date.now()
         };
 
         const transaction = db.transaction(['apiKeys'], 'readwrite');
@@ -473,6 +474,24 @@ function deleteApiKey(index) {
     });
 }
 
+function saveApiKeysToDB() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['apiKeys'], 'readwrite');
+        const store = transaction.objectStore('apiKeys');
+        const request = store.put(window.apiKeys, 'geminiApiKeys'); // Lưu mảng vào khóa 'geminiApiKeys'
+
+        request.onsuccess = () => {
+            console.log('API Keys array saved successfully.');
+            resolve();
+        };
+
+        request.onerror = () => {
+            console.error('Error saving API Keys array:', request.error);
+            reject(request.error);
+        };
+    });
+}
+
 // Export functions to global scope
 window.initDB = initDB;
 window.saveState = saveState;
@@ -488,3 +507,4 @@ window.deleteAllUnknownWords = deleteAllUnknownWords;
 window.saveApiKey = saveApiKey;
 window.loadApiKey = loadApiKey;
 window.deleteApiKey = deleteApiKey;
+window.saveApiKeysToDB = saveApiKeysToDB;

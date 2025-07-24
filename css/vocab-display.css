@@ -1,0 +1,59 @@
+ .korean-word {
+    font-size: 2.5em; /* Kích thước chữ lớn, dễ nhìn */
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#quiz-vietnamese,
+#flashcard-vietnamese {
+    font-size: 2.5em; /* Kích thước chữ lớn */
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.pronunciation {
+    font-size: 1.2em;
+    color: #666; /* Màu xám nhẹ */
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.vietnamese {
+    font-size: 1.5em;
+    color: #2c3e50; /* Màu xanh đen */
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.flip-card-back .vietnamese {
+    font-size: 2em; /* Kích thước lớn hơn cho mặt sau thẻ */
+}
+
+.example {
+    font-size: 1.2em;
+    color: #2c3e50;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.flip-card-back .example {
+    font-size: 1.3em;
+}
+
+.study-example-korean {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.study-example-vietnamese {
+    font-size: 1.1em;
+    font-style: italic;
+    text-align: center;
+    color: #666;
+}

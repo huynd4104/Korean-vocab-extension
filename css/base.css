@@ -1,0 +1,124 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Màu nền gradient cuốn hút */
+    width: 600px; /* Chiều rộng cố định cho extension */
+    color: #333; /* Màu chữ chính */
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 10px;
+    padding-bottom: 10px;
+}
+
+/* Ẩn phần tử */
+.hidden {
+    display: none;
+}
+
+/* Các kiểu dáng chung cho form */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 15px; 
+    border: 1px solid #ddd;  
+    border-radius: 10px; 
+    font-size: 1em;
+    color: #333;  
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);  
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: #667eea;  
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);  
+    outline: none;
+}
+
+.form-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.form-message {
+    margin-top: 15px;
+    font-size: 1em;
+    color: #ff6b6b;  
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Checkbox */
+.form-group label input[type="checkbox"] {
+    margin-right: 5px;
+    transform: scale(1.2); /* Phóng to checkbox */
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: #333;
+}
+
+/* Scrollbar tùy chỉnh cho danh sách từ vựng */
+.vocab-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vocab-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.vocab-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.vocab-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Empty State (trạng thái rỗng) */
+.empty-state {
+    text-align: center;
+    color: #666;
+    padding: 15px;
+}
+
+.empty-state-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state-message {
+    font-size: 1.4em;
+    font-weight: 500;
+    color: #555;
+    line-height: 1.5;
+}

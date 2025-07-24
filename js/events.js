@@ -126,9 +126,9 @@ function handleSaveApiKey() {
     window.saveApiKey(key).then(() => {
         apiKeyMessage.textContent = 'Lưu API Key thành công!';
         apiKeyMessage.style.color = '#4ecdc4';
+        window.saveApiKeysToDB();
         apiKeyInput.value = '';
         window.updateApiKeyList();
-        setTimeout(closeApiKeyModal, 2000);
     }).catch(err => {
         apiKeyMessage.textContent = 'Lỗi khi lưu API Key: ' + err.message;
         apiKeyMessage.style.color = '#ff0000';

@@ -188,7 +188,7 @@ async function initFillGame() {
     while (currentKey) {
         try {
             apiKeys[currentApiKeyIndex].requestCount++;
-            resultDiv.innerHTML = '<div style="color: #4ecdc4; margin: 15px 0; text-align: center; font-size: 1.1em;"><span>🔄</span> Đang tạo câu hỏi...</div>';
+            resultDiv.innerHTML = '<div style="color: #4ecdc4; margin: 15px 0; text-align: center; font-size: 1.1em;"><span>🌀</span> Đang tạo câu hỏi...</div>';
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
                 method: 'POST',
                 headers: {

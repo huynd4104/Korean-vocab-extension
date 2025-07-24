@@ -191,7 +191,7 @@ function checkAnswer(selected, correct) {
     });
     const containerClass = isCorrect ? 'quiz-answer-container' : 'quiz-answer-container wrong';
     const statusClass = isCorrect ? 'quiz-answer-status correct' : 'quiz-answer-status wrong';
-    const statusIcon = isCorrect ? '✅' : '❌';
+    const statusIcon = isCorrect ? '🎉' : '❌';
     const statusText = isCorrect ? 'Chính xác!' : 'Chưa đúng!';
 
     if (isCorrect) {
@@ -407,7 +407,7 @@ function displayMatchingGame() {
         resultDiv.innerHTML = `
             <div class="matched-pairs-container">
                 <div class="matched-pairs-title">
-                    <span>✅</span>
+                    <span>🥳</span>
                     <span>Các cặp đã ghép đúng (${window.modeStates.game.matching.matchedPairs.length}/${window.modeStates.game.matching.shuffledVocab.length})</span>
                 </div>
                 ${matchedPairsHtml}
@@ -419,9 +419,9 @@ function displayMatchingGame() {
         resultDiv.innerHTML += `
             <div class="game-completion">
                 <div class="game-completion-text">
-                    <span>🎉</span>
+                    <span>🎊</span>
                     <span>Hoàn thành xuất sắc!</span>
-                    <span>🎉</span>
+                    <span>🎊</span>
                 </div>
                 <div style="margin-top: 10px; font-size: 1.1em; color: #2e7d32;">
                     Nhấn "Làm Lại Ghép Từ" để chơi tiếp!
@@ -470,7 +470,7 @@ function selectMatchingItem(id, type) {
             koreanItem.classList.add('correct');
             vietnameseItem.classList.add('correct');
             window.modeStates.game.matching.matchedPairs.push(window.modeStates.game.matching.selectedKorean);
-            resultDiv.innerHTML = '<span style="color: #4ecdc4;">✅ Ghép đúng!</span>';
+            resultDiv.innerHTML = '<span style="color: #4ecdc4;">🎉 Ghép đúng!</span>';
 
             if (window.modeStates.game.matching.matchedPairs.length === window.modeStates.game.matching.shuffledVocab.length) {
                 resultDiv.innerHTML = '<span style="color: #4ecdc4;">🎉 Hoàn thành! Nhấn "Làm Lại" để chơi tiếp!</span>';
@@ -579,7 +579,7 @@ function checkFillAnswer(selectedWord) {
     });
     const containerClass = isCorrect ? 'fill-answer-container' : 'fill-answer-container wrong';
     const statusClass = isCorrect ? 'fill-answer-status correct' : 'fill-answer-status wrong';
-    const statusIcon = isCorrect ? '✅' : '❌';
+    const statusIcon = isCorrect ? '🎉' : '❌';
     const statusText = isCorrect ? 'Chính xác!' : 'Chưa đúng!';
 
     resultDiv.innerHTML = `

@@ -1,222 +1,112 @@
-.btn {
-    padding: 10px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
+ .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px; /* Bo tròn nút bấm */
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 40px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: left 0.6s;
-}
-
-.btn:hover::before {
-    left: 100%;
-}
-
-.btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+    transition: all 0.3s ease; /* Hiệu ứng hover mượt mà */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e); /* Màu đỏ cam */
     color: white;
-    border: 1px solid rgba(78, 205, 196, 0.3);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #45b7aa 0%, #3d9b7e 100%);
-    box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
 }
 
 .btn-secondary {
-    background: #6c757d;
+    background: linear-gradient(45deg, #4ecdc4, #44a08d); /* Màu xanh ngọc */
     color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-}
-
-.btn-accent {
-    background: #17a2b8;
-    color: white;
-}
-
-.btn-accent:hover {
-    background: #138496;
 }
 
 .btn-info {
-    background: #007bff;
+    background: linear-gradient(135deg, #17a2b8, #117a8b); /* Màu xanh dương */
     color: white;
 }
 
-.btn-info:hover {
-    background: #0056b3;
+.btn-accent {
+    background: linear-gradient(45deg, #ffd93d, #ffb74d); /* Màu vàng cam */
+    color: #333;
 }
 
-.mode-btn {
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #495057;
-    flex: 1;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+.btn:hover {
+    transform: translateY(-2px); /* Nâng nhẹ nút khi hover */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Đổ bóng sâu hơn khi hover */
 }
 
-.mode-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(78, 205, 196, 0.5);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-}
-
-.mode-btn.active {
-    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-    border-color: #4ecdc4;
-    color: white;
-    box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
-}
-
+/* Nút trong header */
 .action-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-    color: white;
-    border: 1px solid rgba(78, 205, 196, 0.3);
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.action-btn:hover {
-    background: linear-gradient(135deg, #45b7aa 0%, #3d9b7e 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(78, 205, 196, 0.3);
-}
-
-.btn-icon {
-    font-size: 14px;
-}
-
-.tab-btn {
-    padding: 10px 18px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px 12px 0 0;
+    gap: 6px;
+    padding: 8px;
+    border: none;
+    border-radius: 15px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #495057;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
 }
 
-.tab-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
-    transform: translateY(-1px);
-}
-
-.tab-btn.active {
-    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+.add-word-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 50%, #c06060 100%);
     color: white;
-    border-color: #4ecdc4;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
+    min-width: 120px;
 }
 
-.quiz-options .btn {
-    width: 100%;
-    margin: 5px 0;
-    text-align: left;
-    justify-content: flex-start;
+.add-word-btn:hover {
+    transform: translateY(-3px) scale(1.05); /* Hiệu ứng lớn hơn khi hover */
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
 }
 
-.quiz-options .btn.correct {
-    background: #4ecdc4;
-    color: white;
+.window-toggle-btn {
+    background: linear-gradient(135deg, #ffd93d 0%, #ffb74d 50%, #d08137 100%);
+    color: #333;
+    min-width: 110px;
 }
 
-.quiz-options .btn.wrong {
-    background: #ff6b6b;
-    color: white;
+.window-toggle-btn:hover {
+    transform: translateY(-3px) scale(1.05); /* Hiệu ứng lớn hơn khi hover */
+    box-shadow: 0 8px 25px rgba(255, 183, 77, 0.4);
 }
 
-.fill-options .btn {
-    margin: 5px;
-    min-width: 80px;
+.btn-icon {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.fill-options .btn.correct {
-    background: #4ecdc4;
-    color: white;
+/* Nút đóng modal */
+#close-modal-btn {
+    font-size: 1em;
+    padding: 5px 10px;
 }
 
-.fill-options .btn.wrong {
-    background: #ff6b6b;
-    color: white;
+/* Nút chơi TTS */
+#play-tts-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    font-size: 14px;
 }
 
-.back-btn,
-.note-back-btn {
-    margin-top: 12px;
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
 }
 
-.delete-unknown-btn,
-.delete-api-key-btn {
-    padding: 6px 12px;
-    font-size: 12px;
+/* Nút đúng/sai cho game */
+.btn.correct {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%) !important;
+    color: #2e7d32 !important;
+}
+
+.btn.wrong {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%) !important;
+    color: #c62828 !important;
 }

@@ -1,0 +1,61 @@
+ .quiz-answer-container {
+    background: #f8f9fa;
+    border-radius: 12px; /* Bo góc */
+    padding: 20px;
+    margin-top: 15px;
+    border-left: 4px solid #4ecdc4; /* Viền trái màu xanh ngọc */
+}
+
+.quiz-answer-container.wrong {
+    border-left-color: #ff6b6b; /* Viền trái màu đỏ khi sai */
+    background: #fff5f5; /* Nền hồng nhạt khi sai */
+}
+
+.quiz-answer-status {
+    font-size: 1.3em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quiz-answer-status.correct {
+    color: #4ecdc4; /* Màu xanh ngọc khi đúng */
+}
+
+.quiz-answer-status.wrong {
+    color: #ff6b6b; /* Màu đỏ khi sai */
+}
+
+.quiz-correct-answer {
+    background: linear-gradient(135deg, #e8f5e8, #d4edda); /* Nền xanh lá nhạt */
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #155724; /* Màu chữ xanh đậm */
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 1.1em;
+}
+
+.quiz-result {
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.quiz-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 cột */
+    gap: 15px;
+    margin-top: 25px;
+    padding: 0 10px;
+}
+
+.quiz-options .btn {
+    padding: 10px 20px;
+    font-size: 1.4em; /* Kích thước chữ lớn hơn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,203 +1,201 @@
-/* Modal styles for word modal and API key modal */
-
+/* General Modal Overlay */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7); /* Nền overlay tối hơn để nổi bật modal */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    opacity: 0; /* Bắt đầu ẩn */
+    visibility: hidden; /* Bắt đầu ẩn */
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Hiệu ứng mờ dần */
 }
 
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Content - General Styles */
 .modal-content {
-    background: var(--glass-bg);
-    backdrop-filter: var(--surface-blur);
-    -webkit-backdrop-filter: var(--surface-blur);
-    padding: 24px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
+    background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); /* Nền trắng sáng với gradient nhẹ */
+    max-width: 90%;
+    width: 550px; /* Tăng chiều rộng một chút cho modal chính */
+    border-radius: 20px; /* Bo góc nhiều hơn, mềm mại hơn */
+    padding: 30px;
     position: relative;
-    box-shadow: var(--glass-shadow);
-    border: 1px solid var(--glass-border);
-    animation: glassAppear 0.3s ease-out;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); /* Đổ bóng sâu hơn để nổi bật */
+    transform: translateY(-20px); /* Hiệu ứng trượt nhẹ từ trên xuống */
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.modal h2 {
-    margin: 0 0 24px 0;
+.modal:not(.hidden) .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Modal Header */
+.modal-content h2 {
+    font-size: 1.8em; /* Tiêu đề lớn và rõ ràng */
     color: #333;
-    font-size: 1.5em;
-    font-weight: 600;
+    margin-bottom: 25px;
     text-align: center;
-    letter-spacing: -0.02em;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    position: relative;
+    padding-bottom: 10px; /* Khoảng cách cho đường kẻ dưới */
 }
 
-.form-group {
-    margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.5);
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--glass-border);
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 0.95em;
-    color: #444;
-    letter-spacing: -0.01em;
-}
-
-.form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    font-size: 15px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #4ecdc4;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.15);
-    transform: translateY(-1px);
-}
-
-.form-textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    font-size: 15px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    resize: vertical;
-    min-height: 100px;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    font-family: inherit;
-    line-height: 1.5;
-}
-
-.form-textarea:focus {
-    outline: none;
-    border-color: #4ecdc4;
-    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.15);
-    transform: translateY(-1px);
-}
-
-.form-controls {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 24px;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 16px;
-    border: 1px solid var(--glass-border);
-}
-
-.form-message {
-    margin: 16px 0;
-    padding: 12px 16px;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 500;
-    min-height: 24px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    font-size: 0.95em;
-    color: #444;
-}
-
-.form-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    border-radius: 4px;
-    border: 1px solid var(--glass-border);
-    background: white;
-    cursor: pointer;
-}
-
-.form-group div {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0;
-}
-
-.form-group div input[type="text"],
-.form-group div textarea {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.form-group div label {
-    margin: 0;
-    display: flex;
-    align-items: center;
-    font-size: 0.95em;
-    color: #444;
-    cursor: pointer;
-}
-
-#close-modal-btn,
-#close-api-key-modal-btn {
+.modal-content h2::after {
+    content: '';
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 36px;
-    height: 36px;
-    padding: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 60px;  
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);  
+    border-radius: 5px;
+}
+
+/* Close Button */
+.modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff6b6b; 
+    color: white;
+    border-radius: 30%;  
+}
+
+.modal-close-btn:hover {
+    background: #e63946;  
+    transform: scale(1.1);
+}
+
+/* Form Groups within Modals */
+.modal-content .form-group {
+    margin-bottom: 18px; /* Giảm khoảng cách giữa các trường form */
+}
+
+.modal-content .form-input,
+.modal-content .form-textarea {
+    width: 100%;
+    padding: 12px 15px; /* Tăng padding để trường nhập lớn hơn */
+    border: 1px solid #ddd;
+    border-radius: 10px; /* Bo góc */
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content .form-input:focus,
+.modal-content .form-textarea:focus {
+    border-color: #667eea; /* Màu viền khi focus */
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); /* Hiệu ứng focus nhẹ */
+    outline: none;
+}
+
+.modal-content .form-input::placeholder,
+.modal-content .form-textarea::placeholder {
+    color: #aaa; /* Màu placeholder */
+}
+
+/* Input Group with Checkbox */
+.form-input-group {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid var(--glass-border);
-    color: #666;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    gap: 10px; /* Khoảng cách giữa input và checkbox */
 }
 
-#close-modal-btn:hover,
-#close-api-key-modal-btn:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transform: scale(1.05);
-    color: #333;
+.form-input-group input[type="text"],
+.form-input-group textarea {
+    flex-grow: 1; /* Cho phép input/textarea mở rộng */
 }
 
-@keyframes glassAppear {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+.form-input-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #555;
+    white-space: nowrap; /* Ngăn ngắt dòng cho label */
+}
+
+.form-input-group input[type="checkbox"] {
+    margin-right: 5px;
+    transform: scale(1.2); /* Phóng to checkbox */
+    accent-color: #667eea; /* Màu của checkbox khi được chọn */
+}
+
+/* Form Controls (Buttons) */
+.modal-content .form-controls {
+    display: flex;
+    justify-content: center; /* Căn giữa các nút */
+    gap: 15px; /* Tăng khoảng cách giữa các nút */
+    margin-top: 25px; /* Tăng khoảng cách từ form đến nút */
+}
+
+/* Specific styles for API Key Modal */
+#api-key-modal .modal-content {
+    width: 450px; /* Chiều rộng nhỏ hơn cho modal API Key */
+    padding: 25px;
+}
+
+#api-key-modal .modal-content h2 {
+    font-size: 1.6em;
+    margin-bottom: 20px;
+}
+
+#api-key-list {
+    max-height: 200px; /* Giới hạn chiều cao cho danh sách API */
+    overflow-y: auto;
+    background: #f0f4f7; /* Nền xám nhẹ cho danh sách */
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #e0e6ea;
+}
+
+.api-key-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.api-key-item:last-child {
+    margin-bottom: 0;
+}
+
+.api-key-text {
+    flex-grow: 1;
+    font-family: 'Courier New', Courier, monospace; /* Font monospace cho API key */
+    font-size: 0.9em;
+    color: #555;
+    word-break: break-all; /* Ngắt dòng nếu key quá dài */
+}
+
+.api-key-item .btn {
+    padding: 6px 12px; /* Nút nhỏ hơn trong danh sách */
+    font-size: 0.85em;
+    border-radius: 15px;
+}
+
+/* Datalist suggestions (for category-input) */
+datalist#category-suggestions option {
+    font-size: 0.95em;
+    padding: 5px;
+    background-color: #f9f9f9;
+}
+
+datalist#category-suggestions option:hover {
+    background-color: #e0e0e0;
 }

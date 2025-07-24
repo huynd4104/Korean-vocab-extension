@@ -5,11 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Học Từ Vựng Tiếng Hàn</title>
-    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/vocab-display.css">
+    <link rel="stylesheet" href="css/flashcard.css">
+    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="stylesheet" href="css/vocab-list.css">
+    <link rel="stylesheet" href="css/games.css">
     <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="css/modes.css">
-    <link rel="stylesheet" href="css/popup.css">
 </head>
 
 <body>
@@ -30,7 +34,7 @@
                     <img class="developer-avatar" src="avatar.png" alt="Avatar">
                     <div class="developer-text">
                         <div class="developer-label">Developed by</div>
-                        <div class="developer-name">양휘 - RinNguyen</div>
+                        <div class="developer-name"><a href="https://github.com/huynd4104" target="_blank" style="text-decoration: none; color: inherit;">양휘 - RinNguyen</a></div>
                     </div>
                 </div>
             </div>
@@ -39,7 +43,7 @@
         <!-- Modal Thêm/Sửa Từ Vựng -->
         <div class="modal word-modal hidden" id="word-modal">
             <div class="modal-content word-modal-content">
-                <button id="close-modal-btn" class="btn btn-secondary modal-close-btn">✖</button>
+                <button id="close-modal-btn" class="btn modal-close-btn">✖</button>
                 <h2>Thêm/Sửa Từ Vựng</h2>
                 <div class="form-group">
                     <input type="text" id="korean-input" class="form-input" placeholder="Nhập từ tiếng Hàn">
@@ -61,14 +65,14 @@
                 <div class="form-group">
                     <div class="form-input-group">
                         <textarea id="example-input" class="form-textarea"
-                            placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false"></textarea>
+                            placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false" rows="3"></textarea>
                         <label><input type="checkbox" id="lookup-example" checked></label>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="form-input-group">
-                        <textarea id="note-input" class="form-textarea" placeholder="Nhập chú ý (nếu có)"
-                            spellcheck="false"></textarea>
+                        <textarea id="note-input" class="form-textarea" 
+                        placeholder="Nhập chú ý (nếu có)" spellcheck="false" rows="3"></textarea>
                         <label><input type="checkbox" id="lookup-note" checked></label>
                     </div>
                 </div>
@@ -112,10 +116,10 @@
         </div>
 
         <div id="control-buttons" class="controls">
-            <button id="shuffle-btn" class="btn btn-primary">🔀 Trộn Từ</button>
-            <button id="reset-btn" class="btn btn-secondary">🔄 Làm Lại</button>
-            <button id="prev-btn" class="btn btn-accent">⏪ Từ Trước</button>
-            <button id="next-btn" class="btn btn-accent">Từ Tiếp ⏭️</button>
+            <button id="shuffle-btn" class="btn btn-primary">♻️ Trộn Từ</button>
+            <button id="reset-btn" class="btn btn-secondary">⚜️ Làm Lại</button>
+            <button id="prev-btn" class="btn btn-accent">👈 Từ Trước</button>
+            <button id="next-btn" class="btn btn-accent">Từ Tiếp 👉</button>
         </div>
 
         <!-- Study Mode -->
@@ -197,7 +201,7 @@
                 </div>
             </div>
             <div class="controls">
-                <button id="mark-correct-btn" class="btn btn-primary">✅ Biết</button>
+                <button id="mark-correct-btn" class="btn btn-primary">✔️ Biết</button>
                 <button id="mark-wrong-btn" class="btn btn-secondary">❌ Chưa Biết</button>
                 <button id="play-tts-flashcard-btn" class="btn btn-accent">🔊 Phát âm</button>
             </div>
@@ -207,8 +211,8 @@
             <div class="game-tabs">
                 <button class="tab-btn active" id="matching-tab-btn">Ghép Từ</button>
                 <button class="tab-btn" id="fill-tab-btn">Điền Từ</button>
-                <button class="btn btn-accent" id="reset-game-btn">🔄 Làm Lại Ghép Từ</button>
-                <button class="btn btn-accent hidden" id="reset-fill-game-btn">🔄 Làm Lại Điền Từ</button>
+                <button class="btn btn-accent" id="reset-game-btn">♻️ Làm Lại Ghép Từ</button>
+                <button class="btn btn-accent hidden" id="reset-fill-game-btn">♻️ Làm Lại Điền Từ</button>
             </div>
             <div id="matching-game" class="game-content">
                 <div class="matching-container">
@@ -284,7 +288,7 @@
 
         <div id="api-key-modal" class="modal hidden">
             <div class="modal-content">
-                <h2>Quản Lý API Key Gemini</h2>
+                <h2><a href="https://aistudio.google.com/apikey" target="_blank" style="text-decoration: none; color: inherit;">Quản Lý API Key Gemini</a></h2>
                 <div class="form-group">
                     <input type="text" id="api-key-input" class="form-input" placeholder="Thêm API Key">
                 </div>
