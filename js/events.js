@@ -126,6 +126,9 @@ function handleSaveApiKey() {
     window.saveApiKey(key).then(() => {
         apiKeyMessage.textContent = 'Lưu API Key thành công!';
         apiKeyMessage.style.color = '#4ecdc4';
+        setTimeout(() => {
+        apiKeyMessage.textContent = '';
+    }, 2000);
         window.saveApiKeysToDB();
         apiKeyInput.value = '';
         window.updateApiKeyList();
