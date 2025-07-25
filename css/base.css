@@ -102,23 +102,3 @@ body {
 .vocab-list::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-
-/* Empty State (trạng thái rỗng) */
-.empty-state {
-    text-align: center;
-    color: #666;
-    padding: 15px;
-}
-
-.empty-state-icon {
-    font-size: 4em;
-    margin-bottom: 20px;
-    opacity: 0.5;
-}
-
-.empty-state-message {
-    font-size: 1.4em;
-    font-weight: 500;
-    color: #555;
-    line-height: 1.5;
-}

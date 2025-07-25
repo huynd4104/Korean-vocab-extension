@@ -160,8 +160,8 @@ async function initFillGame() {
     if (!sentenceDiv || !optionsContainer || !resultDiv) return;
 
     let gameVocab = selectedCategory === 'all' ? [...allVocab] : allVocab.filter(word => normalizeCategory(word.category) === selectedCategory);
+    window.toggleEmptyState('fill', gameVocab.length === 0);
     if (gameVocab.length === 0) {
-        sentenceDiv.innerHTML = '<div class="fill-empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-message">Chưa có từ vựng trong danh mục này!</div></div>';
         optionsContainer.innerHTML = '';
         resultDiv.innerHTML = '';
         return;
@@ -224,7 +224,7 @@ async function initFillGame() {
                             <div class="fill-korean-sentence">${sentenceMatch[1]}</div>
                             <div class="fill-vietnamese-sentence">${translationMatch[1]}</div>
                         </div>
-    `               ;
+                    `;
                     resultDiv.innerHTML = '';
                 } else {
                     sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
@@ -236,7 +236,6 @@ async function initFillGame() {
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được dữ liệu từ API!</span>';
                 return;
             }
-            // Lưu trạng thái apiKeys
             const transaction = db.transaction(['apiKeys'], 'readwrite');
             const store = transaction.objectStore('apiKeys');
             store.put(apiKeys, 'geminiApiKeys');

@@ -79,18 +79,7 @@ function updateVocabList() {
         word.vietnamese.toLowerCase().includes(window.searchQuery.toLowerCase())
     );
 
-    if (filteredVocab.length === 0) {
-        vocabList.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📚</div>
-                <div class="empty-state-message">
-                    Không có từ vựng nào trong danh mục "${window.selectedCategory === 'all' ? 'Tất cả' : window.selectedCategory}".<br />
-                    Hãy thêm từ mới hoặc kiểm tra tìm kiếm!
-                </div>
-            </div>
-        `;
-        return;
-    }
+    window.toggleEmptyState('manage', filteredVocab.length === 0);
 
     filteredVocab.forEach(word => {
         const vocabItem = document.createElement('div');
@@ -255,17 +244,9 @@ function updateUnknownList() {
             ${window.unknownWords.length > 0 ? `<span class="unknown-count">${window.unknownWords.length} từ</span>` : ''}
         </div>
     `;
-    if (window.unknownWords.length === 0) {
-        unknownList.innerHTML = headerHTML + `
-            <div class="empty-state">
-                <div class="empty-state-icon">📚</div>
-                <div class="empty-state-message">
-                    Chưa có từ nào trong danh sách chưa biết.<br />
-                    Hãy đánh dấu những từ khó trong chế độ Flashcard!
-                </div>
-            </div>
-        `;
-    } else {
+    window.toggleEmptyState('unknown', window.unknownWords.length === 0);
+
+    if (window.unknownWords.length > 0) {
         let wordsHTML = '';
         window.unknownWords.forEach(word => {
             wordsHTML += `
@@ -392,72 +373,45 @@ function displayCurrentWord() {
         return;
     }
 
-    if (window.currentMode === 'unknown' || window.currentMode === 'manage') {
+    if (window.currentMode === 'unknown') {
+        window.toggleEmptyState('unknown', window.unknownWords.length === 0);
+        updateStats();
+        return;
+    }
+
+    if (window.currentMode === 'manage') {
+        window.toggleEmptyState('manage', window.allVocab.length === 0);
         updateStats();
         return;
     }
 
     const currentState = window.modeStates[window.currentMode];
-    const noVocabMessage = window.selectedCategory === 'all' ? 'Chưa có từ vựng' : `Chưa có từ vựng trong danh mục "${window.selectedCategory}"`;
+    window.toggleEmptyState(window.currentMode, currentState.shuffledVocab.length === 0);
 
     if (currentState.shuffledVocab.length === 0) {
-        if (window.currentMode === 'study') {
-            const studyEmptyState = document.getElementById('study-empty-state');
-            if (studyEmptyState) studyEmptyState.classList.remove('hidden');
-            const studyEmptyMessage = document.getElementById('study-empty-message');
-            if (studyEmptyMessage) studyEmptyMessage.textContent = noVocabMessage;
-            ['study-category', 'study-korean', 'study-pronunciation', 'study-vietnamese', 'study-back-category', 'study-example'].forEach(id => {
-                const elem = document.getElementById(id);
-                if (elem) elem.classList.add('hidden');
-            });
-        } else if (window.currentMode === 'quiz') {
-            const quizEmptyState = document.getElementById('quiz-empty-state');
-            const quizEmptyMessage = document.getElementById('quiz-empty-message');
-            const quizKorean = document.getElementById('quiz-korean');
-            const quizVietnamese = document.getElementById('quiz-vietnamese');
-            const quizOptions = document.getElementById('quiz-options');
-            const quizResult = document.getElementById('quiz-result');
-
-            if (quizKorean) quizKorean.textContent = '';
-            if (quizVietnamese) quizVietnamese.textContent = '';
-            if (quizOptions) quizOptions.innerHTML = '';
-            if (quizResult) quizResult.innerHTML = '';
-
-            if (window.modeStates.quiz.shuffledVocab.length === 0) {
-                if (quizEmptyState) quizEmptyState.classList.remove('hidden');
-                if (quizEmptyMessage) {
-                    quizEmptyMessage.textContent = window.selectedCategory === 'all' ? 'Chưa có từ vựng' : `Chưa có từ vựng trong danh mục "${window.selectedCategory}"`;
-                }
-                ['quiz-category', 'quiz-options', 'quiz-result'].forEach(id => {
-                    const elem = document.getElementById(id);
-                    if (elem) elem.classList.add('hidden');
-                });
-            } else {
-                if (quizEmptyState) quizEmptyState.classList.add('hidden');
-                ['quiz-category', 'quiz-options', 'quiz-result'].forEach(id => {
-                    const elem = document.getElementById(id);
-                    if (elem) elem.classList.remove('hidden');
-                });
-                window.displayQuiz(window.modeStates.quiz.shuffledVocab[window.modeStates.quiz.currentIndex]);
-            }
-        } else if (window.currentMode === 'flashcard') {
-            ['flashcard-category', 'flashcard-korean', 'flashcard-pronunciation', 'flashcard-vietnamese',
-                'flashcard-back-korean', 'flashcard-back-pronunciation', 'flashcard-back-vietnamese'].forEach(id => {
-                    const elem = document.getElementById(id);
-                    if (elem) elem.textContent = id === 'flashcard-korean' ? noVocabMessage : '';
-                });
-        }
         updateStats();
+        // Đảm bảo ẩn các phần tử giao diện chính
+        if (window.currentMode === 'study') {
+            const studyCard = document.getElementById('study-card');
+            const buttonContainer = document.querySelector('#study-mode .button-container');
+            if (studyCard) studyCard.classList.add('hidden');
+            if (buttonContainer) buttonContainer.classList.add('hidden');
+        } else if (window.currentMode === 'quiz') {
+            const quizCard = document.querySelector('#quiz-mode .card');
+            const playTtsQuizBtn = document.getElementById('play-tts-quiz-btn');
+            if (quizCard) quizCard.classList.add('hidden');
+            if (playTtsQuizBtn) playTtsQuizBtn.classList.add('hidden');
+        } else if (window.currentMode === 'flashcard') {
+            const flashcard = document.getElementById('flashcard');
+            const controls = document.querySelector('#flashcard-mode .controls');
+            if (flashcard) flashcard.classList.add('hidden');
+            if (controls) controls.classList.add('hidden');
+        }
         return;
     }
 
+    // Logic hiển thị từ vựng hiện tại (giữ nguyên phần còn lại của hàm)
     if (window.currentMode === 'study') {
-        const studyEmptyState = document.getElementById('study-empty-state');
-        if (studyEmptyState) studyEmptyState.classList.add('hidden');
-        ['study-category', 'study-korean', 'study-pronunciation', 'study-vietnamese', 'study-back-category', 'study-example'].forEach(id => {
-            const elem = document.getElementById(id);
-            if (elem) elem.classList.remove('hidden');
-        });
         const word = currentState.shuffledVocab[currentState.currentIndex];
         const studyCategory = document.getElementById('study-category');
         if (studyCategory) studyCategory.textContent = word.category;
@@ -488,12 +442,6 @@ function displayCurrentWord() {
         if (studyCard) studyCard.classList.remove('flipped');
         if (studyCard) studyCard.addEventListener('click', window.flipStudyCard);
     } else if (window.currentMode === 'quiz') {
-        const quizEmptyState = document.getElementById('quiz-empty-state');
-        if (quizEmptyState) quizEmptyState.classList.add('hidden');
-        ['quiz-category', 'quiz-options', 'quiz-result'].forEach(id => {
-            const elem = document.getElementById(id);
-            if (elem) elem.classList.remove('hidden');
-        });
         if (window.modeStates.quiz.shuffledVocab.length > 0) {
             window.displayQuiz(window.modeStates.quiz.shuffledVocab[window.modeStates.quiz.currentIndex]);
         }
@@ -544,6 +492,37 @@ function displayCurrentWord() {
     updateStats();
 }
 
+function toggleEmptyState(mode, isEmpty) {
+    const emptyStateElement = document.getElementById(`${mode}-empty-state`);
+    if (emptyStateElement) {
+        emptyStateElement.classList.toggle('hidden', !isEmpty);
+    }
+
+    // Ẩn các phần tử giao diện chính khi danh sách từ vựng rỗng
+    if (mode === 'study') {
+        const studyCard = document.getElementById('study-card');
+        const buttonContainer = document.querySelector('#study-mode .button-container');
+        if (studyCard) studyCard.classList.toggle('hidden', isEmpty);
+        if (buttonContainer) buttonContainer.classList.toggle('hidden', isEmpty);
+    } else if (mode === 'quiz') {
+        const quizCard = document.querySelector('#quiz-mode .card');
+        const playTtsQuizBtn = document.getElementById('play-tts-quiz-btn');
+        if (quizCard) quizCard.classList.toggle('hidden', isEmpty);
+        if (playTtsQuizBtn) playTtsQuizBtn.classList.toggle('hidden', isEmpty);
+    } else if (mode === 'flashcard') {
+        const flashcard = document.getElementById('flashcard');
+        const controls = document.querySelector('#flashcard-mode .controls');
+        if (flashcard) flashcard.classList.toggle('hidden', isEmpty);
+        if (controls) controls.classList.toggle('hidden', isEmpty);
+    } else if (mode === 'matching') {
+        const matchingGameDiv = document.getElementById('matching-game');
+        if (matchingGameDiv) matchingGameDiv.style.display = isEmpty ? 'none' : '';
+    } else if (mode === 'fill') {
+        const fillGameDiv = document.getElementById('fill-game');
+        if (fillGameDiv) fillGameDiv.style.display = isEmpty ? 'none' : '';
+    }
+}
+
 // Export functions to global scope
 window.updateCategorySelector = updateCategorySelector;
 window.updateCategorySuggestions = updateCategorySuggestions;
@@ -552,3 +531,4 @@ window.updateVocabList = updateVocabList;
 window.updateUnknownList = updateUnknownList;
 window.updateApiKeyList = updateApiKeyList;
 window.displayCurrentWord = displayCurrentWord;
+window.toggleEmptyState = toggleEmptyState;

@@ -42,6 +42,12 @@ function setMode(mode) {
         }
     }
 
+    // Kiểm tra trạng thái rỗng và ẩn các phần tử giao diện chính nếu cần
+    if (['study', 'quiz', 'flashcard'].includes(mode)) {
+        const currentState = window.modeStates[mode];
+        window.toggleEmptyState(mode, currentState.shuffledVocab.length === 0);
+    }
+
     if (mode === 'flashcard') {
         const flashcard = document.getElementById('flashcard');
         if (flashcard) {
@@ -54,18 +60,31 @@ function setMode(mode) {
     } else if (mode === 'unknown') {
         window.loadUnknownWords();
     } else if (mode === 'game') {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        const tabButton = document.getElementById(`${window.modeStates.game.currentTab}-tab-btn`);
-        if (tabButton) {
-            tabButton.classList.add('active');
-        }
-        document.querySelectorAll('.game-content').forEach(content => content.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    const tabButton = document.getElementById(`${window.modeStates.game.currentTab}-tab-btn`);
+    if (tabButton) {
+        tabButton.classList.add('active');
+    }
+    // Ẩn tất cả game-content và empty-state trước
+    document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
+    
+    const resetGameBtn = document.getElementById('reset-game-btn');
+    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
+    let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+
+    if (gameVocab.length === 0) {
+        // Hiển thị empty-state của tab hiện tại
+        const emptyState = document.getElementById(`${window.modeStates.game.currentTab}-empty-state`);
+        if (emptyState) emptyState.classList.remove('hidden');
+        // Ẩn cả hai nút reset
+        if (resetGameBtn) resetGameBtn.classList.add('hidden');
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
+    } else {
+        // Hiển thị nội dung game của tab hiện tại
         const gameContent = document.getElementById(`${window.modeStates.game.currentTab}-game`);
         if (gameContent) {
             gameContent.classList.remove('hidden');
         }
-        const resetGameBtn = document.getElementById('reset-game-btn');
-        const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
         if (resetGameBtn && resetFillGameBtn) {
             if (window.modeStates.game.currentTab === 'matching') {
                 resetGameBtn.classList.remove('hidden');
@@ -77,15 +96,16 @@ function setMode(mode) {
                 }
             } else if (window.modeStates.game.currentTab === 'fill') {
                 resetGameBtn.classList.add('hidden');
-                resetFillGameBtn.classList.remove('hidden');
+                resetFillGameBtn.classList.add('hidden'); // Ẩn nút reset ban đầu, sẽ được hiển thị trong initFillGame nếu cần
                 if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
                     displayFillGame();
                 } else {
-                    window.initFillGame();
+                    initFillGame();
                 }
             }
         }
     }
+}
 
     const developerInfo = document.querySelector('.developer-info');
     const categorySelectors = document.querySelectorAll('.category-selector-display');
@@ -241,41 +261,54 @@ function flipStudyCard() {
 
 // Set game tab (matching or fill)
 function setGameTab(tab) {
+    console.log('Setting game tab:', tab);
     window.modeStates.game.currentTab = tab;
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     const tabButton = document.getElementById(`${tab}-tab-btn`);
-    if (tabButton) {
-        tabButton.classList.add('active');
-    }
+    if (tabButton) tabButton.classList.add('active');
 
-    document.querySelectorAll('.game-content').forEach(content => content.classList.add('hidden'));
-    const gameContent = document.getElementById(`${tab}-game`);
-    if (gameContent) {
-        gameContent.classList.remove('hidden');
-    }
+    document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
 
     const resetGameBtn = document.getElementById('reset-game-btn');
     const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
-    if (resetGameBtn && resetFillGameBtn) {
+    if (resetGameBtn) resetGameBtn.classList.add('hidden');
+    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
+
+    let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+    console.log('Game Vocab:', gameVocab);
+
+    if (gameVocab.length === 0) {
+        console.log('No vocabulary, showing empty state');
+        const emptyState = document.getElementById(`${tab}-empty-state`);
+        if (emptyState) emptyState.classList.remove('hidden');
+    } else {
+        const gameContent = document.getElementById(`${tab}-game`);
+        if (gameContent) {
+            console.log('Showing game content:', `${tab}-game`);
+            gameContent.classList.remove('hidden');
+        } else {
+            console.error(`Game content element ${tab}-game not found`);
+        }
         if (tab === 'matching') {
-            resetGameBtn.classList.remove('hidden');
-            resetFillGameBtn.classList.add('hidden');
+            if (resetGameBtn) resetGameBtn.classList.remove('hidden');
             if (window.modeStates.game.matching.shuffledVocab.length > 0) {
                 displayMatchingGame();
             } else {
                 initMatchingGame();
             }
         } else if (tab === 'fill') {
-            resetGameBtn.classList.add('hidden');
-            resetFillGameBtn.classList.remove('hidden');
             if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
+                console.log('Displaying existing fill game');
                 displayFillGame();
+                if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden'); // Hiển thị nút reset khi trạng thái hợp lệ
             } else {
-                window.initFillGame();
+                console.log('Initializing fill game');
+                initFillGame();
             }
         }
     }
 
+    window.updateStats();
     window.saveState();
 }
 
@@ -288,8 +321,12 @@ function initMatchingGame() {
     if (!koreanColumn || !vietnameseColumn || !resultDiv || !matchingContainer) return;
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+    
+    // Ẩn tất cả game content và chỉ hiển thị empty-state nếu rỗng
+    document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
+    const emptyState = document.getElementById('matching-empty-state');
     if (gameVocab.length === 0) {
-        koreanColumn.innerHTML = '<div class="matching-empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-message">Chưa có từ vựng trong danh mục này!</div></div>';
+        if (emptyState) emptyState.classList.remove('hidden');
         vietnameseColumn.innerHTML = '';
         resultDiv.innerHTML = '';
         matchingContainer.style.height = 'auto';
@@ -297,6 +334,7 @@ function initMatchingGame() {
         return;
     }
 
+    // Logic còn lại giữ nguyên
     gameVocab = gameVocab.sort(() => Math.random() - 0.5).slice(0, Math.min(4, gameVocab.length));
     window.modeStates.game.matching.shuffledVocab = gameVocab;
 
@@ -347,8 +385,8 @@ function displayMatchingGame() {
     if (!koreanColumn || !vietnameseColumn || !resultDiv || !matchingContainer) return;
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+    window.toggleEmptyState('matching', gameVocab.length === 0);
     if (gameVocab.length === 0) {
-        koreanColumn.innerHTML = '<div class="matching-empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-message">Chưa có từ vựng trong danh mục này!</div></div>';
         vietnameseColumn.innerHTML = '';
         resultDiv.innerHTML = '';
         matchingContainer.style.height = 'auto';
@@ -508,15 +546,32 @@ function displayFillGame() {
     const sentenceDiv = document.getElementById('fill-sentence');
     const optionsContainer = document.getElementById('fill-options');
     const resultDiv = document.getElementById('fill-result');
-    if (!sentenceDiv || !optionsContainer || !resultDiv) return;
+    const fillGameDiv = document.getElementById('fill-game');
+    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
+    if (!sentenceDiv || !optionsContainer || !resultDiv || !fillGameDiv) return;
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
-    if (gameVocab.length === 0) {
-        sentenceDiv.innerHTML = '<div class="fill-empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-message">Chưa có từ vựng trong danh mục này!</div></div>';
+
+    // Kiểm tra trạng thái game hợp lệ
+    const isGameStateValid = window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0;
+
+    // Ẩn tất cả game content và empty-state
+    document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
+
+    // Nếu không có từ vựng hoặc trạng thái game không hợp lệ, hiển thị empty-state
+    if (gameVocab.length === 0 || !isGameStateValid) {
+        const emptyState = document.getElementById('fill-empty-state');
+        if (emptyState) emptyState.classList.remove('hidden');
         optionsContainer.innerHTML = '';
         resultDiv.innerHTML = '';
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
+        window.updateStats();
         return;
     }
+
+    // Hiển thị nội dung game
+    fillGameDiv.classList.remove('hidden');
+    if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden');
 
     const sentenceText = window.modeStates.game.fill.currentSentence;
     const match = sentenceText.match(/^(.+) \((.+)\)$/);
@@ -525,17 +580,17 @@ function displayFillGame() {
         const koreanSentence = match[1];
         const vietnameseSentence = match[2];
         sentenceDiv.innerHTML = `
-        <div class="fill-sentence-display">
-            <div class="fill-korean-sentence">${koreanSentence}</div>
-            <div class="fill-vietnamese-sentence">${vietnameseSentence}</div>
-        </div>
-    `;
+            <div class="fill-sentence-display">
+                <div class="fill-korean-sentence">${koreanSentence}</div>
+                <div class="fill-vietnamese-sentence">${vietnameseSentence}</div>
+            </div>
+        `;
     } else {
         sentenceDiv.innerHTML = `
-        <div class="fill-sentence-display">
-            <div class="fill-korean-sentence">${sentenceText}</div>
-        </div>
-    `;
+            <div class="fill-sentence-display">
+                <div class="fill-korean-sentence">${sentenceText}</div>
+            </div>
+        `;
     }
 
     resultDiv.innerHTML = '';
