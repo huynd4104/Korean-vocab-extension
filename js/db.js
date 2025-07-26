@@ -1,8 +1,3 @@
-/**
- * Database module for managing IndexedDB operations
- * Handles vocabulary, unknown words, API keys, and state management
- */
-
 let db;
 let saveStateTimeout = null;
 
@@ -263,7 +258,6 @@ function loadVocabulary() {
         };
 
         request.onerror = () => {
-            console.error('Error loading vocabulary:', request.error);
             document.getElementById('form-message').textContent = 'Lỗi khi tải danh sách từ vựng!';
             reject(request.error);
         };

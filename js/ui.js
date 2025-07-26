@@ -366,10 +366,9 @@ function updateApiKeyList() {
     }
 }
 
-// Display current word based on mode
+// Hiển thị từ hiện tại dựa trên chế độ
 function displayCurrentWord() {
     if (!window.modeStates[window.currentMode] && window.currentMode !== 'unknown' && window.currentMode !== 'manage') {
-        console.error(`Invalid currentMode: ${window.currentMode}`);
         return;
     }
 

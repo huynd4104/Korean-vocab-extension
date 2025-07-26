@@ -100,8 +100,12 @@ function filterVocabByCategory() {
     if (window.currentMode === 'game') {
         if (window.modeStates.game.currentTab === 'matching') {
             window.initMatchingGame();
-        } else if (window.modeStates.game.currentTab === 'fill' && window.modeStates.game.fill.currentSentence) {
-            window.displayFillGame();
+        } else if (window.modeStates.game.currentTab === 'fill') {
+            if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
+                window.displayFillGame();
+            } else {
+                window.initFillGame(); // Khởi tạo lại game nếu trạng thái không hợp lệ
+            }
         }
     }
     window.saveState();
@@ -123,7 +127,6 @@ function markWrong() {
             nextWord();
             window.saveState();
         }).catch(err => {
-            console.error('Error saving unknown word:', err);
             document.getElementById('form-message').textContent = 'Lỗi khi lưu từ chưa biết!';
         });
     }

@@ -135,7 +135,6 @@ function handleSaveApiKey() {
     }).catch(err => {
         apiKeyMessage.textContent = 'Lỗi khi lưu API Key: ' + err.message;
         apiKeyMessage.style.color = '#ff0000';
-        console.error('Error saving API key:', err);
     });
 }
 
@@ -194,7 +193,6 @@ function handleSaveWord() {
     }).catch(err => {
         messageDiv.textContent = 'Lỗi khi lưu từ: ' + err.message;
         messageDiv.style.color = '#ff0000';
-        console.error('Error saving word:', err);
     });
 }
 
@@ -246,7 +244,6 @@ function handleUploadList() {
         window.saveState();
     }).catch(err => {
         messageDiv.textContent = `Lỗi khi lưu danh sách từ: ${err.message}`;
-        console.error('Error saving vocabulary list:', err);
     });
 }
 
@@ -325,7 +322,6 @@ function handleImportFile() {
             window.saveState();
         }).catch(err => {
             messageDiv.textContent = 'Lỗi khi nhập danh sách từ: ' + err.message;
-            console.error('Error importing vocabulary:', err);
         });
     };
     reader.readAsText(file);
@@ -364,7 +360,6 @@ function handleDeleteAll() {
             formMessage.style.color = '#4ecdc4';
         }).catch(err => {
             formMessage.textContent = 'Lỗi khi xóa tất cả từ!';
-            console.error('Error deleting all words:', err);
         });
     }
 }
@@ -386,7 +381,6 @@ function handleDeleteAllUnknown() {
             formMessage.style.color = '#4ecdc4';
         }).catch(err => {
             formMessage.textContent = 'Lỗi khi xóa tất cả từ chưa biết!';
-            console.error('Error deleting all unknown words:', err);
         });
     }
 }
@@ -415,9 +409,7 @@ function initializeEventListeners() {
     Object.entries(modeButtons).forEach(([mode, button]) => {
         if (button) {
             button.addEventListener('click', () => window.setMode(mode));
-        } else {
-            console.error(`Button for mode ${mode} not found`);
-        }
+        } 
     });
 
     // Word lookup and editing

@@ -6,7 +6,6 @@
 // Set current learning mode
 function setMode(mode) {
     if (!['study', 'quiz', 'flashcard', 'game', 'unknown', 'manage'].includes(mode)) {
-        console.error(`Invalid mode: ${mode}`);
         window.currentMode = 'study';
     } else {
         window.currentMode = mode;
@@ -16,10 +15,7 @@ function setMode(mode) {
     const modeButton = document.getElementById(`${mode}-mode-btn`);
     if (modeButton) {
         modeButton.classList.add('active');
-    } else {
-        console.error(`Mode button not found: ${mode}-mode-btn`);
-    }
-
+    } 
     const modes = ['study', 'quiz', 'flashcard', 'game', 'unknown', 'manage'];
     modes.forEach(m => {
         const element = document.getElementById(`${m}-mode`);
@@ -144,13 +140,6 @@ function displayQuiz(correctWord) {
     const quizResult = document.getElementById('quiz-result');
     const playTtsQuizBtn = document.getElementById('play-tts-quiz-btn');
 
-    if (!quizVietnamese) {
-        console.error('Element quiz-vietnamese not found in DOM');
-    }
-    if (!playTtsQuizBtn) {
-        console.error('Element play-tts-quiz-btn not found in DOM');
-    }
-
     if (quizCategory) quizCategory.textContent = correctWord.category;
 
     if (currentState.quizDisplayMode === 'word') {
@@ -261,7 +250,6 @@ function flipStudyCard() {
 
 // Set game tab (matching or fill)
 function setGameTab(tab) {
-    console.log('Setting game tab:', tab);
     window.modeStates.game.currentTab = tab;
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     const tabButton = document.getElementById(`${tab}-tab-btn`);
@@ -275,20 +263,15 @@ function setGameTab(tab) {
     if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
-    console.log('Game Vocab:', gameVocab);
 
     if (gameVocab.length === 0) {
-        console.log('No vocabulary, showing empty state');
         const emptyState = document.getElementById(`${tab}-empty-state`);
         if (emptyState) emptyState.classList.remove('hidden');
     } else {
         const gameContent = document.getElementById(`${tab}-game`);
         if (gameContent) {
-            console.log('Showing game content:', `${tab}-game`);
             gameContent.classList.remove('hidden');
-        } else {
-            console.error(`Game content element ${tab}-game not found`);
-        }
+        } 
         if (tab === 'matching') {
             if (resetGameBtn) resetGameBtn.classList.remove('hidden');
             if (window.modeStates.game.matching.shuffledVocab.length > 0) {
@@ -298,13 +281,11 @@ function setGameTab(tab) {
             }
         } else if (tab === 'fill') {
             if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
-                console.log('Displaying existing fill game');
                 displayFillGame();
-                if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden'); // Hiển thị nút reset khi trạng thái hợp lệ
             } else {
-                console.log('Initializing fill game');
                 initFillGame();
             }
+            if (resetFillGameBtn && gameVocab.length > 0) resetFillGameBtn.classList.remove('hidden'); // Hiển thị nút reset khi có từ vựng
         }
     }
 
@@ -322,11 +303,9 @@ function initMatchingGame() {
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
     
-    // Ẩn tất cả game content và chỉ hiển thị empty-state nếu rỗng
-    document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
-    const emptyState = document.getElementById('matching-empty-state');
+    // Kiểm tra trạng thái rỗng
+    window.toggleEmptyState('matching', gameVocab.length === 0);
     if (gameVocab.length === 0) {
-        if (emptyState) emptyState.classList.remove('hidden');
         vietnameseColumn.innerHTML = '';
         resultDiv.innerHTML = '';
         matchingContainer.style.height = 'auto';
@@ -334,45 +313,12 @@ function initMatchingGame() {
         return;
     }
 
-    // Logic còn lại giữ nguyên
+    // Khởi tạo danh sách từ vựng cho game
     gameVocab = gameVocab.sort(() => Math.random() - 0.5).slice(0, Math.min(4, gameVocab.length));
     window.modeStates.game.matching.shuffledVocab = gameVocab;
 
-    const vietnameseWords = [...gameVocab].sort(() => Math.random() - 0.5);
-
-    koreanColumn.innerHTML = '';
-    vietnameseColumn.innerHTML = '';
-    resultDiv.innerHTML = '';
-
-    gameVocab.forEach(word => {
-        const item = document.createElement('div');
-        item.className = 'matching-item';
-        item.textContent = word.korean;
-        item.dataset.id = word.id;
-        item.style.display = 'block';
-        item.addEventListener('click', () => selectMatchingItem(word.id, 'korean'));
-        koreanColumn.appendChild(item);
-    });
-
-    vietnameseWords.forEach(word => {
-        const item = document.createElement('div');
-        item.className = 'matching-item';
-        item.textContent = word.vietnamese;
-        item.dataset.id = word.id;
-        item.style.display = 'block';
-        item.addEventListener('click', () => selectMatchingItem(word.id, 'vietnamese'));
-        vietnameseColumn.appendChild(item);
-    });
-
-    const itemHeight = 52;
-    const gap = 12;
-    const totalHeight = gameVocab.length * itemHeight + (gameVocab.length - 1) * gap;
-    matchingContainer.style.height = `${totalHeight}px`;
-
-    window.modeStates.game.matching.selectedKorean = null;
-    window.modeStates.game.matching.selectedVietnamese = null;
-    window.modeStates.game.matching.matchedPairs = [];
-    window.updateStats();
+    // Gọi displayMatchingGame để hiển thị giao diện
+    displayMatchingGame();
     window.saveState();
 }
 
@@ -382,7 +328,8 @@ function displayMatchingGame() {
     const vietnameseColumn = document.getElementById('vietnamese-column');
     const resultDiv = document.getElementById('matching-result');
     const matchingContainer = document.querySelector('.matching-container');
-    if (!koreanColumn || !vietnameseColumn || !resultDiv || !matchingContainer) return;
+    const matchingGameDiv = document.getElementById('matching-game');
+    if (!koreanColumn || !vietnameseColumn || !resultDiv || !matchingContainer || !matchingGameDiv) return;
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
     window.toggleEmptyState('matching', gameVocab.length === 0);
@@ -393,6 +340,9 @@ function displayMatchingGame() {
         window.updateStats();
         return;
     }
+
+    // Xóa lớp hidden để hiển thị #matching-game
+    matchingGameDiv.classList.remove('hidden');
 
     if (window.modeStates.game.matching.shuffledVocab.length === 0 ||
         !window.modeStates.game.matching.shuffledVocab.every(word => gameVocab.some(w => w.id === word.id))) {

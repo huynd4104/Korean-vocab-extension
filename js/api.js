@@ -1,9 +1,4 @@
-/**
- * API module for Gemini API integration
- * Handles word lookup and fill game sentence generation
- */
-
-// Get available API key, avoiding rate-limited keys
+ // Get available API key, avoiding rate-limited keys
 function getAvailableApiKey() {
     if (window.apiKeys.length === 0) return null;
 
@@ -133,7 +128,6 @@ async function lookupWord(koreanWord) {
             store.put(apiKeys, 'geminiApiKeys');
             break;
         } catch (error) {
-            console.error('Error calling Gemini API:', error);
             if (error.message.includes('429')) {
                 apiKeys[currentApiKeyIndex].lastRateLimit = Date.now();
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
@@ -157,6 +151,7 @@ async function initFillGame() {
     const sentenceDiv = document.getElementById('fill-sentence');
     const optionsContainer = document.getElementById('fill-options');
     const resultDiv = document.getElementById('fill-result');
+    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');  
     if (!sentenceDiv || !optionsContainer || !resultDiv) return;
 
     let gameVocab = selectedCategory === 'all' ? [...allVocab] : allVocab.filter(word => normalizeCategory(word.category) === selectedCategory);
@@ -164,6 +159,7 @@ async function initFillGame() {
     if (gameVocab.length === 0) {
         optionsContainer.innerHTML = '';
         resultDiv.innerHTML = '';
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không có từ vựng
         return;
     }
 
@@ -180,6 +176,7 @@ async function initFillGame() {
     if (!currentKey) {
         openApiKeyModal();
         resultDiv.innerHTML = '<span style="color: #ff6b6b;">Không có API Key khả dụng! Vui lòng thêm API Key mới.</span>';
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không có API Key
         return;
     }
 
@@ -206,6 +203,7 @@ async function initFillGame() {
                 if (!currentKey) {
                     sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
                     resultDiv.innerHTML = '<span style="color: #ff6b6b;">Tất cả API Key đều đạt giới hạn yêu cầu!</span>';
+                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu API bị giới hạn
                     return;
                 }
                 continue;
@@ -226,14 +224,17 @@ async function initFillGame() {
                         </div>
                     `;
                     resultDiv.innerHTML = '';
+                    if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden'); // Hiển thị nút reset sau khi khởi tạo thành công
                 } else {
                     sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
                     resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được câu hỏi hợp lệ từ API!</span>';
+                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không tạo được câu hỏi
                     return;
                 }
             } else {
                 sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được dữ liệu từ API!</span>';
+                if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không nhận được dữ liệu
                 return;
             }
             const transaction = db.transaction(['apiKeys'], 'readwrite');
@@ -241,7 +242,6 @@ async function initFillGame() {
             store.put(apiKeys, 'geminiApiKeys');
             break;
         } catch (error) {
-            console.error('Error calling Gemini API for fill game:', error);
             if (error.message.includes('429')) {
                 apiKeys[currentApiKeyIndex].lastRateLimit = Date.now();
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
@@ -249,11 +249,13 @@ async function initFillGame() {
                 if (!currentKey) {
                     sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
                     resultDiv.innerHTML = '<span style="color: #ff6b6b;">Tất cả API Key đều đạt giới hạn yêu cầu!</span>';
+                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu API bị giới hạn
                     return;
                 }
             } else {
                 sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: ' + error.message + '</span>';
+                if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu có lỗi khác
                 return;
             }
         }
