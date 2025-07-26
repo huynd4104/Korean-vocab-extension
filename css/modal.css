@@ -5,14 +5,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Nền overlay tối hơn để nổi bật modal */
+    background: rgba(0, 0, 0, 0.7); 
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    opacity: 0; /* Bắt đầu ẩn */
-    visibility: hidden; /* Bắt đầu ẩn */
-    transition: opacity 0.3s ease, visibility 0.3s ease; /* Hiệu ứng mờ dần */
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.3s ease, visibility 0.3s ease; 
 }
 
 .modal:not(.hidden) {
@@ -22,14 +22,14 @@
 
 /* Modal Content - General Styles */
 .modal-content {
-    background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); /* Nền trắng sáng với gradient nhẹ */
+    background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); 
     max-width: 90%;
-    width: 550px; /* Tăng chiều rộng một chút cho modal chính */
-    border-radius: 20px; /* Bo góc nhiều hơn, mềm mại hơn */
+    width: 550px; 
+    border-radius: 20px; 
     padding: 30px;
     position: relative;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); /* Đổ bóng sâu hơn để nổi bật */
-    transform: translateY(-20px); /* Hiệu ứng trượt nhẹ từ trên xuống */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-20px);  
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
@@ -78,15 +78,15 @@
 
 /* Form Groups within Modals */
 .modal-content .form-group {
-    margin-bottom: 18px; /* Giảm khoảng cách giữa các trường form */
+    margin-bottom: 18px;  
 }
 
 .modal-content .form-input,
 .modal-content .form-textarea {
     width: 100%;
-    padding: 12px 15px; /* Tăng padding để trường nhập lớn hơn */
+    padding: 12px 15px; 
     border: 1px solid #ddd;
-    border-radius: 10px; /* Bo góc */
+    border-radius: 10px;  
     font-size: 1em;
     color: #333;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -94,14 +94,14 @@
 
 .modal-content .form-input:focus,
 .modal-content .form-textarea:focus {
-    border-color: #667eea; /* Màu viền khi focus */
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); /* Hiệu ứng focus nhẹ */
+    border-color: #667eea;  
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);  
     outline: none;
 }
 
 .modal-content .form-input::placeholder,
 .modal-content .form-textarea::placeholder {
-    color: #aaa; /* Màu placeholder */
+    color: #aaa;  
 }
 
 /* Input Group with Checkbox */
@@ -127,21 +127,21 @@
 
 .form-input-group input[type="checkbox"] {
     margin-right: 5px;
-    transform: scale(1.2); /* Phóng to checkbox */
-    accent-color: #667eea; /* Màu của checkbox khi được chọn */
+    transform: scale(1.2); 
+    accent-color: #667eea; 
 }
 
 /* Form Controls (Buttons) */
 .modal-content .form-controls {
     display: flex;
-    justify-content: center; /* Căn giữa các nút */
-    gap: 15px; /* Tăng khoảng cách giữa các nút */
-    margin-top: 25px; /* Tăng khoảng cách từ form đến nút */
+    justify-content: center; 
+    gap: 15px;  
+    margin-top: 25px;  
 }
 
 /* Specific styles for API Key Modal */
 #api-key-modal .modal-content {
-    width: 450px; /* Chiều rộng nhỏ hơn cho modal API Key */
+    width: 450px; 
     padding: 25px;
 }
 
@@ -151,9 +151,9 @@
 }
 
 #api-key-list {
-    max-height: 200px; /* Giới hạn chiều cao cho danh sách API */
+    max-height: 200px;  
     overflow-y: auto;
-    background: #f0f4f7; /* Nền xám nhẹ cho danh sách */
+    background: #f0f4f7;  
     border-radius: 10px;
     padding: 10px;
     border: 1px solid #e0e6ea;
@@ -177,14 +177,14 @@
 
 .api-key-text {
     flex-grow: 1;
-    font-family: 'Courier New', Courier, monospace; /* Font monospace cho API key */
+    font-family: 'Courier New', Courier, monospace; 
     font-size: 0.9em;
     color: #555;
-    word-break: break-all; /* Ngắt dòng nếu key quá dài */
+    word-break: break-all;  
 }
 
 .api-key-item .btn {
-    padding: 6px 12px; /* Nút nhỏ hơn trong danh sách */
+    padding: 6px 12px;  
     font-size: 0.85em;
     border-radius: 15px;
 }

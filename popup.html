@@ -30,13 +30,27 @@
                     <span>Cửa Sổ</span>
                 </button>
             </div>
-            <div class="developer-info card-panel hidden">
+            <div class="developer-info card-panel">
                 <div class="developer-content">
                     <img class="developer-avatar" src="avatar.png" alt="Avatar">
                     <div class="developer-text">
                         <div class="developer-label">Developed by</div>
                         <div class="developer-name"><a href="https://github.com/huynd4104" target="_blank"
-                                style="text-decoration: none; color: inherit;">양휘 - RinNguyen</a></div>
+                                style="text-decoration: none; color: inherit;">
+                                양휘 - RinNguyen</a>
+                        </div>
+                    </div>
+                    <div class="category-selector-display hidden" id="quiz-display-mode-container">
+                        <select id="quiz-display-mode">
+                            <option value="word">Từ</option>
+                            <option value="meaning">Nghĩa</option>
+                        </select>
+                    </div>
+                    <div class="category-selector-display hidden" id="flashcard-display-mode-container">
+                        <select id="flashcard-display-mode">
+                            <option value="word">Từ</option>
+                            <option value="meaning">Nghĩa</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -85,8 +99,8 @@
                 </div>
                 <div class="form-message" id="form-message"></div>
                 <div class="form-controls">
-                    <button class="btn btn-primary" id="lookup-word-btn">Tra cứu</button>
                     <button class="btn btn-secondary" id="save-word-btn">Lưu</button>
+                    <button class="btn btn-primary" id="lookup-word-btn">Tra cứu</button>
                 </div>
             </div>
         </div>
@@ -160,12 +174,6 @@
                 <div class="empty-state-icon">❓</div>
                 <div class="empty-state-message-text">Chưa có từ vựng trong mode Kiểm tra.</div>
             </div>
-            <div class="category-selector-display">
-                <select id="quiz-display-mode">
-                    <option value="word">Từ</option>
-                    <option value="meaning">Nghĩa</option>
-                </select>
-            </div>
             <div class="card">
                 <span class="category" id="quiz-category"></span>
                 <div class="korean-word" id="quiz-korean"></div>
@@ -173,16 +181,9 @@
                 <div class="quiz-options" id="quiz-options"></div>
                 <div class="quiz-result" id="quiz-result"></div>
             </div>
-            <button id="play-tts-quiz-btn" class="btn btn-primary">🔊 Phát âm</button>
         </div>
 
         <div id="flashcard-mode" class="hidden">
-            <div class="category-selector-display">
-                <select id="flashcard-display-mode">
-                    <option value="word">Từ</option>
-                    <option value="meaning">Nghĩa</option>
-                </select>
-            </div>
             <div id="flashcard-empty-state" class="empty-state hidden">
                 <div class="empty-state-icon">🎴</div>
                 <div class="empty-state-message-text">Chưa có từ vựng trong mode FlashCard.</div>
@@ -203,11 +204,11 @@
                         <div class="flip-hint">Nhấn để quay lại</div>
                     </div>
                 </div>
-            </div>
-            <div class="controls">
-                <button id="mark-correct-btn" class="btn btn-primary">✔️ Biết</button>
-                <button id="mark-wrong-btn" class="btn btn-secondary">❌ Chưa Biết</button>
-                <button id="play-tts-flashcard-btn" class="btn btn-accent">🔊 Phát âm</button>
+                <div class="controls">
+                    <button id="mark-correct-btn" class="btn btn-primary">✔️ Biết</button>
+                    <button id="mark-wrong-btn" class="btn btn-secondary">❌ Chưa Biết</button>
+                    <button id="play-tts-flashcard-btn" class="btn btn-accent">🔊 Phát âm</button>
+                </div>
             </div>
         </div>
 
@@ -317,8 +318,8 @@
                 <div id="api-key-list" class="vocab-list"></div>
                 <div id="api-key-message" class="form-message"></div>
                 <div class="form-controls">
-                    <button id="save-api-key-btn" class="btn btn-primary">Lưu</button>
-                    <button id="close-api-key-modal-btn" class="btn btn-secondary">✖</button>
+                    <button id="save-api-key-btn" class="btn btn-secondary">Lưu</button>
+                    <button id="close-api-key-modal-btn" class="btn btn-primary">✖</button>
                 </div>
             </div>
         </div>

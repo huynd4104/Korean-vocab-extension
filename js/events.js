@@ -446,13 +446,43 @@ function initializeEventListeners() {
 
     // Flashcard and study interactions
     const flashcard = document.getElementById('flashcard');
-    if (flashcard) flashcard.addEventListener('click', window.flipCard);
+    if (flashcard) flashcard.addEventListener('click', (event) => {
+        // Chỉ lật thẻ nếu click vào vùng flip-card-inner
+        if (event.target.closest('.flip-card-inner')) {
+            window.flipCard();
+        }
+    });
+
+    const markCorrectBtn = document.getElementById('mark-correct-btn');
+    if (markCorrectBtn) {
+        markCorrectBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // Ngăn sự kiện click lan truyền lên flashcard
+            window.markCorrect();
+        });
+    }
+    
+    const markWrongBtn = document.getElementById('mark-wrong-btn');
+    if (markWrongBtn) {
+        markWrongBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // Ngăn sự kiện click lan truyền lên flashcard
+            window.markWrong();
+        });
+    }
+    
+    const playTtsFlashcardBtn = document.getElementById('play-tts-flashcard-btn');
+    if (playTtsFlashcardBtn) {
+        playTtsFlashcardBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // Ngăn sự kiện click lan truyền lên flashcard
+            const currentState = window.modeStates.flashcard;
+            if (currentState?.shuffledVocab.length > 0) {
+                const word = currentState.shuffledVocab[currentState.currentIndex];
+                window.playTTS(word.korean);
+            }
+        });
+    }
+
     const windowToggleBtn = document.getElementById('window-toggle-btn');
     if (windowToggleBtn) windowToggleBtn.addEventListener('click', window.toggleWindowMode);
-    const markCorrectBtn = document.getElementById('mark-correct-btn');
-    if (markCorrectBtn) markCorrectBtn.addEventListener('click', window.markCorrect);
-    const markWrongBtn = document.getElementById('mark-wrong-btn');
-    if (markWrongBtn) markWrongBtn.addEventListener('click', window.markWrong);
 
     // Management functions
     const deleteAllBtn = document.getElementById('delete-all-btn');
@@ -517,16 +547,6 @@ function initializeEventListeners() {
     if (playTtsQuizBtn) {
         playTtsQuizBtn.addEventListener('click', () => {
             const currentState = window.modeStates.quiz;
-            if (currentState?.shuffledVocab.length > 0) {
-                const word = currentState.shuffledVocab[currentState.currentIndex];
-                window.playTTS(word.korean);
-            }
-        });
-    }
-    const playTtsFlashcardBtn = document.getElementById('play-tts-flashcard-btn');
-    if (playTtsFlashcardBtn) {
-        playTtsFlashcardBtn.addEventListener('click', () => {
-            const currentState = window.modeStates.flashcard;
             if (currentState?.shuffledVocab.length > 0) {
                 const word = currentState.shuffledVocab[currentState.currentIndex];
                 window.playTTS(word.korean);

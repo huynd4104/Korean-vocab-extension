@@ -5,13 +5,13 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    border: 1px dashed #ccc; /* Thêm khung viền đầy đủ */
+    border: 1px dashed #ccc; 
     border-radius: 8px;
     background-color: #f9f9f9;
     color: #666;
     text-align: center;
-    margin-top: 20px; /* Thêm khoảng cách với các phần tử khác */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Thêm đổ bóng nhẹ */
+    margin-top: 20px;  
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
 }
 
 .empty-state-icon {
@@ -26,16 +26,15 @@
 
 /* Specific adjustments for cards if needed */
 .card .empty-state {
-    border: none; /* Bỏ border dash nếu nó đã nằm trong card có border */
-    background-color: transparent; /* Bỏ background nếu card đã có */
-    box-shadow: none; /* Bỏ shadow nếu card đã có */
-    padding: 10px 0; /* Điều chỉnh padding cho phù hợp với card */
+    border: none; 
+    background-color: transparent;  
+    box-shadow: none; 
+    padding: 10px 0;
 }
 
 /* Ensuring empty state within specific modes are styled correctly if they have a 'card' class */
 #quiz-mode .card .empty-state,
 #flashcard-mode .card .empty-state {
-    /* Example: If the card itself is the container for empty message, adjust styling */
     border: 1px dashed #ccc;
     background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -43,7 +42,7 @@
 
 /* Adjustments for unknown mode specific message layout */
 #unknown-mode .empty-state {
-    margin-bottom: 20px; /* Space between message and list */
+    margin-bottom: 20px; 
 }
 
 /* Hide utility class */

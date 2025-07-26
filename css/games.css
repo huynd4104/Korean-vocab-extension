@@ -35,29 +35,29 @@
 .matching-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border-color: #667eea; /* Màu viền khi hover */
+    border-color: #667eea;  
 }
 
 .matching-item.selected {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* Nền xanh lam nhạt khi chọn */
-    border-color: #2196f3; /* Viền xanh lam đậm */
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);  
+    border-color: #2196f3; 
     color: #1565c0;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
 }
 
 .matching-item.correct {
-    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); /* Nền xanh lá nhạt khi đúng */
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);  
     border-color: #4caf50;
     color: #2e7d32;
-    animation: correctPulse 0.6s ease-in-out; /* Hiệu ứng phồng lên khi đúng */
+    animation: correctPulse 0.6s ease-in-out; / 
 }
 
 .matching-item.wrong {
-    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); /* Nền đỏ nhạt khi sai */
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);  
     border-color: #f44336;
     color: #c62828;
-    animation: wrongShake 0.6s ease-in-out; /* Hiệu ứng rung khi sai */
+    animation: wrongShake 0.6s ease-in-out;  
 }
 
 @keyframes correctPulse {
@@ -90,7 +90,7 @@
     border-radius: 12px;
     padding: 20px;
     margin-top: 20px;
-    border-left: 4px solid #4caf50; /* Viền xanh lá cây */
+    border-left: 4px solid #4caf50;  
 }
 
 .matched-pairs-title {
@@ -159,18 +159,42 @@
 
 .fill-options {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 cột */
+    grid-template-columns: repeat(2, 1fr); 
     gap: 15px;
     margin-top: 25px;
     padding: 0 10px;
 }
 
 .fill-options .btn {
-    padding: 10px 20px;
+    padding: 15px 20px;
     font-size: 1.4em;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 16px;
+    color: #2c3e50;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.fill-options .btn.correct {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+    border-color: #4ecdc4;
+    box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+}
+
+.fill-options .btn.wrong {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border-color: #ff6b6b;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
 }
 
 .fill-answer-container {
@@ -237,7 +261,7 @@
 }
 
 .underlined-word {
-    background: linear-gradient(135deg, #fff3cd, #ffeaa7); /* Nền vàng nhẹ */
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);  
     color: #856404;
     padding: 2px 6px;
     border-radius: 4px;

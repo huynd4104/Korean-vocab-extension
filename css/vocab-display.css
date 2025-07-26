@@ -1,8 +1,13 @@
- .korean-word {
-    font-size: 2.5em; /* Kích thước chữ lớn, dễ nhìn */
-    color: #333;
-    margin-bottom: 10px;
-    font-weight: bold;
+.korean-word {
+    font-size: 36px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 16px 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 #quiz-vietnamese,
@@ -14,29 +19,31 @@
 }
 
 .pronunciation {
-    font-size: 1.2em;
-    color: #666; /* Màu xám nhẹ */
-    margin-bottom: 10px;
+    font-size: 18px;
+    color: #7f8c8d;
     font-style: italic;
+    margin: 8px 0;
+    font-weight: 500;
 }
 
 .vietnamese {
-    font-size: 1.5em;
-    color: #2c3e50; /* Màu xanh đen */
+    font-size: 20px;
+    color: #e74c3c;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin: 12px 0;
+    line-height: 1.4;
 }
 
 .flip-card-back .vietnamese {
-    font-size: 2em; /* Kích thước lớn hơn cho mặt sau thẻ */
+    font-size: 2em;  
 }
 
 .example {
-    font-size: 1.2em;
-    color: #2c3e50;
-    font-weight: 500;
-    line-height: 1.5;
-    margin-bottom: 15px;
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 16px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
 }
 
 .flip-card-back .example {
@@ -44,16 +51,14 @@
 }
 
 .study-example-korean {
-    font-size: 1.5em;
-    font-weight: bold;
-    text-align: center;
+    font-size: 18px;
+    color: #2c3e50;
     margin-bottom: 8px;
-    color: #333;
+    font-weight: 600;
 }
 
 .study-example-vietnamese {
-    font-size: 1.1em;
+    font-size: 16px;
+    color: #7f8c8d;
     font-style: italic;
-    text-align: center;
-    color: #666;
 }

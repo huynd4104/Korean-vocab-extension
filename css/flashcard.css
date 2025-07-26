@@ -5,12 +5,19 @@
     perspective: 1000px; /* Tạo hiệu ứng 3D cho lật thẻ */
 }
 
+#flashcard .controls { 
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: -10px;
+}
+
 .flip-card-inner {
     position: relative;
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.8s; /* Thời gian lật thẻ */
+    transition: transform 0.8s;  
     transform-style: preserve-3d;
     cursor: pointer;
 }
@@ -24,8 +31,8 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    backface-visibility: hidden; /* Ẩn mặt sau khi không lật */
-    border-radius: 15px; /* Bo góc thẻ */
+    backface-visibility: hidden;  
+    border-radius: 15px; 
     background: white;
     display: flex;
     flex-direction: column;
@@ -44,14 +51,16 @@
     font-size: 1.1em;
 }
 
-.flashcard-display-mode,
-.quiz-display-mode {
+#flashcard-display-mode,
+#quiz-display-mode {
     background: rgba(255, 255, 255, 0.95);
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 6px 12px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     cursor: pointer;
     outline: none;
+    color: #333;
+    width: 100%;
 }

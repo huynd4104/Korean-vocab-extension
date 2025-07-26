@@ -36,6 +36,9 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    height: 40px;  
+    width: 170px;  
+    justify-content: space-between;
 }
 
 .developer-avatar {
@@ -112,13 +115,13 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 24px;
-    padding: 32px;
+    padding: 22px;
+    margin-bottom: 10px;
     text-align: center;
     box-shadow: 
         0 20px 60px rgba(0, 0, 0, 0.12),
         0 8px 32px rgba(0, 0, 0, 0.08),
         inset 0 2px 4px rgba(255, 255, 255, 0.9);
-    margin-bottom: 20px;
     min-height: 280px;
     display: flex;
     flex-direction: column;
@@ -210,8 +213,7 @@
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 9px;
-    margin-top: 0px;
+    margin: 10px 0;
     flex-wrap: wrap;
 }
 
@@ -271,16 +273,6 @@
     color: white;
 }
 
-.category-selector-display {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 8px 8px;
-    border-radius: 20px;
-}
-
-
 /* Bộ chọn chế độ (Flashcard/Quiz) */
 .mode-selector {
     display: flex;
@@ -317,20 +309,11 @@
     color: #667eea; /* Màu nổi bật khi active */
 }
 
-#flashcard-display-mode,
-#quiz-display-mode {
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    border-radius: 12px;
-    padding: 6px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    outline: none;
-}
-
 /* Enhanced Category Selector */
 .category-selector .form-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(15px);
     border: 2px solid rgba(255, 255, 255, 0.3);

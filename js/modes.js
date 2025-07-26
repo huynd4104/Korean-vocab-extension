@@ -15,7 +15,7 @@ function setMode(mode) {
     const modeButton = document.getElementById(`${mode}-mode-btn`);
     if (modeButton) {
         modeButton.classList.add('active');
-    } 
+    }
     const modes = ['study', 'quiz', 'flashcard', 'game', 'unknown', 'manage'];
     modes.forEach(m => {
         const element = document.getElementById(`${m}-mode`);
@@ -56,75 +56,80 @@ function setMode(mode) {
     } else if (mode === 'unknown') {
         window.loadUnknownWords();
     } else if (mode === 'game') {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    const tabButton = document.getElementById(`${window.modeStates.game.currentTab}-tab-btn`);
-    if (tabButton) {
-        tabButton.classList.add('active');
-    }
-    // Ẩn tất cả game-content và empty-state trước
-    document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
-    
-    const resetGameBtn = document.getElementById('reset-game-btn');
-    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
-    let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
-
-    if (gameVocab.length === 0) {
-        // Hiển thị empty-state của tab hiện tại
-        const emptyState = document.getElementById(`${window.modeStates.game.currentTab}-empty-state`);
-        if (emptyState) emptyState.classList.remove('hidden');
-        // Ẩn cả hai nút reset
-        if (resetGameBtn) resetGameBtn.classList.add('hidden');
-        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
-    } else {
-        // Hiển thị nội dung game của tab hiện tại
-        const gameContent = document.getElementById(`${window.modeStates.game.currentTab}-game`);
-        if (gameContent) {
-            gameContent.classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const tabButton = document.getElementById(`${window.modeStates.game.currentTab}-tab-btn`);
+        if (tabButton) {
+            tabButton.classList.add('active');
         }
-        if (resetGameBtn && resetFillGameBtn) {
-            if (window.modeStates.game.currentTab === 'matching') {
-                resetGameBtn.classList.remove('hidden');
-                resetFillGameBtn.classList.add('hidden');
-                if (window.modeStates.game.matching.shuffledVocab.length > 0) {
-                    displayMatchingGame();
-                } else {
-                    initMatchingGame();
-                }
-            } else if (window.modeStates.game.currentTab === 'fill') {
-                resetGameBtn.classList.add('hidden');
-                resetFillGameBtn.classList.add('hidden'); // Ẩn nút reset ban đầu, sẽ được hiển thị trong initFillGame nếu cần
-                if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
-                    displayFillGame();
-                } else {
-                    initFillGame();
+        // Ẩn tất cả game-content và empty-state trước
+        document.querySelectorAll('.game-content, .empty-state').forEach(content => content.classList.add('hidden'));
+
+        const resetGameBtn = document.getElementById('reset-game-btn');
+        const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
+        let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
+
+        if (gameVocab.length === 0) {
+            // Hiển thị empty-state của tab hiện tại
+            const emptyState = document.getElementById(`${window.modeStates.game.currentTab}-empty-state`);
+            if (emptyState) emptyState.classList.remove('hidden');
+            // Ẩn cả hai nút reset
+            if (resetGameBtn) resetGameBtn.classList.add('hidden');
+            if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
+        } else {
+            // Hiển thị nội dung game của tab hiện tại
+            const gameContent = document.getElementById(`${window.modeStates.game.currentTab}-game`);
+            if (gameContent) {
+                gameContent.classList.remove('hidden');
+            }
+            if (resetGameBtn && resetFillGameBtn) {
+                if (window.modeStates.game.currentTab === 'matching') {
+                    resetGameBtn.classList.remove('hidden');
+                    resetFillGameBtn.classList.add('hidden');
+                    if (window.modeStates.game.matching.shuffledVocab.length > 0) {
+                        displayMatchingGame();
+                    } else {
+                        initMatchingGame();
+                    }
+                } else if (window.modeStates.game.currentTab === 'fill') {
+                    resetGameBtn.classList.add('hidden');
+                    resetFillGameBtn.classList.add('hidden'); // Ẩn nút reset ban đầu, sẽ được hiển thị trong initFillGame nếu cần
+                    if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
+                        displayFillGame();
+                    } else {
+                        initFillGame();
+                    }
                 }
             }
         }
     }
-}
 
-    const developerInfo = document.querySelector('.developer-info');
-    const categorySelectors = document.querySelectorAll('.category-selector-display');
-    
-    if (developerInfo) {
-        if (mode === 'study' || mode === 'game' || mode === 'unknown' || mode === 'manage') {
-            developerInfo.classList.remove('hidden');
+    const developerText = document.querySelector('.developer-info .developer-text');
+    const quizDisplayModeContainer = document.getElementById('quiz-display-mode-container');
+    const flashcardDisplayModeContainer = document.getElementById('flashcard-display-mode-container');
+
+    if (developerText) {
+        if (mode === 'quiz' || mode === 'flashcard') {
+            developerText.classList.add('hidden');
         } else {
-            developerInfo.classList.add('hidden');
+            developerText.classList.remove('hidden');
         }
     }
 
-    categorySelectors.forEach(selector => {
-        if ((mode === 'quiz' || mode === 'flashcard') && selector.closest(`#${mode}-mode`)) {
-            selector.classList.remove('hidden');
-            selector.style.position = 'absolute';
-            selector.style.top = '20px';
-            selector.style.right = '20px';
+    if (quizDisplayModeContainer) {
+        if (mode === 'quiz') {
+            quizDisplayModeContainer.classList.remove('hidden');
         } else {
-            selector.removeAttribute('style');
-            selector.classList.add('hidden');
+            quizDisplayModeContainer.classList.add('hidden');
         }
-    });
+    }
+
+    if (flashcardDisplayModeContainer) {
+        if (mode === 'flashcard') {
+            flashcardDisplayModeContainer.classList.remove('hidden');
+        } else {
+            flashcardDisplayModeContainer.classList.add('hidden');
+        }
+    }
 
     window.displayCurrentWord();
     window.saveState();
@@ -271,7 +276,7 @@ function setGameTab(tab) {
         const gameContent = document.getElementById(`${tab}-game`);
         if (gameContent) {
             gameContent.classList.remove('hidden');
-        } 
+        }
         if (tab === 'matching') {
             if (resetGameBtn) resetGameBtn.classList.remove('hidden');
             if (window.modeStates.game.matching.shuffledVocab.length > 0) {
@@ -302,7 +307,7 @@ function initMatchingGame() {
     if (!koreanColumn || !vietnameseColumn || !resultDiv || !matchingContainer) return;
 
     let gameVocab = window.selectedCategory === 'all' ? [...window.allVocab] : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
-    
+
     // Kiểm tra trạng thái rỗng
     window.toggleEmptyState('matching', gameVocab.length === 0);
     if (gameVocab.length === 0) {

@@ -238,6 +238,9 @@ function updateUnknownList() {
     const unknownList = document.getElementById('unknown-list');
     if (!unknownList) return;
 
+    // Đặt lại nội dung của unknown-list
+    unknownList.innerHTML = '';
+
     const headerHTML = `
         <div class="unknown-header">
             <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
@@ -246,8 +249,8 @@ function updateUnknownList() {
     `;
     window.toggleEmptyState('unknown', window.unknownWords.length === 0);
 
+    let wordsHTML = '';
     if (window.unknownWords.length > 0) {
-        let wordsHTML = '';
         window.unknownWords.forEach(word => {
             wordsHTML += `
                 <div class="vocab-item unknown-item">
@@ -262,8 +265,10 @@ function updateUnknownList() {
                 </div>
             `;
         });
-        unknownList.innerHTML = headerHTML + wordsHTML;
     }
+
+    // Cập nhật nội dung của unknown-list
+    unknownList.innerHTML = headerHTML + wordsHTML;
 
     const clearButton = document.getElementById('clear-unknown-btn');
     if (clearButton) {
