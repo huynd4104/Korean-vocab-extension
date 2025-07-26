@@ -41,12 +41,12 @@
 
 /* Modal Header */
 .modal-content h2 {
-    font-size: 1.8em; /* Tiêu đề lớn và rõ ràng */
-    color: #333;
+    font-size: 1.8em;  
+    color: #2c3e50;
     margin-bottom: 25px;
     text-align: center;
     position: relative;
-    padding-bottom: 10px; /* Khoảng cách cho đường kẻ dưới */
+    padding-bottom: 10px;  
 }
 
 .modal-content h2::after {

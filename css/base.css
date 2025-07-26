@@ -5,11 +5,14 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Màu nền gradient cuốn hút */
-    width: 600px; /* Chiều rộng cố định cho extension */
-    color: #333; /* Màu chữ chính */
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-attachment: fixed;
+    width: 600px;
+    color: #2c3e50;
     line-height: 1.6;
+    position: relative;
+    overflow-x: hidden;
 }
 
 .container {
@@ -69,19 +72,6 @@ body {
     color: #ff6b6b;  
     text-align: center;
     font-weight: 500;
-}
-
-/* Checkbox */
-.form-group label input[type="checkbox"] {
-    margin-right: 5px;
-    transform: scale(1.2); /* Phóng to checkbox */
-}
-
-.form-group label {
-    display: flex;
-    align-items: center;
-    font-size: 1em;
-    color: #333;
 }
 
 /* Scrollbar tùy chỉnh cho danh sách từ vựng */

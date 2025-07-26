@@ -5,33 +5,77 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: all 0.3s ease; /* Hiệu ứng hover mượt mà */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+    letter-spacing: 0.5px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
 }
 
 .btn-primary {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e); /* Màu đỏ cam */
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 50%, #ffa8a8 100%);
     color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 12px 40px rgba(255, 107, 107, 0.3),
+        0 4px 16px rgba(255, 107, 107, 0.2);
 }
 
 .btn-secondary {
-    background: linear-gradient(45deg, #4ecdc4, #44a08d); /* Màu xanh ngọc */
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 50%, #3d8b82 100%);
     color: white;
 }
 
-.btn-info {
-    background: linear-gradient(135deg, #17a2b8, #117a8b); /* Màu xanh dương */
-    color: white;
+.btn-secondary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 12px 40px rgba(78, 205, 196, 0.3),
+        0 4px 16px rgba(78, 205, 196, 0.2);
 }
 
 .btn-accent {
-    background: linear-gradient(45deg, #ffd93d, #ffb74d); /* Màu vàng cam */
-    color: #333;
+    background: linear-gradient(135deg, #ffd93d 0%, #ffb74d 50%, #ff9800 100%);
+    color: #2c3e50;
 }
 
-.btn:hover {
-    transform: translateY(-2px); /* Nâng nhẹ nút khi hover */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Đổ bóng sâu hơn khi hover */
+.btn-accent:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 12px 40px rgba(255, 217, 61, 0.3),
+        0 4px 16px rgba(255, 217, 61, 0.2);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 50%, #0f6674 100%);
+    color: white;
+}
+
+.btn-info:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 12px 40px rgba(23, 162, 184, 0.3),
+        0 4px 16px rgba(23, 162, 184, 0.2);
 }
 
 /* Nút trong header */

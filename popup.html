@@ -91,21 +91,22 @@
             </div>
         </div>
 
-        <div class="stats-progress-row">
-            <div class="stats">
-                <div class="stat-item">
-                    <span id="current-count">0</span> / <span id="total-count">0</span>
+        <div class="stats-category-row">
+            <div class="stats-progress-row">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span id="current-count">0</span> / <span id="total-count">0</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
                 </div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            <div class="category-selector">
+                <select id="category-select" class="form-input">
+                    <option value="all">Tất cả</option>
+                </select>
             </div>
-        </div>
-
-        <div class="category-selector">
-            <select id="category-select" class="form-input">
-                <option value="all">Tất cả</option>
-            </select>
         </div>
 
         <div class="mode-selector">
@@ -228,7 +229,7 @@
                 </div>
                 <div id="matching-result" class="game-result"></div>
             </div>
-            
+
             <div id="fill-empty-state" class="empty-state hidden">
                 <div class="empty-state-icon">✍️</div>
                 <div class="empty-state-message-text">Chưa có từ vựng trong danh mục này!</div>

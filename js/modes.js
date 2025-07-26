@@ -458,11 +458,6 @@ function selectMatchingItem(id, type) {
             koreanItem.classList.add('correct');
             vietnameseItem.classList.add('correct');
             window.modeStates.game.matching.matchedPairs.push(window.modeStates.game.matching.selectedKorean);
-            resultDiv.innerHTML = '<span style="color: #4ecdc4;">🎉 Ghép đúng!</span>';
-
-            if (window.modeStates.game.matching.matchedPairs.length === window.modeStates.game.matching.shuffledVocab.length) {
-                resultDiv.innerHTML = '<span style="color: #4ecdc4;">🎉 Hoàn thành! Nhấn "Làm Lại" để chơi tiếp!</span>';
-            }
 
             setTimeout(() => {
                 if (koreanItem) koreanItem.style.display = 'none';
@@ -475,7 +470,6 @@ function selectMatchingItem(id, type) {
         } else {
             koreanItem.classList.add('wrong');
             vietnameseItem.classList.add('wrong');
-            resultDiv.innerHTML = '<span style="color: #ff6b6b;">❌ Ghép sai! Thử lại!</span>';
             setTimeout(() => {
                 if (koreanItem) koreanItem.classList.remove('wrong', 'selected');
                 if (vietnameseItem) vietnameseItem.classList.remove('wrong', 'selected');
