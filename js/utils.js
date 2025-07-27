@@ -138,7 +138,7 @@ async function toggleWindowMode() {
     chrome.windows.create({
         url: chrome.runtime.getURL('popup.html'),
         type: 'popup',
-        width: 640,
+        width: 615,
         height: 640,
         left: 100,
         top: 100
