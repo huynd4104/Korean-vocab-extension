@@ -78,7 +78,7 @@
 
 /* Form Groups within Modals */
 .modal-content .form-group {
-    margin-bottom: 18px;  
+    margin-bottom: 15px;  
 }
 
 .modal-content .form-input,
@@ -107,22 +107,20 @@
 /* Input Group with Checkbox */
 .form-input-group {
     display: flex;
+    align-items: center;  
+    gap: 10px; 
+}
+
+.form-input-group label {
+    margin: 0;  
+    display: flex;
     align-items: center;
-    gap: 10px; /* Khoảng cách giữa input và checkbox */
+    height: 100%; 
 }
 
 .form-input-group input[type="text"],
 .form-input-group textarea {
     flex-grow: 1; /* Cho phép input/textarea mở rộng */
-}
-
-.form-input-group label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.9em;
-    color: #555;
-    white-space: nowrap; /* Ngăn ngắt dòng cho label */
 }
 
 .form-input-group input[type="checkbox"] {

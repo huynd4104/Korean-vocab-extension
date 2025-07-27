@@ -131,7 +131,22 @@
     border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.card::before {
+.game-content {
+    background: transparent;
+    border-radius: 24px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.12),
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        inset 0 2px 4px rgba(255, 255, 255, 0.9);
+    position: relative;
+    overflow: hidden;
+    min-height: auto;
+    height: auto;
+}
+
+.card::before, .game-content::before {
     content: '';
     position: absolute;
     top: 0;
@@ -319,6 +334,7 @@
     border: 2px solid rgba(255, 255, 255, 0.3);
     color: white;
     max-width: 400px;
+    cursor: pointer;
 }
 
 select.form-input option {
@@ -373,12 +389,4 @@ select.form-input option {
 .tab-btn.active {
     background: white;
     color: #667eea;
-}
-
-.game-content {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    min-height: 170px;
 }
