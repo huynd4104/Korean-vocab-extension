@@ -122,8 +122,8 @@ function handleSaveApiKey() {
         apiKeyMessage.textContent = 'Lưu API Key thành công!';
         apiKeyMessage.style.color = '#4ecdc4';
         setTimeout(() => {
-        apiKeyMessage.textContent = '';
-    }, 2000);
+            apiKeyMessage.textContent = '';
+        }, 2000);
         window.saveApiKeysToDB();
         apiKeyInput.value = '';
         window.updateApiKeyList();
@@ -131,6 +131,85 @@ function handleSaveApiKey() {
         apiKeyMessage.textContent = 'Lỗi khi lưu API Key: ' + err.message;
         apiKeyMessage.style.color = '#ff0000';
     });
+}
+
+// Category modal functions
+function openCategoryModal() {
+    const categoryModal = document.getElementById('category-modal');
+    const categoryInput = document.getElementById('category-name-input');
+    const categoryMessage = document.getElementById('category-message');
+    if (categoryModal && categoryInput && categoryMessage) {
+        categoryInput.value = '';
+        categoryMessage.textContent = '';
+        categoryModal.classList.remove('hidden');
+        window.updateCategoryList();
+    }
+}
+
+function closeCategoryModal() {
+    const categoryModal = document.getElementById('category-modal');
+    const categoryInput = document.getElementById('category-name-input');
+    const categoryMessage = document.getElementById('category-message');
+    if (categoryModal && categoryInput && categoryMessage) {
+        categoryInput.value = '';
+        categoryMessage.textContent = '';
+        categoryModal.classList.add('hidden');
+    }
+}
+
+function handleSaveCategory() {
+    const categoryInput = document.getElementById('category-name-input');
+    const categoryMessage = document.getElementById('category-message');
+    if (!categoryInput || !categoryMessage) return;
+
+    const name = categoryInput.value.trim();
+    if (!name) {
+        categoryMessage.textContent = 'Vui lòng nhập tên danh mục!';
+        categoryMessage.style.color = '#ff0000';
+        return;
+    }
+
+    const normalizedName = window.normalizeCategory(name);
+    if (window.editingCategoryId === null && window.allCategories.some(cat => cat.name === normalizedName)) {
+        categoryMessage.textContent = 'Danh mục đã tồn tại!';
+        categoryMessage.style.color = '#ff0000';
+        return;
+    }
+
+    const category = { name };
+    if (window.editingCategoryId !== null) {
+        category.id = window.editingCategoryId;
+    }
+
+    window.saveCategory(category).then(() => {
+        categoryMessage.textContent = window.editingCategoryId !== null ? 'Cập nhật danh mục thành công!' : 'Thêm danh mục thành công!';
+        categoryMessage.style.color = '#4ecdc4';
+        setTimeout(() => {
+            categoryMessage.textContent = '';
+            categoryInput.value = '';
+            window.editingCategoryId = null;
+            const saveCategoryBtn = document.getElementById('save-category-btn');
+            if (saveCategoryBtn) saveCategoryBtn.textContent = 'Thêm Danh Mục';
+        }, 2000);
+        window.updateCategoryList();
+    }).catch(err => {
+        categoryMessage.textContent = 'Lỗi khi lưu danh mục: ' + err.message;
+        categoryMessage.style.color = '#ff0000';
+    });
+}
+
+function editCategory(category) {
+    const categoryInput = document.getElementById('category-name-input');
+    const categoryMessage = document.getElementById('category-message');
+    const saveCategoryBtn = document.getElementById('save-category-btn');
+    if (!categoryInput || !categoryMessage || !saveCategoryBtn) return;
+
+    categoryInput.value = category.name;
+    saveCategoryBtn.textContent = 'Cập Nhật';
+    window.editingCategoryId = category.id;
+    categoryMessage.textContent = '';
+    const categoryModal = document.getElementById('category-modal');
+    if (categoryModal) categoryModal.classList.remove('hidden');
 }
 
 // Form handlers
@@ -440,7 +519,7 @@ function initializeEventListeners() {
     if (nextBtn) nextBtn.addEventListener('click', window.nextWord);
 
     // Flashcard and study interactions
-    const flashcard = document.getElementById('flashcard');
+    const flashcard = document.getElementById('flip-card-inner');
     if (flashcard) flashcard.addEventListener('click', (event) => {
         // Chỉ lật thẻ nếu click vào vùng flip-card-inner
         if (event.target.closest('.flip-card-inner')) {
@@ -526,6 +605,14 @@ function initializeEventListeners() {
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
     const saveWordBtn = document.getElementById('save-word-btn');
     if (saveWordBtn) saveWordBtn.addEventListener('click', handleSaveWord);
+
+    // Category modal management
+    const openCategoryModalBtn = document.getElementById('open-category-modal-btn');
+    if (openCategoryModalBtn) openCategoryModalBtn.addEventListener('click', openCategoryModal);
+    const closeCategoryModalBtn = document.getElementById('close-category-modal-btn');
+    if (closeCategoryModalBtn) closeCategoryModalBtn.addEventListener('click', closeCategoryModal);
+    const saveCategoryBtn = document.getElementById('save-category-btn');
+    if (saveCategoryBtn) saveCategoryBtn.addEventListener('click', handleSaveCategory);
 
     // TTS buttons
     const playTtsBtn = document.getElementById('play-tts-btn');
@@ -660,3 +747,7 @@ window.handleDeleteAll = handleDeleteAll;
 window.handleDeleteAllUnknown = handleDeleteAllUnknown;
 window.handleCategoryChange = handleCategoryChange;
 window.initializeEventListeners = initializeEventListeners;
+window.openCategoryModal = openCategoryModal;
+window.closeCategoryModal = closeCategoryModal;
+window.handleSaveCategory = handleSaveCategory;
+window.editCategory = editCategory;

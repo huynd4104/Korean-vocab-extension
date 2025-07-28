@@ -2,7 +2,8 @@
 function updateCategorySelector() {
     const select = document.getElementById('category-select');
     if (!select) return;
-    const categories = [...new Map(window.allVocab.map(word => [window.normalizeCategory(word.category), window.normalizeCategory(word.category)])).values()].sort();
+
+    const categories = window.allCategories.map(cat => cat.name).sort();
     const currentValue = select.value;
 
     select.innerHTML = '<option value="all">Tất cả</option>';
@@ -23,7 +24,8 @@ function updateCategorySelector() {
 function updateCategorySuggestions() {
     const datalist = document.getElementById('category-suggestions');
     if (!datalist) return;
-    const categories = [...new Map(window.allVocab.map(word => [window.normalizeCategory(word.category), window.normalizeCategory(word.category)])).values()].sort();
+
+    const categories = window.allCategories.map(cat => cat.name).sort();
     datalist.innerHTML = '';
     categories.forEach(category => {
         const option = document.createElement('option');
@@ -524,6 +526,76 @@ function toggleEmptyState(mode, isEmpty) {
         if (unknownCard) unknownCard.classList.toggle('hidden', isEmpty);
     }
 }
+
+function updateCategoryList() {
+    const categoryListDiv = document.getElementById('category-list');
+    if (!categoryListDiv) return;
+
+    categoryListDiv.innerHTML = '';
+
+    if (window.allCategories && window.allCategories.length > 0) {
+        window.allCategories.forEach(category => {
+            const categoryItem = document.createElement('div');
+            categoryItem.classList.add('category-item', 'vocab-item');
+
+            categoryItem.innerHTML = `
+                <div class="vocab-info">
+                    <div class="category-name">${category.name}</div>
+                </div>
+                <div class="vocab-buttons">
+                    <button class="btn btn-primary btn-small edit-category-btn" data-id="${category.id}">Sửa</button>
+                    <button class="btn btn-secondary btn-small delete-category-btn" data-id="${category.id}">Xóa</button>
+                </div>
+            `;
+            categoryListDiv.appendChild(categoryItem);
+        });
+
+        categoryListDiv.querySelectorAll('.edit-category-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const categoryId = parseInt(event.target.dataset.id);
+                const category = window.allCategories.find(cat => cat.id === categoryId);
+                if (category) {
+                    window.editCategory(category);
+                }
+            });
+        });
+
+        categoryListDiv.querySelectorAll('.delete-category-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const categoryId = parseInt(event.target.dataset.id);
+                const category = window.allCategories.find(cat => cat.id === categoryId);
+                if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"? Các từ vựng thuộc danh mục này sẽ không còn danh mục.`)) {
+                    window.deleteCategory(categoryId).then(() => {
+                        const categoryMessage = document.getElementById('category-message');
+                        if (categoryMessage) {
+                            categoryMessage.textContent = 'Xóa danh mục thành công!';
+                            categoryMessage.style.color = '#4ecdc4';
+                            setTimeout(() => {
+                                categoryMessage.textContent = '';
+                            }, 2000);
+                        }
+                        window.updateCategoryList();
+                    }).catch(err => {
+                        console.error('Lỗi khi xóa danh mục:', err);
+                        const categoryMessage = document.getElementById('category-message');
+                        if (categoryMessage) {
+                            categoryMessage.textContent = 'Lỗi khi xóa danh mục!';
+                            categoryMessage.style.color = '#ff0000';
+                        }
+                    });
+                }
+            });
+        });
+    } else {
+        categoryListDiv.innerHTML = `
+            <div class="empty-state-api">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-message">Chưa có danh mục nào. Hãy thêm danh mục mới!</div>
+            </div>
+        `;
+    }
+}
+
 // Export functions to global scope
 window.updateCategorySelector = updateCategorySelector;
 window.updateCategorySuggestions = updateCategorySuggestions;
@@ -533,3 +605,4 @@ window.updateUnknownList = updateUnknownList;
 window.updateApiKeyList = updateApiKeyList;
 window.displayCurrentWord = displayCurrentWord;
 window.toggleEmptyState = toggleEmptyState;
+window.updateCategoryList = updateCategoryList;

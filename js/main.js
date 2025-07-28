@@ -1,8 +1,3 @@
-/**
- * Main application entry point
- * Initializes the extension and coordinates all modules
- */
-
 // Global variables
 window.db = null;
 window.currentMode = 'study';
@@ -19,6 +14,7 @@ window.modalState = {
     saveButtonText: 'Lưu'
 };
 window.apiKeys = [];
+window.allCategories = [];
 window.currentApiKeyIndex = 0;
 window.modeStates = {
     study: {
@@ -80,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         Promise.all([
             window.loadVocabulary(), 
             window.loadUnknownWords(), 
-            window.loadApiKey()
+            window.loadApiKey(),
+            window.loadCategories()
         ]).then(() => {
             window.updateCategorySelector();
             window.updateCategorySuggestions();

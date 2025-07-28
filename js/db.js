@@ -4,7 +4,7 @@ let saveStateTimeout = null;
 // Initialize IndexedDB
 function initDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('VocabDB', 5);
+        const request = indexedDB.open('VocabDB', 6); // Tăng version lên 6
 
         request.onupgradeneeded = (event) => {
             db = event.target.result;
@@ -20,6 +20,9 @@ function initDB() {
             if (!db.objectStoreNames.contains('apiKeys')) {
                 db.createObjectStore('apiKeys');
             }
+            if (!db.objectStoreNames.contains('categories')) {
+                db.createObjectStore('categories', { keyPath: 'id', autoIncrement: true });
+            }
         };
 
         request.onsuccess = (event) => {
@@ -30,6 +33,96 @@ function initDB() {
         request.onerror = (event) => {
             reject(event.target.error);
         };
+    });
+}
+
+// Thêm các hàm quản lý danh mục
+function saveCategory(category) {
+    return new Promise((resolve, reject) => {
+        const normalizedCategory = window.normalizeCategory(category.name);
+        const transaction = db.transaction(['categories'], 'readwrite');
+        const store = transaction.objectStore('categories');
+        const categoryData = { name: normalizedCategory };
+        
+        // Chỉ thêm id nếu đang chỉnh sửa danh mục
+        if (category.id) {
+            categoryData.id = category.id;
+        }
+
+        const request = store.put(categoryData);
+
+        request.onsuccess = () => {
+            loadCategories().then(() => {
+                window.updateCategorySelector();
+                window.updateCategorySuggestions();
+                resolve();
+            });
+        };
+
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function loadCategories() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['categories'], 'readonly');
+        const store = transaction.objectStore('categories');
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            window.allCategories = request.result;
+            resolve();
+        };
+
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function deleteCategory(id) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['categories', 'vocabulary'], 'readwrite');
+        const categoryStore = transaction.objectStore('categories');
+        const vocabStore = transaction.objectStore('vocabulary');
+
+        // Xóa danh mục
+        const categoryRequest = categoryStore.delete(id);
+
+        // Xóa categoryId khỏi các từ vựng liên quan
+        const vocabRequest = vocabStore.getAll();
+        vocabRequest.onsuccess = () => {
+            const vocabList = vocabRequest.result;
+            const updatePromises = vocabList
+                .filter(word => word.categoryId === id)
+                .map(word => {
+                    word.categoryId = null; // Hoặc có thể đặt về một giá trị mặc định
+                    return new Promise((res, rej) => {
+                        const updateRequest = vocabStore.put(word);
+                        updateRequest.onsuccess = () => res();
+                        updateRequest.onerror = () => rej(updateRequest.error);
+                    });
+                });
+
+            categoryRequest.onsuccess = () => {
+                Promise.all(updatePromises).then(() => {
+                    loadVocabulary().then(() => {
+                        loadCategories().then(() => {
+                            window.updateCategorySelector();
+                            window.updateCategorySuggestions();
+                            window.filterVocabByCategory();
+                            if (window.currentMode === 'manage') {
+                                window.updateVocabList();
+                            }
+                            window.saveState();
+                            resolve();
+                        });
+                    });
+                });
+            };
+
+            categoryRequest.onerror = () => reject(categoryRequest.error);
+        };
+
+        vocabRequest.onerror = () => reject(vocabRequest.error);
     });
 }
 
@@ -245,52 +338,90 @@ function loadState() {
 // Load vocabulary from IndexedDB
 function loadVocabulary() {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['vocabulary'], 'readonly');
-        const store = transaction.objectStore('vocabulary');
-        const request = store.getAll();
+        const transaction = db.transaction(['vocabulary', 'categories'], 'readonly');
+        const vocabStore = transaction.objectStore('vocabulary');
+        const categoryStore = transaction.objectStore('categories');
+        
+        const categoryRequest = categoryStore.getAll();
+        categoryRequest.onsuccess = () => {
+            const categories = categoryRequest.result;
+            const vocabRequest = vocabStore.getAll();
 
-        request.onsuccess = () => {
-            window.allVocab = request.result.map(word => ({
-                ...word,
-                example: word.example || ''
-            }));
-            resolve();
+            vocabRequest.onsuccess = () => {
+                window.allVocab = vocabRequest.result.map(word => ({
+                    ...word,
+                    example: word.example || '',
+                    category: categories.find(cat => cat.id === word.categoryId)?.name || 'Khác'
+                }));
+                resolve();
+            };
+
+            vocabRequest.onerror = () => {
+                document.getElementById('form-message').textContent = 'Lỗi khi tải danh sách từ vựng!';
+                reject(vocabRequest.error);
+            };
         };
 
-        request.onerror = () => {
-            document.getElementById('form-message').textContent = 'Lỗi khi tải danh sách từ vựng!';
-            reject(request.error);
-        };
+        categoryRequest.onerror = () => reject(categoryRequest.error);
     });
 }
 
 // Save a word to IndexedDB
 function saveWord(word) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['vocabulary'], 'readwrite');
-        const store = transaction.objectStore('vocabulary');
-        let request;
-
-        if (word.id) {
-            request = store.put(word);
-        } else {
-            request = store.add(word);
-        }
-
-        request.onsuccess = () => {
-            loadVocabulary().then(() => {
-                window.updateCategorySelector();
-                window.updateCategorySuggestions();
-                window.filterVocabByCategory();
-                if (window.currentMode === 'manage') {
-                    window.updateVocabList();
+        const transaction = db.transaction(['vocabulary', 'categories'], 'readwrite');
+        const vocabStore = transaction.objectStore('vocabulary');
+        const categoryStore = transaction.objectStore('categories');
+        
+        // Tìm hoặc tạo danh mục
+        const normalizedCategory = window.normalizeCategory(word.category);
+        const categoryRequest = categoryStore.getAll();
+        
+        categoryRequest.onsuccess = () => {
+            const categories = categoryRequest.result;
+            let category = categories.find(cat => cat.name === normalizedCategory);
+            
+            if (!category) {
+                // Tạo danh mục mới nếu chưa tồn tại
+                category = { name: normalizedCategory };
+                const addCategoryRequest = categoryStore.add(category);
+                addCategoryRequest.onsuccess = () => {
+                    category.id = addCategoryRequest.result;
+                    saveVocab();
+                };
+                addCategoryRequest.onerror = () => reject(addCategoryRequest.error);
+            } else {
+                saveVocab();
+            }
+            
+            function saveVocab() {
+                const vocabData = { ...word, categoryId: category.id };
+                delete vocabData.category; // Xóa field category string
+                let request;
+                if (vocabData.id) {
+                    request = vocabStore.put(vocabData);
+                } else {
+                    request = vocabStore.add(vocabData);
                 }
-                saveState();
-                resolve();
-            });
+
+                request.onsuccess = () => {
+                    loadVocabulary().then(() => {
+                        window.updateCategorySelector();
+                        window.updateCategorySuggestions();
+                        window.filterVocabByCategory();
+                        if (window.currentMode === 'manage') {
+                            window.updateVocabList();
+                        }
+                        saveState();
+                        resolve();
+                    });
+                };
+
+                request.onerror = () => reject(request.error);
+            }
         };
 
-        request.onerror = () => reject(request.error);
+        categoryRequest.onerror = () => reject(categoryRequest.error);
     });
 }
 
@@ -321,12 +452,25 @@ function deleteWord(id) {
 // Delete all words from IndexedDB
 function deleteAllWords() {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['vocabulary'], 'readwrite');
-        const store = transaction.objectStore('vocabulary');
-        const request = store.clear();
+        const transaction = db.transaction(['vocabulary', 'categories'], 'readwrite');
+        const vocabStore = transaction.objectStore('vocabulary');
+        const categoryStore = transaction.objectStore('categories');
+        
+        const vocabRequest = vocabStore.clear();
+        const categoryRequest = categoryStore.clear();
 
-        request.onsuccess = () => {
+        Promise.all([
+            new Promise((res, rej) => {
+                vocabRequest.onsuccess = () => res();
+                vocabRequest.onerror = () => rej(vocabRequest.error);
+            }),
+            new Promise((res, rej) => {
+                categoryRequest.onsuccess = () => res();
+                categoryRequest.onerror = () => rej(categoryRequest.error);
+            })
+        ]).then(() => {
             window.allVocab = [];
+            window.allCategories = [];
             Object.keys(window.modeStates).forEach(mode => {
                 window.modeStates[mode].shuffledVocab = [];
                 window.modeStates[mode].currentIndex = 0;
@@ -338,9 +482,7 @@ function deleteAllWords() {
             window.setMode(window.currentMode);
             saveState();
             resolve();
-        };
-
-        request.onerror = () => reject(request.error);
+        }).catch(err => reject(err));
     });
 }
 
