@@ -357,7 +357,7 @@ function updateApiKeyList() {
 
     } else {
         apiKeyListDiv.innerHTML = `
-            <div class="empty-state">
+            <div class="empty-state-api">
                 <div class="empty-state-icon">🔑</div>
                 <div class="empty-state-message">Chưa có API Key nào. Hãy thêm key mới!</div>
                 <div class="empty-state-message"><a href="https://aistudio.google.com/apikey" target="_blank" style="text-decoration: none;">Nhấn vào đây hoặc tiêu đề để lấy API Key</a></div>
@@ -519,9 +519,11 @@ function toggleEmptyState(mode, isEmpty) {
     } else if (mode === 'fill') {
         const fillGameDiv = document.getElementById('fill-game');
         if (fillGameDiv) fillGameDiv.style.display = isEmpty ? 'none' : '';
+    } else if (mode === 'unknown') {
+        const unknownCard = document.querySelector('#unknown-mode .card');
+        if (unknownCard) unknownCard.classList.toggle('hidden', isEmpty);
     }
 }
-
 // Export functions to global scope
 window.updateCategorySelector = updateCategorySelector;
 window.updateCategorySuggestions = updateCategorySuggestions;

@@ -241,13 +241,13 @@
             </div>
         </div>
 
-        <div id="unknown-mode" class="hidden">
+        <div id="unknown-mode">
+            <div id="unknown-empty-state" class="empty-state hidden">
+                <div class="empty-state-icon">⚠️</div>
+                <div class="empty-state-message-text">Chưa có từ nào trong danh sách chưa biết.</div>
+                <div class="empty-state-message-text">Hãy đánh dấu những từ khó trong chế độ Flashcard!</div>
+            </div>
             <div class="card">
-                <div id="unknown-empty-state" class="empty-state hidden">
-                    <div class="empty-state-icon">⚠️</div>
-                    <div class="empty-state-message-text">Chưa có từ nào trong danh sách chưa biết.</div>
-                    <div class="empty-state-message-text">Hãy đánh dấu những từ khó trong chế độ Flashcard!</div>
-                </div>
                 <div class="vocab-list" id="unknown-list"></div>
             </div>
         </div>
@@ -291,7 +291,8 @@
             <div class="card">
                 <h2>Nhập/Xuất Từ Vựng</h2>
                 <div class="form-group">
-                    <label for="import-file">Chọn file để nhập (từ tiếng Hàn` phiên âm` nghĩa tiếng Việt` ví dụ` chú ý` danh mục)</label>
+                    <label for="import-file">Chọn file để nhập (từ tiếng Hàn` phiên âm` nghĩa tiếng Việt` ví dụ` chú ý`
+                        danh mục)</label>
                     <input type="file" id="import-file" class="form-input" accept=".txt">
                 </div>
                 <div class="controls">
@@ -327,7 +328,8 @@
             <div class="modal-content">
                 <h2>Quản Lý Danh Mục</h2>
                 <div class="form-group">
-                    <input type="text" id="category-manage-input" class="form-input" placeholder="Thêm/Sửa Tên Danh Mục">
+                    <input type="text" id="category-manage-input" class="form-input"
+                        placeholder="Thêm/Sửa Tên Danh Mục">
                 </div>
                 <div id="category-list" class="vocab-list">
                 </div>
