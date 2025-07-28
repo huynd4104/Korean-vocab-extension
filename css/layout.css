@@ -142,7 +142,7 @@
         inset 0 2px 4px rgba(255, 255, 255, 0.9);
     position: relative;
     overflow: hidden;
-    min-height: auto;
+    min-height: 280px;
     height: auto;
 }
 

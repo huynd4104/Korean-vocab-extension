@@ -273,7 +273,7 @@
                 <h2>Tải Lên Danh Sách Từ Vựng</h2>
                 <div class="form-group">
                     <label for="vocab-list-input">
-                        Danh sách từ (mỗi dòng: từ tiếng Hàn`phiên âm`nghĩa tiếng Việt`ví dụ - tùy chọn):
+                        Danh sách từ (từ tiếng Hàn`phiên âm`nghĩa tiếng Việt`ví dụ - tùy chọn`chú ý - tùy chọn)
                     </label>
                     <textarea id="vocab-list-input" class="form-textarea" rows="5"></textarea>
                 </div>
@@ -291,8 +291,7 @@
             <div class="card">
                 <h2>Nhập/Xuất Từ Vựng</h2>
                 <div class="form-group">
-                    <label for="import-file">Chọn file để nhập (mỗi dòng: từ tiếng Hàn.phiên âm.nghĩa tiếng Việt.danh
-                        mục):</label>
+                    <label for="import-file">Chọn file để nhập (từ tiếng Hàn` phiên âm` nghĩa tiếng Việt` ví dụ` chú ý` danh mục)</label>
                     <input type="file" id="import-file" class="form-input" accept=".txt">
                 </div>
                 <div class="controls">
@@ -304,6 +303,7 @@
 
             <div class="form-group">
                 <button class="btn btn-primary" id="open-api-key-modal-btn">Cài Đặt API Key</button>
+                <button class="btn btn-primary" id="open-category-modal-btn">Cài Đặt Danh Mục</button>
             </div>
         </div>
 
@@ -319,6 +319,22 @@
                 <div class="form-controls">
                     <button id="save-api-key-btn" class="btn btn-secondary">Lưu</button>
                     <button id="close-api-key-modal-btn" class="btn btn-primary">✖</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="category-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Quản Lý Danh Mục</h2>
+                <div class="form-group">
+                    <input type="text" id="category-manage-input" class="form-input" placeholder="Thêm/Sửa Tên Danh Mục">
+                </div>
+                <div id="category-list" class="vocab-list">
+                </div>
+                <div id="category-message" class="form-message"></div>
+                <div class="form-controls">
+                    <button id="add-category-btn" class="btn btn-secondary">Thêm Danh Mục</button>
+                    <button id="close-category-modal-btn" class="btn btn-primary">✖</button>
                 </div>
             </div>
         </div>

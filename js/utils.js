@@ -1,8 +1,3 @@
-/**
- * Utility functions for common operations
- * Includes text processing, navigation, and helper functions
- */
-
 // Normalize category string
 function normalizeCategory(str) {
     return str.trim().replace(/\s+/g, ' ').toLowerCase().replace(/^\w/, c => c.toUpperCase());

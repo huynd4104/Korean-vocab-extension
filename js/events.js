@@ -1,8 +1,3 @@
-/**
- * Event handlers module for user interactions
- * Handles button clicks, form submissions, and keyboard events
- */
-
 // Modal management functions
 function openAddWordModal() {
     window.modalState = {

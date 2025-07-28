@@ -1,8 +1,3 @@
-/**
- * UI module for updating interface elements
- * Handles display updates for all modes and components
- */
-
 // Update category selector dropdown
 function updateCategorySelector() {
     const select = document.getElementById('category-select');

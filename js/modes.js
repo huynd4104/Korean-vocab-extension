@@ -1,8 +1,3 @@
-/**
- * Modes module for handling different learning modes
- * Includes study, quiz, flashcard, game modes and their logic
- */
-
 // Set current learning mode
 function setMode(mode) {
     if (!['study', 'quiz', 'flashcard', 'game', 'unknown', 'manage'].includes(mode)) {
