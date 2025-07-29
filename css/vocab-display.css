@@ -10,9 +10,27 @@
     background-clip: text;
 }
 
-#quiz-vietnamese,
+#quiz-mode .korean-word {
+    color: white;
+    background: none;  
+    -webkit-background-clip: unset;  
+    -webkit-text-fill-color: initial;  
+    background-clip: unset; 
+}
+
+#quiz-mode #quiz-vietnamese {
+    color: white;  
+    font-size: 36px;
+    font-weight: 700;
+    margin: 16px 0;
+    background: none; 
+    -webkit-background-clip: unset; 
+    -webkit-text-fill-color: initial;  
+    background-clip: unset;
+}
+
 #flashcard-vietnamese {
-    font-size: 2.5em; /* Kích thước chữ lớn */
+    font-size: 2.5em; 
     color: #333;
     margin-bottom: 10px;
     font-weight: bold;

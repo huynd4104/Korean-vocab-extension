@@ -194,7 +194,7 @@ function handleSaveCategory() {
         Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
             window.updateCategorySelector();
             window.updateCategorySuggestions();
-            window.updateCategoryList();  
+            window.updateCategoryList();
             window.filterVocabByCategory();
             window.setMode(window.currentMode);
             window.saveState();
@@ -407,7 +407,7 @@ function handleImportFile() {
             Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
                 window.updateCategorySelector();
                 window.updateCategorySuggestions();
-                window.updateCategoryList(); 
+                window.updateCategoryList();
                 window.filterVocabByCategory();
                 window.setMode(window.currentMode);
                 messageDiv.textContent = `Đã nhập ${valid.length} từ thành công!` +
@@ -504,7 +504,7 @@ function initializeEventListeners() {
     Object.entries(modeButtons).forEach(([mode, button]) => {
         if (button) {
             button.addEventListener('click', () => window.setMode(mode));
-        } 
+        }
     });
 
     // Word lookup and editing
@@ -540,13 +540,14 @@ function initializeEventListeners() {
     if (nextBtn) nextBtn.addEventListener('click', window.nextWord);
 
     // Flashcard and study interactions
-    const flashcard = document.getElementById('flip-card-inner');
-    if (flashcard) flashcard.addEventListener('click', (event) => {
-        // Chỉ lật thẻ nếu click vào vùng flip-card-inner
-        if (event.target.closest('.flip-card-inner')) {
-            window.flipCard();
-        }
-    });
+    const flashcardElement = document.getElementById('flashcard');
+    if (flashcardElement) {
+        flashcardElement.addEventListener('click', () => {
+            if (window.currentMode === 'flashcard') {
+                flashcardElement.classList.toggle('flipped');
+            }
+        });
+    }
 
     const markCorrectBtn = document.getElementById('mark-correct-btn');
     if (markCorrectBtn) {
@@ -555,7 +556,7 @@ function initializeEventListeners() {
             window.markCorrect();
         });
     }
-    
+
     const markWrongBtn = document.getElementById('mark-wrong-btn');
     if (markWrongBtn) {
         markWrongBtn.addEventListener('click', (event) => {
@@ -563,7 +564,7 @@ function initializeEventListeners() {
             window.markWrong();
         });
     }
-    
+
     const playTtsFlashcardBtn = document.getElementById('play-tts-flashcard-btn');
     if (playTtsFlashcardBtn) {
         playTtsFlashcardBtn.addEventListener('click', (event) => {
