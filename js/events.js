@@ -320,9 +320,16 @@ function handleUploadList() {
 
     Promise.all(savePromises).then(() => {
         window.clearUploadForm();
-        messageDiv.textContent = `Đã thêm ${validWords.length} từ thành công!${errors.length ? '\nLỗi:\n' + errors.join('\n') : ''}`;
-        messageDiv.style.color = '#4ecdc4';
-        window.saveState();
+        Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
+            window.updateCategorySelector();
+            window.updateCategorySuggestions();
+            window.updateCategoryList(); // Thêm dòng này để cập nhật danh sách danh mục
+            window.filterVocabByCategory();
+            window.setMode(window.currentMode);
+            messageDiv.textContent = `Đã thêm ${validWords.length} từ thành công!${errors.length ? '\nLỗi:\n' + errors.join('\n') : ''}`;
+            messageDiv.style.color = '#4ecdc4';
+            window.saveState();
+        });
     }).catch(err => {
         messageDiv.textContent = `Lỗi khi lưu danh sách từ: ${err.message}`;
     });
@@ -397,10 +404,17 @@ function handleImportFile() {
 
         Promise.all(valid.map(window.saveWord)).then(() => {
             window.clearImportForm();
-            messageDiv.textContent = `Đã nhập ${valid.length} từ thành công!` +
-                (errors.length ? '\nLỗi:\n' + errors.join('\n') : '');
-            messageDiv.style.color = '#4ecdc4';
-            window.saveState();
+            Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
+                window.updateCategorySelector();
+                window.updateCategorySuggestions();
+                window.updateCategoryList(); 
+                window.filterVocabByCategory();
+                window.setMode(window.currentMode);
+                messageDiv.textContent = `Đã nhập ${valid.length} từ thành công!` +
+                    (errors.length ? '\nLỗi:\n' + errors.join('\n') : '');
+                messageDiv.style.color = '#4ecdc4';
+                window.saveState();
+            });
         }).catch(err => {
             messageDiv.textContent = 'Lỗi khi nhập danh sách từ: ' + err.message;
         });

@@ -409,9 +409,10 @@ function saveWord(word) {
                 }
 
                 request.onsuccess = () => {
-                    loadVocabulary().then(() => {
+                    Promise.all([loadVocabulary(), loadCategories()]).then(() => {
                         window.updateCategorySelector();
                         window.updateCategorySuggestions();
+                        window.updateCategoryList();  
                         window.filterVocabByCategory();
                         if (window.currentMode === 'manage') {
                             window.updateVocabList();
