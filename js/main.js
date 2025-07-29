@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]).then(() => {
             window.updateCategorySelector();
             window.updateCategorySuggestions();
+            window.updateCategoryList();
             window.updateApiKeyList();
             
             window.loadState().then(() => {

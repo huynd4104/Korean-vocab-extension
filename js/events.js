@@ -191,7 +191,14 @@ function handleSaveCategory() {
             const saveCategoryBtn = document.getElementById('save-category-btn');
             if (saveCategoryBtn) saveCategoryBtn.textContent = 'Thêm Danh Mục';
         }, 2000);
-        window.updateCategoryList();
+        Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
+            window.updateCategorySelector();
+            window.updateCategorySuggestions();
+            window.updateCategoryList();  
+            window.filterVocabByCategory();
+            window.setMode(window.currentMode);
+            window.saveState();
+        });
     }).catch(err => {
         categoryMessage.textContent = 'Lỗi khi lưu danh mục: ' + err.message;
         categoryMessage.style.color = '#ff0000';

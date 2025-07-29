@@ -529,9 +529,8 @@ function toggleEmptyState(mode, isEmpty) {
 
 function updateCategoryList() {
     const categoryListDiv = document.getElementById('category-list');
-    if (!categoryListDiv) return;
 
-    categoryListDiv.innerHTML = '';
+    categoryListDiv.innerHTML = ''; // Xóa nội dung cũ
 
     if (window.allCategories && window.allCategories.length > 0) {
         window.allCategories.forEach(category => {
@@ -540,7 +539,9 @@ function updateCategoryList() {
 
             categoryItem.innerHTML = `
                 <div class="vocab-info">
-                    <div class="category-name">${category.name}</div>
+                    <div class="category-display">
+                        <div class="category-name">${category.name}</div>
+                    </div>
                 </div>
                 <div class="vocab-buttons">
                     <button class="btn btn-primary btn-small edit-category-btn" data-id="${category.id}">Sửa</button>
@@ -550,6 +551,7 @@ function updateCategoryList() {
             categoryListDiv.appendChild(categoryItem);
         });
 
+        // Gắn lại sự kiện cho các nút
         categoryListDiv.querySelectorAll('.edit-category-btn').forEach(button => {
             button.addEventListener('click', (event) => {
                 const categoryId = parseInt(event.target.dataset.id);
@@ -565,18 +567,7 @@ function updateCategoryList() {
                 const categoryId = parseInt(event.target.dataset.id);
                 const category = window.allCategories.find(cat => cat.id === categoryId);
                 if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"? Các từ vựng thuộc danh mục này sẽ không còn danh mục.`)) {
-                    window.deleteCategory(categoryId).then(() => {
-                        const categoryMessage = document.getElementById('category-message');
-                        if (categoryMessage) {
-                            categoryMessage.textContent = 'Xóa danh mục thành công!';
-                            categoryMessage.style.color = '#4ecdc4';
-                            setTimeout(() => {
-                                categoryMessage.textContent = '';
-                            }, 2000);
-                        }
-                        window.updateCategoryList();
-                    }).catch(err => {
-                        console.error('Lỗi khi xóa danh mục:', err);
+                    window.deleteCategory(categoryId).catch(err => {
                         const categoryMessage = document.getElementById('category-message');
                         if (categoryMessage) {
                             categoryMessage.textContent = 'Lỗi khi xóa danh mục!';
