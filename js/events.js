@@ -170,8 +170,13 @@ function handleSaveCategory() {
     }
 
     const normalizedName = window.normalizeCategory(name);
-    if (window.editingCategoryId === null && window.allCategories.some(cat => cat.name === normalizedName)) {
-        categoryMessage.textContent = 'Danh mục đã tồn tại!';
+
+    const isDuplicate = window.allCategories.some(cat =>
+        window.normalizeCategory(cat.name) === normalizedName && cat.id !== window.editingCategoryId
+    );
+
+    if (isDuplicate) {
+        categoryMessage.textContent = 'Tên danh mục đã tồn tại. Vui lòng chọn tên khác!';
         categoryMessage.style.color = '#ff0000';
         return;
     }
@@ -190,7 +195,7 @@ function handleSaveCategory() {
             window.editingCategoryId = null;
             const saveCategoryBtn = document.getElementById('save-category-btn');
             if (saveCategoryBtn) saveCategoryBtn.textContent = 'Thêm Danh Mục';
-        }, 2000);
+        }, 1000);
         Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
             window.updateCategorySelector();
             window.updateCategorySuggestions();

@@ -3,6 +3,7 @@
      display: flex;
      justify-content: space-between;
      gap: 20px;
+     height: auto !important;
      margin-bottom: auto;
      transition: height 0.3s ease;
      align-items: flex-start
