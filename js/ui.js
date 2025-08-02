@@ -233,17 +233,18 @@ function updateVocabList() {
 // Update unknown words list
 function updateUnknownList() {
     const unknownList = document.getElementById('unknown-list');
-    if (!unknownList) return;
-
-    // Đặt lại nội dung của unknown-list
-    unknownList.innerHTML = '';
+    const unknownHeader = document.getElementById('unknown-header');
+    
+    if (!unknownList || !unknownHeader) return;
 
     const headerHTML = `
-        <div class="unknown-header">
-            <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
-            ${window.unknownWords.length > 0 ? `<span class="unknown-count">${window.unknownWords.length} từ</span>` : ''}
-        </div>
+        ${window.unknownWords.length > 0 ? `<span class="unknown-count">${window.unknownWords.length} từ</span>` : ''}
+        <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
     `;
+    unknownHeader.innerHTML = headerHTML;
+    
+    unknownList.innerHTML = '';
+    
     window.toggleEmptyState('unknown', window.unknownWords.length === 0);
 
     let wordsHTML = '';
@@ -264,9 +265,10 @@ function updateUnknownList() {
         });
     }
 
-    // Cập nhật nội dung của unknown-list
-    unknownList.innerHTML = headerHTML + wordsHTML;
+    // Cập nhật chỉ phần danh sách từ
+    unknownList.innerHTML = wordsHTML;
 
+    // Xử lý sự kiện cho các button
     const clearButton = document.getElementById('clear-unknown-btn');
     if (clearButton) {
         clearButton.onclick = function () {
