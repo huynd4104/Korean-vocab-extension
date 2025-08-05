@@ -554,14 +554,6 @@ function initializeEventListeners() {
         });
     }
 
-    const markCorrectBtn = document.getElementById('mark-correct-btn');
-    if (markCorrectBtn) {
-        markCorrectBtn.addEventListener('click', (event) => {
-            event.stopPropagation(); // Ngăn sự kiện click lan truyền lên flashcard
-            window.markCorrect();
-        });
-    }
-
     const markWrongBtn = document.getElementById('mark-wrong-btn');
     if (markWrongBtn) {
         markWrongBtn.addEventListener('click', (event) => {

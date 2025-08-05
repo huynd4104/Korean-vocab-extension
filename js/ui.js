@@ -150,8 +150,8 @@ function updateVocabList() {
                 }
                 back.innerHTML = `
                 <div class="example">
-                <div style="font-size:1.3em;font-weight:bold;margin-bottom:8px;">${han || 'Chưa có ví dụ'}</div>
-                <div style="font-style:italic;color:#555;">${viet}</div>
+                <div style="font-size:1.5em;font-weight:bold;margin-bottom:8px;">${han || 'Chưa có ví dụ'}</div>
+                <div style="font-style:italic;color:#555;font-size:1.3em;">${viet}</div>
                 </div>
                 <button class="btn btn-secondary back-btn" style="margin-top:12px;">Quay lại</button>
                 `;
@@ -192,7 +192,7 @@ function updateVocabList() {
                 noteBack.style.width = '100%';
                 noteBack.innerHTML = `
                 <div class="example">
-                    <div style="color:#555;">${word.note ? word.note : 'Chưa có ghi chú'}</div>
+                    <div style="color:black; font-size: 1.3em;">${word.note ? word.note : 'Chưa có ghi chú'}</div>
                 </div>
                 <button class="btn btn-secondary note-back-btn" style="margin-top:12px;">Quay lại</button>
                 `;
@@ -238,7 +238,7 @@ function updateUnknownList() {
     if (!unknownList || !unknownHeader) return;
 
     const headerHTML = `
-        ${window.unknownWords.length > 0 ? `<span class="unknown-count">${window.unknownWords.length} từ</span>` : ''}
+        ${window.unknownWords.length > 0 ? `<span class="unknown-count" style="font-size: 1.3em;">📌 ${window.unknownWords.length} từ</span>` : ''}
         <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
     `;
     unknownHeader.innerHTML = headerHTML;
@@ -424,8 +424,6 @@ function displayCurrentWord() {
         if (studyPronunciation) studyPronunciation.textContent = word.pronunciation;
         const studyVietnamese = document.getElementById('study-vietnamese');
         if (studyVietnamese) studyVietnamese.textContent = word.vietnamese;
-        const studyBackCategory = document.getElementById('study-back-category');
-        if (studyBackCategory) studyBackCategory.textContent = word.category;
         const studyExample = document.getElementById('study-example');
         if (studyExample) {
             const example = word.example || '';

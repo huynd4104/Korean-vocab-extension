@@ -107,13 +107,6 @@ function filterVocabByCategory() {
 }
 
 // Flashcard actions
-function markCorrect() {
-    if (window.modeStates[window.currentMode]?.shuffledVocab.length > 0) {
-        nextWord();
-        window.saveState();
-    }
-}
-
 function markWrong() {
     if (window.modeStates[window.currentMode]?.shuffledVocab.length > 0) {
         const currentState = window.modeStates[window.currentMode];
