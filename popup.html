@@ -5,16 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Học Từ Vựng Tiếng Hàn</title>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/vocab-display.css">
-    <link rel="stylesheet" href="css/flashcard.css">
-    <link rel="stylesheet" href="css/quiz.css">
-    <link rel="stylesheet" href="css/vocab-list.css">
-    <link rel="stylesheet" href="css/games.css">
-    <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="css/messages.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -81,14 +72,14 @@
                     <div class="form-input-group">
                         <textarea id="example-input" class="form-textarea"
                             placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false"
-                            rows="3"></textarea>
+                            rows="3" style="min-height: 60px;"></textarea>
                         <label><input type="checkbox" id="lookup-example" checked></label>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="form-input-group">
                         <textarea id="note-input" class="form-textarea" placeholder="Nhập chú ý (nếu có)"
-                            spellcheck="false" rows="3"></textarea>
+                            spellcheck="false" rows="3" style="min-height: 60px;"></textarea>
                         <label><input type="checkbox" id="lookup-note" checked></label>
                     </div>
                 </div>
@@ -306,8 +297,8 @@
             </div>
 
             <div class="form-group">
-                <button class="btn btn-primary" id="open-api-key-modal-btn" style="margin-right: 10px;">֎ Cài Đặt API Key</button>
-                <button class="btn btn-primary" id="open-category-modal-btn">☰ Cài Đặt Danh Mục</button>
+                <button class="btn btn-accent" id="open-api-key-modal-btn" style="margin-right: 10px;">֎ Cài Đặt API Key</button>
+                <button class="btn btn-accent" id="open-category-modal-btn">☰ Cài Đặt Danh Mục</button>
             </div>
         </div>
 

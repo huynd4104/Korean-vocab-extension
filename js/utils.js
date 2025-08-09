@@ -127,7 +127,7 @@ async function toggleWindowMode() {
         url: chrome.runtime.getURL('popup.html'),
         type: 'popup',
         width: 615,
-        height: 610,
+        height: 615,
         left: 100,
         top: 100
     });
