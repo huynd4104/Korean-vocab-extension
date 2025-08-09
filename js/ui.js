@@ -238,7 +238,7 @@ function updateUnknownList() {
     if (!unknownList || !unknownHeader) return;
 
     const headerHTML = `
-        ${window.unknownWords.length > 0 ? `<span class="unknown-count" style="font-size: 1.3em;">📌 ${window.unknownWords.length} từ</span>` : ''}
+        ${window.unknownWords.length > 0 ? `<span class="unknown-count">📌 ${window.unknownWords.length} từ</span>` : ''}
         <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
     `;
     unknownHeader.innerHTML = headerHTML;
