@@ -115,12 +115,7 @@ function deleteCategory(id) {
                         }
                         window.saveState();
 
-                        const categoryMessage = document.getElementById('category-message');
-                        if (categoryMessage) {
-                            categoryMessage.textContent = 'Xóa danh mục thành công!';
-                            categoryMessage.style.color = '#4ecdc4';
-                            setTimeout(() => categoryMessage.textContent = '', 2000);
-                        }
+                        window.showToast('Xóa danh mục thành công!', 'success');
                         resolve();
                     })
                     .catch(reject);
@@ -191,13 +186,11 @@ function saveState() {
                     },
                     apiKeyModal: {
                         isOpen: !document.getElementById('api-key-modal')?.classList.contains('hidden') || false,
-                        input: document.getElementById('api-key-input')?.value || '',
-                        message: document.getElementById('api-key-message')?.textContent || ''
+                        input: document.getElementById('api-key-input')?.value || ''
                     },
                     categoryModal: {
                         isOpen: !document.getElementById('category-modal')?.classList.contains('hidden') || false,
                         input: document.getElementById('category-name-input')?.value || '',
-                        message: document.getElementById('category-message')?.textContent || '',
                         editingCategoryId: window.editingCategoryId
                     }
                 }
@@ -274,7 +267,6 @@ function loadState() {
                         document.getElementById('lookup-vietnamese').checked = savedState.modalState.wordModal.lookupOptions.vietnamese;
                         document.getElementById('lookup-example').checked = savedState.modalState.wordModal.lookupOptions.example;
                         document.getElementById('save-word-btn').textContent = savedState.modalState.wordModal.saveButtonText;
-                        document.getElementById('form-message').textContent = '';
                     }
                 }
 
@@ -284,7 +276,6 @@ function loadState() {
                     if (apiKeyModal) {
                         apiKeyModal.classList.remove('hidden');
                         document.getElementById('api-key-input').value = savedState.modalState.apiKeyModal.input;
-                        document.getElementById('api-key-message').textContent = savedState.modalState.apiKeyModal.message;
                     }
                 }
 
@@ -294,7 +285,6 @@ function loadState() {
                     if (categoryModal) {
                         categoryModal.classList.remove('hidden');
                         document.getElementById('category-name-input').value = savedState.modalState.categoryModal.input;
-                        document.getElementById('category-message').textContent = savedState.modalState.categoryModal.message;
                         window.editingCategoryId = savedState.modalState.categoryModal.editingCategoryId || null;
                         document.getElementById('save-category-btn').textContent = window.editingCategoryId !== null ? 'Cập Nhật' : 'Thêm Danh Mục';
                     }
@@ -347,7 +337,7 @@ function loadVocabulary() {
             };
 
             vocabRequest.onerror = () => {
-                document.getElementById('form-message').textContent = 'Lỗi khi tải danh sách từ vựng!';
+                window.showToast('Lỗi khi tải danh sách từ vựng!', 'error');
                 reject(vocabRequest.error);
             };
         };

@@ -115,7 +115,7 @@ function markWrong() {
             nextWord();
             window.saveState();
         }).catch(err => {
-            document.getElementById('form-message').textContent = 'Lỗi khi lưu từ chưa biết!';
+            window.showToast('Lỗi khi lưu từ chưa biết!', 'error');
         });
     }
 }
@@ -148,8 +148,6 @@ function clearForm() {
     if (noteInput) noteInput.value = '';
     const categoryInput = document.getElementById('category-input');
     if (categoryInput) categoryInput.value = '';
-    const formMessage = document.getElementById('form-message');
-    if (formMessage) formMessage.textContent = '';
     window.editingWordId = null;
     window.modalState = {
         isModalOpen: false,
@@ -169,15 +167,11 @@ function clearUploadForm() {
     if (vocabListInput) vocabListInput.value = '';
     const listCategoryInput = document.getElementById('list-category-input');
     if (listCategoryInput) listCategoryInput.value = '';
-    const uploadMessage = document.getElementById('upload-message');
-    if (uploadMessage) uploadMessage.textContent = '';
 }
 
 function clearImportForm() {
     const importFile = document.getElementById('import-file');
     if (importFile) importFile.value = '';
-    const importMessage = document.getElementById('import-message');
-    if (importMessage) importMessage.textContent = '';
 }
 
 function clearSearch() {
@@ -197,7 +191,6 @@ window.nextWord = nextWord;
 window.shuffleWords = shuffleWords;
 window.resetProgress = resetProgress;
 window.filterVocabByCategory = filterVocabByCategory;
-window.markCorrect = markCorrect;
 window.markWrong = markWrong;
 window.toggleWindowMode = toggleWindowMode;
 window.clearForm = clearForm;

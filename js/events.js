@@ -23,8 +23,6 @@ function openAddWordModal() {
     if (lookupVietnamese) lookupVietnamese.checked = true;
     const lookupExample = document.getElementById('lookup-example');
     if (lookupExample) lookupExample.checked = true;
-    const formMessage = document.getElementById('form-message');
-    if (formMessage) formMessage.textContent = '';
     window.editingWordId = null;
     const saveWordBtn = document.getElementById('save-word-btn');
     if (saveWordBtn) saveWordBtn.textContent = 'Lưu';
@@ -73,8 +71,6 @@ function editWord(word) {
     if (lookupExample) lookupExample.checked = true;
     const saveWordBtn = document.getElementById('save-word-btn');
     if (saveWordBtn) saveWordBtn.textContent = 'Cập Nhật';
-    const formMessage = document.getElementById('form-message');
-    if (formMessage) formMessage.textContent = '';
     window.editingWordId = word.id;
     const wordModal = document.getElementById('word-modal');
     if (wordModal) wordModal.classList.remove('hidden');
@@ -86,10 +82,8 @@ function editWord(word) {
 function openApiKeyModal() {
     const apiKeyModal = document.getElementById('api-key-modal');
     const apiKeyInput = document.getElementById('api-key-input');
-    const apiKeyMessage = document.getElementById('api-key-message');
-    if (apiKeyModal && apiKeyInput && apiKeyMessage) {
+    if (apiKeyModal && apiKeyInput) {
         apiKeyInput.value = '';
-        apiKeyMessage.textContent = '';
         apiKeyModal.classList.remove('hidden');
         window.updateApiKeyList();
     }
@@ -98,38 +92,29 @@ function openApiKeyModal() {
 function closeApiKeyModal() {
     const apiKeyModal = document.getElementById('api-key-modal');
     const apiKeyInput = document.getElementById('api-key-input');
-    const apiKeyMessage = document.getElementById('api-key-message');
-    if (apiKeyModal && apiKeyInput && apiKeyMessage) {
+    if (apiKeyModal && apiKeyInput) {
         apiKeyInput.value = '';
-        apiKeyMessage.textContent = '';
         apiKeyModal.classList.add('hidden');
     }
 }
 
 function handleSaveApiKey() {
     const apiKeyInput = document.getElementById('api-key-input');
-    const apiKeyMessage = document.getElementById('api-key-message');
-    if (!apiKeyInput || !apiKeyMessage) return;
+    if (!apiKeyInput) return;
 
     const key = apiKeyInput.value.trim();
     if (!key) {
-        apiKeyMessage.textContent = 'Vui lòng nhập API Key!';
-        apiKeyMessage.style.color = '#ff0000';
+        window.showToast('Vui lòng nhập API Key!', 'error');
         return;
     }
 
     window.saveApiKey(key).then(() => {
-        apiKeyMessage.textContent = 'Lưu API Key thành công!';
-        apiKeyMessage.style.color = '#4ecdc4';
-        setTimeout(() => {
-            apiKeyMessage.textContent = '';
-        }, 2000);
+        window.showToast('Lưu API Key thành công!', 'success');
         window.saveApiKeysToDB();
         apiKeyInput.value = '';
         window.updateApiKeyList();
     }).catch(err => {
-        apiKeyMessage.textContent = 'Lỗi khi lưu API Key: ' + err.message;
-        apiKeyMessage.style.color = '#ff0000';
+        window.showToast('Lỗi khi lưu API Key: ' + err.message, 'error');
     });
 }
 
@@ -137,10 +122,8 @@ function handleSaveApiKey() {
 function openCategoryModal() {
     const categoryModal = document.getElementById('category-modal');
     const categoryInput = document.getElementById('category-name-input');
-    const categoryMessage = document.getElementById('category-message');
-    if (categoryModal && categoryInput && categoryMessage) {
+    if (categoryModal && categoryInput) {
         categoryInput.value = '';
-        categoryMessage.textContent = '';
         categoryModal.classList.remove('hidden');
         window.updateCategoryList();
     }
@@ -149,23 +132,19 @@ function openCategoryModal() {
 function closeCategoryModal() {
     const categoryModal = document.getElementById('category-modal');
     const categoryInput = document.getElementById('category-name-input');
-    const categoryMessage = document.getElementById('category-message');
-    if (categoryModal && categoryInput && categoryMessage) {
+    if (categoryModal && categoryInput) {
         categoryInput.value = '';
-        categoryMessage.textContent = '';
         categoryModal.classList.add('hidden');
     }
 }
 
 function handleSaveCategory() {
     const categoryInput = document.getElementById('category-name-input');
-    const categoryMessage = document.getElementById('category-message');
-    if (!categoryInput || !categoryMessage) return;
+    if (!categoryInput) return;
 
     const name = categoryInput.value.trim();
     if (!name) {
-        categoryMessage.textContent = 'Vui lòng nhập tên danh mục!';
-        categoryMessage.style.color = '#ff0000';
+        window.showToast('Vui lòng nhập tên danh mục!', 'error');
         return;
     }
 
@@ -176,8 +155,7 @@ function handleSaveCategory() {
     );
 
     if (isDuplicate) {
-        categoryMessage.textContent = 'Tên danh mục đã tồn tại. Vui lòng chọn tên khác!';
-        categoryMessage.style.color = '#ff0000';
+        window.showToast('Tên danh mục đã tồn tại. Vui lòng chọn tên khác!', 'error');
         return;
     }
 
@@ -187,10 +165,9 @@ function handleSaveCategory() {
     }
 
     window.saveCategory(category).then(() => {
-        categoryMessage.textContent = window.editingCategoryId !== null ? 'Cập nhật danh mục thành công!' : 'Thêm danh mục thành công!';
-        categoryMessage.style.color = '#4ecdc4';
+        const successMessage = window.editingCategoryId !== null ? 'Cập nhật danh mục thành công!' : 'Thêm danh mục thành công!';
         setTimeout(() => {
-            categoryMessage.textContent = '';
+            window.showToast(successMessage, 'success');
             categoryInput.value = '';
             window.editingCategoryId = null;
             const saveCategoryBtn = document.getElementById('save-category-btn');
@@ -205,21 +182,18 @@ function handleSaveCategory() {
             window.saveState();
         });
     }).catch(err => {
-        categoryMessage.textContent = 'Lỗi khi lưu danh mục: ' + err.message;
-        categoryMessage.style.color = '#ff0000';
+        window.showToast('Lỗi khi lưu danh mục: ' + err.message, 'error');
     });
 }
 
 function editCategory(category) {
     const categoryInput = document.getElementById('category-name-input');
-    const categoryMessage = document.getElementById('category-message');
     const saveCategoryBtn = document.getElementById('save-category-btn');
-    if (!categoryInput || !categoryMessage || !saveCategoryBtn) return;
+    if (!categoryInput || !saveCategoryBtn) return;
 
     categoryInput.value = category.name;
     saveCategoryBtn.textContent = 'Cập Nhật';
     window.editingCategoryId = category.id;
-    categoryMessage.textContent = '';
     const categoryModal = document.getElementById('category-modal');
     if (categoryModal) categoryModal.classList.remove('hidden');
 }
@@ -231,9 +205,8 @@ function handleSaveWord() {
     const vietnameseInput = document.getElementById('vietnamese-input');
     const exampleInput = document.getElementById('example-input');
     const categoryInput = document.getElementById('category-input');
-    const messageDiv = document.getElementById('form-message');
 
-    if (!koreanInput || !pronunciationInput || !vietnameseInput || !exampleInput || !categoryInput || !messageDiv) return;
+    if (!koreanInput || !pronunciationInput || !vietnameseInput || !exampleInput || !categoryInput) return;
 
     const korean = koreanInput.value.trim();
     const pronunciation = pronunciationInput.value.trim();
@@ -242,8 +215,7 @@ function handleSaveWord() {
     const category = window.normalizeCategory(categoryInput.value);
 
     if (!korean || !pronunciation || !vietnamese || !category) {
-        messageDiv.textContent = 'Vui lòng điền đầy đủ các trường bắt buộc!';
-        messageDiv.style.color = '#ff0000';
+        window.showToast('Vui lòng điền đầy đủ các trường bắt buộc!', 'error');
         return;
     }
 
@@ -273,26 +245,24 @@ function handleSaveWord() {
             window.updateCategorySuggestions();
             window.filterVocabByCategory();
             window.setMode(window.currentMode);
-            messageDiv.textContent = window.editingWordId !== null ? 'Cập nhật thành công!' : 'Thêm từ thành công!';
-            messageDiv.style.color = '#4ecdc4';
+            const wordMessage = window.editingWordId !== null ? 'Cập nhật thành công!' : 'Thêm từ thành công!';
+            window.showToast(wordMessage, 'success');
         });
     }).catch(err => {
-        messageDiv.textContent = 'Lỗi khi lưu từ: ' + err.message;
-        messageDiv.style.color = '#ff0000';
+        window.showToast('Lỗi khi lưu từ: ' + err.message, 'error');
     });
 }
 
 function handleUploadList() {
     const vocabListInput = document.getElementById('vocab-list-input');
     const listCategoryInput = document.getElementById('list-category-input');
-    const messageDiv = document.getElementById('upload-message');
-    if (!vocabListInput || !messageDiv) return;
+    if (!vocabListInput) return;
 
     const vocabListValue = vocabListInput.value.trim();
     const category = window.normalizeCategory(listCategoryInput?.value || 'Khác');
 
     if (!vocabListValue) {
-        messageDiv.textContent = 'Vui lòng nhập danh sách từ vựng!';
+        window.showToast('Vui lòng nhập danh sách từ vựng!', 'error');
         return;
     }
 
@@ -317,7 +287,7 @@ function handleUploadList() {
     });
 
     if (validWords.length === 0) {
-        messageDiv.textContent = 'Không có từ vựng hợp lệ để lưu!\n' + errors.join('\n');
+        window.showToast('Không có từ vựng hợp lệ để lưu!\n' + errors.join('\n'), 'error');
         return;
     }
 
@@ -328,24 +298,20 @@ function handleUploadList() {
         Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
             window.updateCategorySelector();
             window.updateCategorySuggestions();
-            window.updateCategoryList(); // Thêm dòng này để cập nhật danh sách danh mục
+            window.updateCategoryList();
             window.filterVocabByCategory();
             window.setMode(window.currentMode);
-            messageDiv.textContent = `Đã thêm ${validWords.length} từ thành công!${errors.length ? '\nLỗi:\n' + errors.join('\n') : ''}`;
-            messageDiv.style.color = '#4ecdc4';
+            window.showToast(`Đã thêm ${validWords.length} từ thành công!${errors.length ? '\nLỗi:\n' + errors.join('\n') : ''}`, 'success');
             window.saveState();
         });
     }).catch(err => {
-        messageDiv.textContent = `Lỗi khi lưu danh sách từ: ${err.message}`;
+        window.showToast(`Lỗi khi lưu danh sách từ: ${err.message}`, 'error');
     });
 }
 
 function handleExportAll() {
-    const formMessage = document.getElementById('form-message');
-    if (!formMessage) return;
-
     if (window.allVocab.length === 0) {
-        formMessage.textContent = 'Không có từ vựng để xuất khẩu!';
+        window.showToast('Không có từ vựng để xuất!', 'error');
         return;
     }
 
@@ -363,18 +329,16 @@ function handleExportAll() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    formMessage.textContent = 'Đã xuất danh sách từ!';
-    formMessage.style.color = '#4ecdc4';
+    window.showToast('Đã xuất danh sách từ!', 'success');
 }
 
 function handleImportFile() {
     const fileInput = document.getElementById('import-file');
-    const messageDiv = document.getElementById('import-message');
-    if (!fileInput || !messageDiv) return;
+    if (!fileInput) return;
 
     const file = fileInput.files[0];
     if (!file) {
-        messageDiv.textContent = 'Vui lòng chọn file để nhập!';
+        window.showToast('Vui lòng chọn file để nhập!', 'error');
         return;
     }
 
@@ -403,7 +367,7 @@ function handleImportFile() {
         });
 
         if (valid.length === 0) {
-            messageDiv.textContent = 'Không có từ vựng hợp lệ để nhập!\n' + errors.join('\n');
+            window.showToast('Không có từ vựng hợp lệ để nhập!\n' + errors.join('\n'), 'error');
             return;
         }
 
@@ -415,13 +379,11 @@ function handleImportFile() {
                 window.updateCategoryList();
                 window.filterVocabByCategory();
                 window.setMode(window.currentMode);
-                messageDiv.textContent = `Đã nhập ${valid.length} từ thành công!` +
-                    (errors.length ? '\nLỗi:\n' + errors.join('\n') : '');
-                messageDiv.style.color = '#4ecdc4';
+                window.showToast(`Đã nhập ${valid.length} từ thành công!` + (errors.length ? '\nLỗi:\n' + errors.join('\n') : ''), 'success');
                 window.saveState();
             });
         }).catch(err => {
-            messageDiv.textContent = 'Lỗi khi nhập danh sách từ: ' + err.message;
+            window.showToast('Lỗi khi nhập danh sách từ: ' + err.message, 'error');
         });
     };
     reader.readAsText(file);
@@ -446,30 +408,23 @@ function handleFlashcardDisplayModeChange() {
 }
 
 function handleDeleteAll() {
-    const formMessage = document.getElementById('form-message');
-    if (!formMessage) return;
-
     if (window.allVocab.length === 0) {
-        formMessage.textContent = 'Không có từ vựng để xóa!';
+        window.showToast('Không có từ vựng để xóa!', 'error');
         return;
     }
 
     if (confirm('Bạn có chắc muốn xóa tất cả từ vựng?')) {
         window.deleteAllWords().then(() => {
-            formMessage.textContent = 'Đã xóa tất cả từ!';
-            formMessage.style.color = '#4ecdc4';
+            window.showToast('Đã xóa tất cả từ!', 'success');
         }).catch(err => {
-            formMessage.textContent = 'Lỗi khi xóa tất cả từ!';
+            window.showToast('Lỗi khi xóa tất cả từ!', 'error');
         });
     }
 }
 
 function handleDeleteAllUnknown() {
-    const formMessage = document.getElementById('form-message');
-    if (!formMessage) return;
-
     if (window.unknownWords.length === 0) {
-        formMessage.textContent = 'Không có từ chưa biết để xóa!';
+        window.showToast('Không có từ chưa biết để xóa!', 'error');
         return;
     }
 
@@ -477,10 +432,9 @@ function handleDeleteAllUnknown() {
         window.deleteAllUnknownWords().then(() => {
             window.unknownWords = [];
             window.updateUnknownList();
-            formMessage.textContent = 'Đã xóa tất cả từ chưa biết!';
-            formMessage.style.color = '#4ecdc4';
+             window.showToast('Đã xóa tất cả từ chưa biết!', 'success');
         }).catch(err => {
-            formMessage.textContent = 'Lỗi khi xóa tất cả từ chưa biết!';
+            window.showToast('Lỗi khi xóa tất cả từ!', 'error');
         });
     }
 }

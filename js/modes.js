@@ -24,9 +24,19 @@ function setMode(mode) {
         currentModeElement.classList.remove('hidden');
     }
 
+    //Ẩn các nút điều khiển  
     const controlButtons = document.getElementById('control-buttons');
     if (controlButtons) {
-        if (mode === 'unknown' || mode === 'manage' || mode === 'game') {
+        let isVocabEmpty = false;
+
+        const isSpecialMode = mode === 'unknown' || mode === 'manage' || mode === 'game';
+
+        if (['study', 'quiz', 'flashcard'].includes(mode)) {
+            const currentState = window.modeStates[mode];
+            isVocabEmpty = currentState.shuffledVocab.length === 0;
+        }
+
+        if (isSpecialMode || isVocabEmpty) {
             controlButtons.classList.add('hidden');
         } else {
             controlButtons.classList.remove('hidden');

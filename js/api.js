@@ -1,4 +1,4 @@
- // Get available API key, avoiding rate-limited keys
+// Get available API key, avoiding rate-limited keys
 function getAvailableApiKey() {
     if (window.apiKeys.length === 0) return null;
 
@@ -16,18 +16,15 @@ function getAvailableApiKey() {
 
 // Lookup word using Gemini API
 async function lookupWord(koreanWord) {
-    const formMessage = document.getElementById('form-message');
     if (!koreanWord) {
-        formMessage.textContent = 'Vui lòng nhập từ tiếng Hàn trước khi tra cứu!';
-        formMessage.style.color = '#ff0000';
+        window.showToast('Vui lòng nhập từ cần tra cứu!', 'error');
         return;
     }
 
     let currentKey = getAvailableApiKey();
     if (!currentKey) {
         openApiKeyModal();
-        formMessage.textContent = 'Không có API Key khả dụng! Vui lòng thêm API Key mới.';
-        formMessage.style.color = '#ff0000';
+        window.showToast('Không có API Key khả dụng! Vui lòng thêm API Key mới.', 'error');
         return;
     }
 
@@ -37,8 +34,7 @@ async function lookupWord(koreanWord) {
     const lookupNote = document.getElementById('lookup-note')?.checked;
 
     if (!lookupPronunciation && !lookupVietnamese && !lookupExample && !lookupNote) {
-        formMessage.textContent = 'Vui lòng chọn ít nhất một trường để tra cứu!';
-        formMessage.style.color = '#ff0000';
+        window.showToast('Vui lòng chọn ít nhất một trường để tra cứu!', 'error');
         return;
     }
 
@@ -60,8 +56,7 @@ async function lookupWord(koreanWord) {
     while (currentKey) {
         try {
             apiKeys[currentApiKeyIndex].requestCount++;
-            formMessage.textContent = 'Đang tra cứu...';
-            formMessage.style.color = '#4ecdc4';
+            window.showToast('🌀 Đang tra cứu', 'success');
 
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
                 method: 'POST',
@@ -78,8 +73,7 @@ async function lookupWord(koreanWord) {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
                 currentKey = getAvailableApiKey();
                 if (!currentKey) {
-                    formMessage.textContent = 'Tất cả API Key đều đạt giới hạn yêu cầu!';
-                    formMessage.style.color = '#ff0000';
+                    window.showToast('Tất cả API Key đều đạt giới hạn yêu cầu!', 'error');
                     return;
                 }
                 continue;
@@ -112,15 +106,12 @@ async function lookupWord(koreanWord) {
                     if (noteMatch) {
                         document.getElementById('note-input').value = noteMatch[1].trim();
                     }
-                    formMessage.textContent = 'Tra cứu thành công!';
-                    formMessage.style.color = '#4ecdc4';
+                    window.showToast('Tra cứu thành công!', 'success');
                 } else {
-                    formMessage.textContent = 'Không tìm thấy thông tin đầy đủ cho các trường đã chọn!';
-                    formMessage.style.color = '#ff0000';
+                    window.showToast('Không tìm thấy thông tin đầy đủ cho các trường đã chọn!', 'error');
                 }
             } else {
-                formMessage.textContent = 'Không nhận được dữ liệu từ API!';
-                formMessage.style.color = '#ff0000';
+                window.showToast('Không nhận được dữ liệu từ API!', 'error');
             }
             // Lưu trạng thái apiKeys
             const transaction = db.transaction(['apiKeys'], 'readwrite');
@@ -133,13 +124,11 @@ async function lookupWord(koreanWord) {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
                 currentKey = getAvailableApiKey();
                 if (!currentKey) {
-                    formMessage.textContent = 'Tất cả API Key đều đạt giới hạn yêu cầu!';
-                    formMessage.style.color = '#ff0000';
+                    window.showToast('Tất cả API Key đều đạt giới hạn yêu cầu!', 'error');
                     return;
                 }
             } else {
-                formMessage.textContent = 'Lỗi khi tra cứu từ: ' + error.message;
-                formMessage.style.color = '#ff0000';
+                window.showToast('Lỗi khi tra cứu từ: ' + error.message, 'error');
                 break;
             }
         }
@@ -151,7 +140,7 @@ async function initFillGame() {
     const sentenceDiv = document.getElementById('fill-sentence');
     const optionsContainer = document.getElementById('fill-options');
     const resultDiv = document.getElementById('fill-result');
-    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');  
+    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
     if (!sentenceDiv || !optionsContainer || !resultDiv) return;
 
     let gameVocab = selectedCategory === 'all' ? [...allVocab] : allVocab.filter(word => normalizeCategory(word.category) === selectedCategory);
@@ -159,7 +148,7 @@ async function initFillGame() {
     if (gameVocab.length === 0) {
         optionsContainer.innerHTML = '';
         resultDiv.innerHTML = '';
-        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không có từ vựng
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
         return;
     }
 
@@ -176,7 +165,7 @@ async function initFillGame() {
     if (!currentKey) {
         openApiKeyModal();
         resultDiv.innerHTML = '<span style="color: #ff6b6b;">Không có API Key khả dụng! Vui lòng thêm API Key mới.</span>';
-        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không có API Key
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
         return;
     }
 
@@ -201,9 +190,9 @@ async function initFillGame() {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
                 currentKey = getAvailableApiKey();
                 if (!currentKey) {
-                    sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
+                    window.showToast('Không thể tạo câu hỏi!', 'error');
                     resultDiv.innerHTML = '<span style="color: #ff6b6b;">Tất cả API Key đều đạt giới hạn yêu cầu!</span>';
-                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu API bị giới hạn
+                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
                     return;
                 }
                 continue;
@@ -224,17 +213,17 @@ async function initFillGame() {
                         </div>
                     `;
                     resultDiv.innerHTML = '';
-                    if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden'); // Hiển thị nút reset sau khi khởi tạo thành công
+                    if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden');
                 } else {
-                    sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
+                    window.showToast('Không thể tạo câu hỏi!', 'error');
                     resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được câu hỏi hợp lệ từ API!</span>';
-                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không tạo được câu hỏi
+                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
                     return;
                 }
             } else {
-                sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
+                window.showToast('Không thể tạo câu hỏi!', 'error');
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được dữ liệu từ API!</span>';
-                if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu không nhận được dữ liệu
+                if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
                 return;
             }
             const transaction = db.transaction(['apiKeys'], 'readwrite');
@@ -247,13 +236,13 @@ async function initFillGame() {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
                 currentKey = getAvailableApiKey();
                 if (!currentKey) {
-                    sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
+                    window.showToast('Không thể tạo câu hỏi!', 'error');
                     resultDiv.innerHTML = '<span style="color: #ff6b6b;">Tất cả API Key đều đạt giới hạn yêu cầu!</span>';
                     if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu API bị giới hạn
                     return;
                 }
             } else {
-                sentenceDiv.textContent = 'Không thể tạo câu hỏi!';
+                window.showToast('Không thể tạo câu hỏi!', 'error');
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: ' + error.message + '</span>';
                 if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu có lỗi khác
                 return;

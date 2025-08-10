@@ -62,7 +62,6 @@ if (window.modalState.isModalOpen) {
         document.getElementById('lookup-vietnamese').checked = window.modalState.lookupOptions.vietnamese;
         document.getElementById('lookup-example').checked = window.modalState.lookupOptions.example;
         document.getElementById('save-word-btn').textContent = window.modalState.saveButtonText;
-        document.getElementById('form-message').textContent = '';
     }
 }
 
@@ -89,20 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.setMode(window.currentMode);
             }).catch(err => {
                 console.error('Error loading state:', err);
-                const formMessage = document.getElementById('form-message');
-                if (formMessage) formMessage.textContent = 'Lỗi khi tải trạng thái học!';
+                window.showToast('Lỗi khi tải trạng thái học!', 'error');
                 window.filterVocabByCategory();
                 window.setMode('study');
             });
         }).catch(err => {
             console.error('Error loading data:', err);
-            const formMessage = document.getElementById('form-message');
-            if (formMessage) formMessage.textContent = 'Lỗi khi tải dữ liệu!';
+            window.showToast('Lỗi khi tải dữ liệu!', 'error');
         });
     }).catch(err => {
         console.error('Error initializing DB:', err);
-        const formMessage = document.getElementById('form-message');
-        if (formMessage) formMessage.textContent = 'Lỗi khi khởi tạo cơ sở dữ liệu!';
+        window.showToast('Lỗi khi khởi tạo cơ sở dữ liệu!', 'error');
     });
 
     // Save state before popup closes

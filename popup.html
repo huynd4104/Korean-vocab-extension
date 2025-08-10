@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <div id="toast-container"></div>
     <div class="container">
         <div class="header-row">
             <div class="header-actions card-panel">
@@ -88,7 +89,6 @@
                         list="category-suggestions" spellcheck="false">
                     <datalist id="category-suggestions"></datalist>
                 </div>
-                <div class="form-message" id="form-message"></div>
                 <div class="form-controls">
                     <button class="btn btn-secondary" id="save-word-btn">Lưu</button>
                     <button class="btn btn-primary" id="lookup-word-btn">🔍 Tra cứu</button>
@@ -279,7 +279,6 @@
                 <div class="form-controls">
                     <button class="btn btn-primary" id="upload-list-btn">📄 Tải Lên</button>
                 </div>
-                <div class="form-message" id="upload-message"></div>
             </div>
 
             <div class="card">
@@ -293,7 +292,6 @@
                     <button id="import-file-btn" class="btn btn-primary">📥 Nhập File</button>
                     <button id="export-all-btn" class="btn btn-secondary">📤 Xuất Tất Cả</button>
                 </div>
-                <div id="import-message" class="form-message"></div>
             </div>
 
             <div class="form-group">
@@ -310,7 +308,6 @@
                     <input type="text" id="api-key-input" class="form-input" placeholder="Thêm API Key">
                 </div>
                 <div id="api-key-list" class="vocab-list"></div>
-                <div id="api-key-message" class="form-message"></div>
                 <div class="form-controls">
                     <button id="save-api-key-btn" class="btn btn-secondary">Lưu</button>
                     <button id="close-api-key-modal-btn" class="btn btn-primary">✖</button>
@@ -325,7 +322,6 @@
                     <input type="text" id="category-name-input" class="form-input" placeholder="Thêm/Sửa Tên Danh Mục">
                 </div>
                 <div id="category-list" class="vocab-list"></div>
-                <div id="category-message" class="form-message"></div>
                 <div class="form-controls">
                     <button id="save-category-btn" class="btn btn-secondary">Thêm Danh Mục</button>
                     <button id="close-category-modal-btn" class="btn btn-primary">✖</button>

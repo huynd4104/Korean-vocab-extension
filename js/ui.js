@@ -1,3 +1,24 @@
+// Show a toast notification
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`; // type có thể là 'success' hoặc 'error'
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.5s forwards';
+        toast.addEventListener('animationend', () => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        });
+    }, 3000);  
+}
+
 // Update category selector dropdown
 function updateCategorySelector() {
     const select = document.getElementById('category-select');
@@ -111,12 +132,16 @@ function updateVocabList() {
         deleteBtn.addEventListener('click', () => {
             if (confirm(`Bạn có chắc muốn xóa từ "${word.korean}"?`)) {
                 window.deleteWord(word.id).then(() => {
+                    window.showToast('Xóa từ thành công!', 'success');
                     window.loadVocabulary().then(() => {
                         window.filterVocabByCategory();
                         updateVocabList();
                         window.saveState();
                     });
-                }).catch(err => console.error('Error deleting word:', err));
+                }).catch(err => {
+                    console.error('Error deleting word:', err);
+                    window.showToast('Lỗi khi xóa từ!', 'error');  
+                });
             }
         });
 
@@ -274,6 +299,7 @@ function updateUnknownList() {
         clearButton.onclick = function () {
             if (confirm('Bạn có chắc muốn xóa tất cả từ chưa biết?')) {
                 window.deleteAllUnknownWords().then(() => {
+                    window.showToast('Đã xóa tất cả từ khỏi danh sách chú ý!', 'success'); 
                     window.loadUnknownWords();
                 });
             }
@@ -286,10 +312,11 @@ function updateUnknownList() {
             const word = window.unknownWords.find(w => w.id === wordId);
             if (confirm(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chưa biết không?`)) {
                 window.deleteUnknownWord(wordId).then(() => {
+                    window.showToast('Đã xóa từ khỏi danh sách chú ý!', 'success'); 
                     window.loadUnknownWords();
                 }).catch(err => {
                     console.error('Error deleting unknown word:', err);
-                    document.getElementById('form-message').textContent = 'Lỗi khi xóa từ chưa biết!';
+                    window.showToast('Lỗi khi xóa từ chưa biết!', 'error');
                 });
             }
         });
@@ -568,11 +595,7 @@ function updateCategoryList() {
                 const category = window.allCategories.find(cat => cat.id === categoryId);
                 if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"? Các từ vựng thuộc danh mục này sẽ không còn danh mục.`)) {
                     window.deleteCategory(categoryId).catch(err => {
-                        const categoryMessage = document.getElementById('category-message');
-                        if (categoryMessage) {
-                            categoryMessage.textContent = 'Lỗi khi xóa danh mục!';
-                            categoryMessage.style.color = '#ff0000';
-                        }
+                        window.showToast('Lỗi khi xóa danh mục!', 'error');
                     });
                 }
             });
@@ -588,6 +611,7 @@ function updateCategoryList() {
 }
 
 // Export functions to global scope
+window.showToast = showToast;
 window.updateCategorySelector = updateCategorySelector;
 window.updateCategorySuggestions = updateCategorySuggestions;
 window.updateStats = updateStats;
