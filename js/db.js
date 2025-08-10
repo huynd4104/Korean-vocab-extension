@@ -1,16 +1,32 @@
 let db;
 let saveStateTimeout = null;
 
+function promisifyRequest(request) {
+    return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
 // Initialize IndexedDB
 function initDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('VocabDB', 6);
+        const request = indexedDB.open('VocabDB', 7);
 
         request.onupgradeneeded = (event) => {
             db = event.target.result;
+            let vocabStore;
             if (!db.objectStoreNames.contains('vocabulary')) {
-                db.createObjectStore('vocabulary', { keyPath: 'id', autoIncrement: true });
+                vocabStore = db.createObjectStore('vocabulary', { keyPath: 'id', autoIncrement: true });
+            } else {
+                vocabStore = event.target.transaction.objectStore('vocabulary');
             }
+
+            // Tạo chỉ mục trên 'categoryId' nếu chưa có
+            if (!vocabStore.indexNames.contains('categoryId')) {
+                vocabStore.createIndex('categoryId', 'categoryId', { unique: false });
+            }
+
             if (!db.objectStoreNames.contains('settings')) {
                 db.createObjectStore('settings');
             }
@@ -31,14 +47,14 @@ function initDB() {
         };
 
         request.onerror = (event) => {
+            console.error("Database error: ", event.target.error);
             reject(event.target.error);
         };
     });
 }
 
-// Save category
-function saveCategory(category) {
-    return new Promise((resolve, reject) => {
+async function saveCategory(category) {
+    try {
         const normalizedCategory = window.normalizeCategory(category.name);
         const transaction = db.transaction(['categories'], 'readwrite');
         const store = transaction.objectStore('categories');
@@ -48,82 +64,67 @@ function saveCategory(category) {
             categoryData.id = category.id;
         }
 
-        const request = store.put(categoryData);
+        await promisifyRequest(store.put(categoryData));
 
-        request.onsuccess = () => {
-            loadCategories().then(() => {
-                window.updateCategorySelector();
-                window.updateCategorySuggestions();
-                resolve();
-            });
-        };
-
-        request.onerror = () => reject(request.error);
-    });
+        await loadCategories();
+        window.updateCategorySelector();
+        window.updateCategorySuggestions();
+    } catch (error) {
+        console.error('Error saving category:', error);
+        window.showToast('Lỗi khi lưu danh mục!', 'error');
+        throw error;
+    }
 }
-
-// Load categories
-function loadCategories() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['categories'], 'readonly');
-        const store = transaction.objectStore('categories');
-        const request = store.getAll();
-
-        request.onsuccess = () => {
-            window.allCategories = request.result || [];
-            resolve();
-        };
-
-        request.onerror = () => {
-            reject(request.error);
-        };
-    });
-}
-
-// Delete a category
-function deleteCategory(id) {
-    return new Promise((resolve, reject) => {
+ 
+async function deleteCategory(id) {
+    try {
         const transaction = db.transaction(['categories', 'vocabulary'], 'readwrite');
         const categoryStore = transaction.objectStore('categories');
         const vocabStore = transaction.objectStore('vocabulary');
+        const vocabIndex = vocabStore.index('categoryId');
 
-        const categoryRequest = categoryStore.delete(id);
+        await promisifyRequest(categoryStore.delete(id));
 
-        categoryRequest.onsuccess = () => {
-            const vocabRequest = vocabStore.getAll();
-            vocabRequest.onsuccess = () => {
-                const updatePromises = vocabRequest.result
-                    .filter(word => word.categoryId === id)
-                    .map(word => {
-                        word.categoryId = null;
-                        return new Promise(res => {
-                            const updateRequest = vocabStore.put(word);
-                            updateRequest.onsuccess = res;
-                            updateRequest.onerror = () => reject(updateRequest.error);
-                        });
-                    });
-
-                Promise.all(updatePromises)
-                    .then(() => Promise.all([loadCategories(), loadVocabulary()]))
-                    .then(() => {
-                        window.updateCategorySelector();
-                        window.updateCategorySuggestions();
-                        window.updateCategoryList();
-                        window.filterVocabByCategory();
-                        if (window.currentMode === 'manage') {
-                            window.updateVocabList();
-                        }
-                        window.saveState();
-
-                        window.showToast('Xóa danh mục thành công!', 'success');
-                        resolve();
-                    })
-                    .catch(reject);
+        const cursorRequest = vocabIndex.openCursor(IDBKeyRange.only(id));
+        await new Promise((resolve, reject) => {
+            cursorRequest.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const word = cursor.value;
+                    word.categoryId = null;
+                    cursor.update(word); // Không cần await vì nó diễn ra trong cùng transaction
+                    cursor.continue();
+                } else {
+                    resolve();
+                }
             };
-            vocabRequest.onerror = () => reject(vocabRequest.error);
-        };
-        categoryRequest.onerror = () => reject(categoryRequest.error);
-    });
+            cursorRequest.onerror = () => reject(cursorRequest.error);
+        });
+
+        await Promise.all([loadCategories(), loadVocabulary()]);
+
+        window.updateCategorySelector();
+        window.updateCategorySuggestions();
+        window.updateCategoryList();
+        window.filterVocabByCategory();
+        if (window.currentMode === 'manage') {
+            window.updateVocabList();
+        }
+        await saveState();
+        window.showToast('Xóa danh mục thành công!', 'success');
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        window.showToast('Lỗi khi xóa danh mục!', 'error');
+        throw error;
+    }
+}
+
+
+// Load categories
+async function loadCategories() {
+    const transaction = db.transaction(['categories'], 'readonly');
+    const store = transaction.objectStore('categories');
+    window.allCategories = await promisifyRequest(store.getAll()) || [];
 }
 
 // Save state to IndexedDB with debounce
@@ -316,294 +317,202 @@ function loadState() {
 }
 
 // Load vocabulary from IndexedDB
-function loadVocabulary() {
-    return new Promise((resolve, reject) => {
+async function loadVocabulary() {
+    try {
         const transaction = db.transaction(['vocabulary', 'categories'], 'readonly');
         const vocabStore = transaction.objectStore('vocabulary');
         const categoryStore = transaction.objectStore('categories');
 
-        const categoryRequest = categoryStore.getAll();
-        categoryRequest.onsuccess = () => {
-            const categories = categoryRequest.result;
-            const vocabRequest = vocabStore.getAll();
+        const [categories, vocabulary] = await Promise.all([
+            promisifyRequest(categoryStore.getAll()),
+            promisifyRequest(vocabStore.getAll())
+        ]);
+        
+        const categoryMap = new Map(categories.map(cat => [cat.id, cat.name]));
 
-            vocabRequest.onsuccess = () => {
-                window.allVocab = vocabRequest.result.map(word => ({
-                    ...word,
-                    example: word.example || '',
-                    category: categories.find(cat => cat.id === word.categoryId)?.name || 'Khác'
-                }));
-                resolve();
-            };
-
-            vocabRequest.onerror = () => {
-                window.showToast('Lỗi khi tải danh sách từ vựng!', 'error');
-                reject(vocabRequest.error);
-            };
-        };
-
-        categoryRequest.onerror = () => reject(categoryRequest.error);
-    });
+        window.allVocab = vocabulary.map(word => ({
+            ...word,
+            example: word.example || '',
+            category: categoryMap.get(word.categoryId) || 'Khác'
+        }));
+    } catch (error) {
+         window.showToast('Lỗi khi tải danh sách từ vựng!', 'error');
+         throw error;
+    }
 }
 
 // Save a word to IndexedDB
-function saveWord(word) {
-    return new Promise((resolve, reject) => {
+async function saveWord(word) {
+    try {
         const transaction = db.transaction(['vocabulary', 'categories'], 'readwrite');
         const vocabStore = transaction.objectStore('vocabulary');
         const categoryStore = transaction.objectStore('categories');
 
-        // Find or create category
         const normalizedCategory = window.normalizeCategory(word.category);
-        const categoryRequest = categoryStore.getAll();
+        const categories = await promisifyRequest(categoryStore.getAll());
+        let category = categories.find(cat => cat.name === normalizedCategory);
 
-        categoryRequest.onsuccess = () => {
-            const categories = categoryRequest.result;
-            let category = categories.find(cat => cat.name === normalizedCategory);
+        let categoryId;
+        if (category) {
+            categoryId = category.id;
+        } else {
+            // Nếu danh mục không tồn tại, tạo mới và lấy ID
+            categoryId = await promisifyRequest(categoryStore.add({ name: normalizedCategory }));
+        }
 
-            if (!category) {
-                category = { name: normalizedCategory };
-                const addCategoryRequest = categoryStore.add(category);
-                addCategoryRequest.onsuccess = () => {
-                    category.id = addCategoryRequest.result;
-                    saveVocab();
-                };
-                addCategoryRequest.onerror = () => reject(addCategoryRequest.error);
-            } else {
-                saveVocab();
-            }
+        const vocabData = { ...word, categoryId };
+        delete vocabData.category; // Xóa trường category dạng chuỗi
 
-            function saveVocab() {
-                const vocabData = { ...word, categoryId: category.id };
-                delete vocabData.category; // Remove string category field
-                let request;
-                if (vocabData.id) {
-                    request = vocabStore.put(vocabData);
-                } else {
-                    request = vocabStore.add(vocabData);
-                }
+        if (vocabData.id) {
+            await promisifyRequest(vocabStore.put(vocabData));
+        } else {
+            await promisifyRequest(vocabStore.add(vocabData));
+        }
 
-                request.onsuccess = () => {
-                    Promise.all([loadVocabulary(), loadCategories()]).then(() => {
-                        window.updateCategorySelector();
-                        window.updateCategorySuggestions();
-                        window.updateCategoryList();
-                        window.filterVocabByCategory();
-                        if (window.currentMode === 'manage') {
-                            window.updateVocabList();
-                        }
-                        saveState();
-                        resolve();
-                    });
-                };
-
-                request.onerror = () => reject(request.error);
-            }
-        };
-
-        categoryRequest.onerror = () => reject(categoryRequest.error);
-    });
+        // Tải lại dữ liệu và cập nhật UI
+        await Promise.all([loadVocabulary(), loadCategories()]);
+        window.updateCategorySelector();
+        window.updateCategorySuggestions();
+        window.updateCategoryList();
+        window.filterVocabByCategory();
+        if (window.currentMode === 'manage') {
+            window.updateVocabList();
+        }
+        await saveState();
+    } catch (error) {
+        console.error('Error saving word:', error);
+        window.showToast('Lỗi khi lưu từ vựng!', 'error');
+        throw error;
+    }
 }
 
 // Delete a word from IndexedDB
-function deleteWord(id) {
-    return new Promise((resolve, reject) => {
+async function deleteWord(id) {
+    try {
         const transaction = db.transaction(['vocabulary'], 'readwrite');
         const store = transaction.objectStore('vocabulary');
-        const request = store.delete(id);
+        await promisifyRequest(store.delete(id));
 
-        request.onsuccess = () => {
-            loadVocabulary().then(() => {
-                window.updateCategorySelector();
-                window.updateCategorySuggestions();
-                window.filterVocabByCategory();
-                if (window.currentMode === 'manage') {
-                    window.updateVocabList();
-                }
-                saveState();
-                resolve();
-            });
-        };
-
-        request.onerror = () => reject(request.error);
-    });
+        await loadVocabulary();
+        window.updateCategorySelector();
+        window.updateCategorySuggestions();
+        window.filterVocabByCategory();
+        if (window.currentMode === 'manage') {
+            window.updateVocabList();
+        }
+        await saveState();
+    } catch (error) {
+        console.error('Error deleting word:', error);
+        window.showToast('Lỗi khi xóa từ!', 'error');
+        throw error;
+    }
 }
 
 // Delete all words from IndexedDB
-function deleteAllWords() {
-    return new Promise((resolve, reject) => {
+async function deleteAllWords() {
+    try {
         const transaction = db.transaction(['vocabulary', 'categories'], 'readwrite');
         const vocabStore = transaction.objectStore('vocabulary');
         const categoryStore = transaction.objectStore('categories');
 
-        const vocabRequest = vocabStore.clear();
-        const categoryRequest = categoryStore.clear();
+        await Promise.all([
+            promisifyRequest(vocabStore.clear()),
+            promisifyRequest(categoryStore.clear())
+        ]);
 
-        Promise.all([
-            new Promise((res, rej) => {
-                vocabRequest.onsuccess = () => res();
-                vocabRequest.onerror = () => rej(vocabRequest.error);
-            }),
-            new Promise((res, rej) => {
-                categoryRequest.onsuccess = () => res();
-                categoryRequest.onerror = () => rej(categoryRequest.error);
-            })
-        ]).then(() => {
-            window.allVocab = [];
-            window.allCategories = [];
-            Object.keys(window.modeStates).forEach(mode => {
-                window.modeStates[mode].shuffledVocab = [];
-                window.modeStates[mode].currentIndex = 0;
-            });
-            window.updateCategorySelector();
-            window.updateCategorySuggestions();
-            window.updateVocabList();
-            window.updateStats();
-            window.setMode(window.currentMode);
-            saveState();
-            resolve();
-        }).catch(err => reject(err));
-    });
+        // Reset state
+        window.allVocab = [];
+        window.allCategories = [];
+        Object.keys(window.modeStates).forEach(mode => {
+            window.modeStates[mode].shuffledVocab = [];
+            window.modeStates[mode].currentIndex = 0;
+        });
+
+        // Update UI
+        window.updateCategorySelector();
+        window.updateCategorySuggestions();
+        window.updateVocabList();
+        window.updateStats();
+        window.setMode(window.currentMode);
+        await saveState();
+    } catch (error) {
+        console.error('Error deleting all words:', error);
+        window.showToast('Lỗi khi xóa toàn bộ từ vựng!', 'error');
+        throw error;
+    }
 }
 
 // Load unknown words from IndexedDB
-function loadUnknownWords() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['unknownWords'], 'readonly');
-        const store = transaction.objectStore('unknownWords');
-        const request = store.getAll();
-
-        request.onsuccess = () => {
-            window.unknownWords = request.result;
-            window.updateUnknownList();
-            resolve();
-        };
-
-        request.onerror = () => reject(request.error);
-    });
+async function loadUnknownWords() {
+    const transaction = db.transaction(['unknownWords'], 'readonly');
+    const store = transaction.objectStore('unknownWords');
+    window.unknownWords = await promisifyRequest(store.getAll());
+    window.updateUnknownList();
 }
 
-// Save unknown word to IndexedDB
-function saveUnknownWord(word) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['unknownWords'], 'readwrite');
-        const store = transaction.objectStore('unknownWords');
-        const request = store.put(word);
-
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
+async function saveUnknownWord(word) {
+    const transaction = db.transaction(['unknownWords'], 'readwrite');
+    const store = transaction.objectStore('unknownWords');
+    await promisifyRequest(store.put(word));
 }
 
-// Delete unknown word from IndexedDB
-function deleteUnknownWord(id) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['unknownWords'], 'readwrite');
-        const store = transaction.objectStore('unknownWords');
-        const request = store.delete(id);
-
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
+async function deleteUnknownWord(id) {
+    const transaction = db.transaction(['unknownWords'], 'readwrite');
+    const store = transaction.objectStore('unknownWords');
+    await promisifyRequest(store.delete(id));
 }
 
-// Delete all unknown words from IndexedDB
-function deleteAllUnknownWords() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['unknownWords'], 'readwrite');
-        const store = transaction.objectStore('unknownWords');
-        const request = store.clear();
-
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
+async function deleteAllUnknownWords() {
+    const transaction = db.transaction(['unknownWords'], 'readwrite');
+    const store = transaction.objectStore('unknownWords');
+    await promisifyRequest(store.clear());
 }
 
 // Save API key to IndexedDB
-function saveApiKey(key) {
-    return new Promise((resolve, reject) => {
-        if (!key || window.apiKeys.some(k => k.key === key)) {
-            reject(new Error('API Key đã tồn tại hoặc không hợp lệ!'));
-            return;
-        }
+async function saveApiKey(key) {
+    if (!key) {
+        throw new Error('API Key không hợp lệ!');
+    }
+    
+    const transaction = db.transaction(['apiKeys'], 'readwrite');
+    const store = transaction.objectStore('apiKeys');
+    let keys = await promisifyRequest(store.get('geminiApiKeys')) || [];
+    if (!Array.isArray(keys)) keys = [];
 
-        const newKey = {
-            key: key,
-            requestCount: 0,
-            lastRateLimit: 0,
-            dateAdded: Date.now()
-        };
+    if (keys.some(k => k.key === key)) {
+        throw new Error('API Key đã tồn tại!');
+    }
 
-        const transaction = db.transaction(['apiKeys'], 'readwrite');
-        const store = transaction.objectStore('apiKeys');
-        const request = store.get('geminiApiKeys').onsuccess = (event) => {
-            let keys = event.target.result || [];
-            if (!Array.isArray(keys)) keys = [];
-            keys.push(newKey);
-            window.apiKeys = keys;
-            const putRequest = store.put(keys, 'geminiApiKeys');
-
-            putRequest.onsuccess = () => {
-                if (window.apiKeys.length === 1) window.currentApiKeyIndex = 0;
-                resolve();
-            };
-            putRequest.onerror = () => reject(putRequest.error);
-        };
-
-        request.onerror = () => reject(request.error);
-    });
+    keys.push({ key, requestCount: 0, lastRateLimit: 0, dateAdded: Date.now() });
+    window.apiKeys = keys;
+    
+    await promisifyRequest(store.put(keys, 'geminiApiKeys'));
+    if (window.apiKeys.length === 1) window.currentApiKeyIndex = 0;
 }
 
-// Load API keys from IndexedDB
-function loadApiKey() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['apiKeys'], 'readonly');
-        const store = transaction.objectStore('apiKeys');
-        const request = store.get('geminiApiKeys');
-
-        request.onsuccess = () => {
-            window.apiKeys = request.result || [];
-            if (!Array.isArray(window.apiKeys)) window.apiKeys = [];
-            window.currentApiKeyIndex = window.apiKeys.length > 0 ? 0 : -1;
-            resolve();
-        };
-        request.onerror = () => reject(request.error);
-    });
+async function loadApiKey() {
+    const transaction = db.transaction(['apiKeys'], 'readonly');
+    const store = transaction.objectStore('apiKeys');
+    window.apiKeys = await promisifyRequest(store.get('geminiApiKeys')) || [];
+    if (!Array.isArray(window.apiKeys)) window.apiKeys = [];
+    window.currentApiKeyIndex = window.apiKeys.length > 0 ? 0 : -1;
 }
 
-// Delete API key from IndexedDB
-function deleteApiKey(index) {
-    return new Promise((resolve, reject) => {
-        window.apiKeys.splice(index, 1);
-        if (window.currentApiKeyIndex >= window.apiKeys.length) {
-            window.currentApiKeyIndex = window.apiKeys.length > 0 ? 0 : -1;
-        }
-        const transaction = db.transaction(['apiKeys'], 'readwrite');
-        const store = transaction.objectStore('apiKeys');
-        const request = store.put(window.apiKeys, 'geminiApiKeys');
-
-        request.onsuccess = () => {
-            window.updateApiKeyList();
-            resolve();
-        };
-        request.onerror = () => reject(request.error);
-    });
+async function deleteApiKey(index) {
+    window.apiKeys.splice(index, 1);
+    if (window.currentApiKeyIndex >= window.apiKeys.length) {
+        window.currentApiKeyIndex = window.apiKeys.length > 0 ? 0 : -1;
+    }
+    const transaction = db.transaction(['apiKeys'], 'readwrite');
+    const store = transaction.objectStore('apiKeys');
+    await promisifyRequest(store.put(window.apiKeys, 'geminiApiKeys'));
+    window.updateApiKeyList();
 }
 
-function saveApiKeysToDB() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['apiKeys'], 'readwrite');
-        const store = transaction.objectStore('apiKeys');
-        const request = store.put(window.apiKeys, 'geminiApiKeys');
-
-        request.onsuccess = () => {
-            resolve();
-        };
-
-        request.onerror = () => {
-            reject(request.error);
-        };
-    });
+async function saveApiKeysToDB() {
+    const transaction = db.transaction(['apiKeys'], 'readwrite');
+    const store = transaction.objectStore('apiKeys');
+    await promisifyRequest(store.put(window.apiKeys, 'geminiApiKeys'));
 }
 
 // Export functions to global scope

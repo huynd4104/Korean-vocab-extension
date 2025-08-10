@@ -99,7 +99,7 @@ function filterVocabByCategory() {
             if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
                 window.displayFillGame();
             } else {
-                window.initFillGame(); // Khởi tạo lại game nếu trạng thái không hợp lệ
+                window.initFillGame();  
             }
         }
     }
