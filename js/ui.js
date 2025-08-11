@@ -324,64 +324,122 @@ function updateApiKeyList() {
 
 // Hiển thị từ hiện tại dựa trên chế độ
 function displayCurrentWord() {
-    const mode = window.currentMode;
-    const modeState = window.modeStates[mode];
-
-    if (mode === 'manage' || mode === 'unknown') {
-        const hasVocab = mode === 'manage' ? window.allVocab.length > 0 : window.unknownWords.length > 0;
-        toggleEmptyState(mode, !hasVocab);
-        updateStats();
+    if (!window.modeStates[window.currentMode] && window.currentMode !== 'unknown' && window.currentMode !== 'manage') {
         return;
     }
-    
-    if (!modeState) return;
 
-    const { shuffledVocab, currentIndex } = modeState;
-    const isEmpty = shuffledVocab.length === 0;
-    toggleEmptyState(mode, isEmpty);
-
-    if (isEmpty) {
+    if (window.currentMode === 'unknown') {
+        window.toggleEmptyState('unknown', window.unknownWords.length === 0);
         updateStats();
         return;
     }
 
-    const word = shuffledVocab[currentIndex];
+    if (window.currentMode === 'manage') {
+        window.toggleEmptyState('manage', window.allVocab.length === 0);
+        updateStats();
+        return;
+    }
 
-    if (mode === 'study') {
-        document.getElementById('study-category').textContent = word.category;
-        document.getElementById('study-korean').textContent = word.korean;
-        document.getElementById('study-pronunciation').textContent = word.pronunciation;
-        document.getElementById('study-vietnamese').textContent = word.vietnamese;
-        const [koreanSentence, vietnameseSentence] = word.example?.includes(' - ') ? word.example.split(' - ', 2) : [word.example || 'Chưa có câu ví dụ', ''];
-        document.getElementById('study-example-korean').textContent = koreanSentence.trim();
-        document.getElementById('study-example-vietnamese').textContent = vietnameseSentence.trim();
+    const currentState = window.modeStates[window.currentMode];
+    window.toggleEmptyState(window.currentMode, currentState.shuffledVocab.length === 0);
+
+    if (currentState.shuffledVocab.length === 0) {
+        updateStats();
+        // Đảm bảo ẩn các phần tử giao diện chính
+        if (window.currentMode === 'study') {
+            const studyCard = document.getElementById('study-card');
+            const buttonContainer = document.querySelector('#study-mode .button-container');
+            if (studyCard) studyCard.classList.add('hidden');
+            if (buttonContainer) buttonContainer.classList.add('hidden');
+        } else if (window.currentMode === 'quiz') {
+            const quizCard = document.querySelector('#quiz-mode .card');
+            const playTtsQuizBtn = document.getElementById('play-tts-quiz-btn');
+            if (quizCard) quizCard.classList.add('hidden');
+            if (playTtsQuizBtn) playTtsQuizBtn.classList.add('hidden');
+        } else if (window.currentMode === 'flashcard') {
+            const flashcard = document.getElementById('flashcard');
+            const controls = document.querySelector('#flashcard-mode .controls');
+            if (flashcard) flashcard.classList.add('hidden');
+            if (controls) controls.classList.add('hidden');
+        }
+        return;
+    }
+
+    // Logic hiển thị từ vựng hiện tại (giữ nguyên phần còn lại của hàm)
+    if (window.currentMode === 'study') {
+        const word = currentState.shuffledVocab[currentState.currentIndex];
+        const studyCategory = document.getElementById('study-category');
+        if (studyCategory) studyCategory.textContent = word.category;
+        const studyKorean = document.getElementById('study-korean');
+        if (studyKorean) studyKorean.textContent = word.korean;
+        const studyPronunciation = document.getElementById('study-pronunciation');
+        if (studyPronunciation) studyPronunciation.textContent = word.pronunciation;
+        const studyVietnamese = document.getElementById('study-vietnamese');
+        if (studyVietnamese) studyVietnamese.textContent = word.vietnamese;
+        const studyExample = document.getElementById('study-example');
+        if (studyExample) {
+            const example = word.example || '';
+            let koreanSentence = '';
+            let vietnameseSentence = '';
+            if (example && example.includes(' - ')) {
+                [koreanSentence, vietnameseSentence] = example.split(' - ', 2);
+            } else {
+                koreanSentence = example;
+            }
+            const koreanDiv = document.getElementById('study-example-korean');
+            const vietnameseDiv = document.getElementById('study-example-vietnamese');
+            if (koreanDiv) koreanDiv.textContent = koreanSentence.trim() || 'Chưa có câu ví dụ';
+            if (vietnameseDiv) vietnameseDiv.textContent = vietnameseSentence.trim();
+        }
         const studyCard = document.getElementById('study-card');
-        studyCard.classList.remove('flipped');
-        studyCard.addEventListener('click', () => studyCard.classList.toggle('flipped'));
-    } else if (mode === 'quiz') {
-        window.displayQuiz(word);
-    } else if (mode === 'flashcard') {
-        const isWordMode = modeState.flashcardDisplayMode === 'word';
-        document.getElementById('flashcard-category').textContent = word.category;
+        if (studyCard) studyCard.classList.remove('flipped');
+        if (studyCard) studyCard.addEventListener('click', window.flipStudyCard);
+    } else if (window.currentMode === 'quiz') {
+        if (window.modeStates.quiz.shuffledVocab.length > 0) {
+            window.displayQuiz(window.modeStates.quiz.shuffledVocab[window.modeStates.quiz.currentIndex]);
+        }
+    } else if (window.currentMode === 'flashcard') {
+        const word = currentState.shuffledVocab[currentState.currentIndex];
+        const flashcardCategory = document.getElementById('flashcard-category');
+        if (flashcardCategory) flashcardCategory.textContent = word.category;
+        const flashcardKorean = document.getElementById('flashcard-korean');
+        if (flashcardKorean) flashcardKorean.textContent = word.korean;
+        const flashcardPronunciation = document.getElementById('flashcard-pronunciation');
+        if (flashcardPronunciation) flashcardPronunciation.textContent = word.pronunciation;
+        const flashcardVietnamese = document.getElementById('flashcard-vietnamese');
+        if (flashcardVietnamese) flashcardVietnamese.textContent = word.vietnamese;
+        const flashcardBackKorean = document.getElementById('flashcard-back-korean');
+        if (flashcardBackKorean) flashcardBackKorean.textContent = word.korean;
+        const flashcardBackPronunciation = document.getElementById('flashcard-back-pronunciation');
+        if (flashcardBackPronunciation) flashcardBackPronunciation.textContent = word.pronunciation;
+        const flashcardBackVietnamese = document.getElementById('flashcard-back-vietnamese');
+        if (flashcardBackVietnamese) flashcardBackVietnamese.textContent = word.vietnamese;
 
-        document.getElementById('flashcard-korean').textContent = word.korean;
-        document.getElementById('flashcard-pronunciation').textContent = word.pronunciation;
-        document.getElementById('flashcard-vietnamese').textContent = word.vietnamese;
-        document.getElementById('flashcard-back-korean').textContent = word.korean;
-        document.getElementById('flashcard-back-pronunciation').textContent = word.pronunciation;
-        document.getElementById('flashcard-back-vietnamese').textContent = word.vietnamese;
-        
-        document.getElementById('flashcard-korean').classList.toggle('hidden', !isWordMode);
-        document.getElementById('flashcard-pronunciation').classList.toggle('hidden', !isWordMode);
-        document.getElementById('flashcard-vietnamese').classList.toggle('hidden', isWordMode);
-        document.getElementById('flashcard-back-korean').classList.toggle('hidden', isWordMode);
-        document.getElementById('flashcard-back-pronunciation').classList.toggle('hidden', isWordMode);
-        document.getElementById('flashcard-back-vietnamese').classList.toggle('hidden', !isWordMode);
-
-        document.querySelector('#flashcard .flip-card-front .flip-hint').textContent = isWordMode ? 'Nhấn để xem nghĩa' : 'Nhấn để xem từ';
-        document.querySelector('#flashcard .flip-card-back .flip-hint').textContent = isWordMode ? 'Nhấn để xem từ' : 'Nhấn để xem nghĩa';
-        
-        document.getElementById('flashcard').classList.remove('flipped');
+        if (currentState.flashcardDisplayMode === 'word') {
+            if (flashcardKorean) flashcardKorean.classList.remove('hidden');
+            if (flashcardPronunciation) flashcardPronunciation.classList.remove('hidden');
+            if (flashcardVietnamese) flashcardVietnamese.classList.add('hidden');
+            if (flashcardBackKorean) flashcardBackKorean.classList.add('hidden');
+            if (flashcardBackPronunciation) flashcardBackPronunciation.classList.add('hidden');
+            if (flashcardBackVietnamese) flashcardBackVietnamese.classList.remove('hidden');
+            const frontHint = document.querySelector('#flashcard .flip-card-front .flip-hint');
+            if (frontHint) frontHint.textContent = 'Nhấn để xem nghĩa';
+            const backHint = document.querySelector('#flashcard .flip-card-back .flip-hint');
+            if (backHint) backHint.textContent = 'Nhấn để xem từ';
+        } else {
+            if (flashcardKorean) flashcardKorean.classList.add('hidden');
+            if (flashcardPronunciation) flashcardPronunciation.classList.add('hidden');
+            if (flashcardVietnamese) flashcardVietnamese.classList.remove('hidden');
+            if (flashcardBackKorean) flashcardBackKorean.classList.remove('hidden');
+            if (flashcardBackPronunciation) flashcardBackPronunciation.classList.remove('hidden');
+            if (flashcardBackVietnamese) flashcardBackVietnamese.classList.add('hidden');
+            const frontHint = document.querySelector('#flashcard .flip-card-front .flip-hint');
+            if (frontHint) frontHint.textContent = 'Nhấn để xem từ';
+            const backHint = document.querySelector('#flashcard .flip-card-back .flip-hint');
+            if (backHint) backHint.textContent = 'Nhấn để xem nghĩa';
+        }
+        const flashcard = document.getElementById('flashcard');
+        if (flashcard) flashcard.classList.remove('flipped');
     }
 
     updateStats();

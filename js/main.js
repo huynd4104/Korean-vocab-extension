@@ -2,21 +2,68 @@ window.db = null;
 window.currentMode = 'study';
 window.allVocab = [];
 window.unknownWords = [];
-window.editingWordId = null;
 window.selectedCategory = 'all';
 window.searchQuery = '';
 window.apiKeys = [];
 window.allCategories = [];
-window.editingCategoryId = null; 
 window.currentApiKeyIndex = 0;
+window.modalState = {
+    wordModal: {
+        isOpen: false,
+        inputs: {
+            korean: '',
+            pronunciation: '',
+            vietnamese: '',
+            example: '',
+            note: '',
+            category: ''
+        },
+        lookupOptions: {
+            pronunciation: true,
+            vietnamese: true,
+            example: true
+        },
+        editingWordId: null,
+        saveButtonText: 'Lưu'
+    },
+    apiKeyModal: {
+        isOpen: false,
+        input: ''
+    },
+    categoryModal: {
+        isOpen: false,
+        input: '',
+        editingCategoryId: null
+    }
+};
 window.modeStates = {
-    study: { currentIndex: 0, shuffledVocab: [] },
-    quiz: { currentIndex: 0, shuffledVocab: [], quizDisplayMode: 'word' },
-    flashcard: { currentIndex: 0, shuffledVocab: [], flashcardDisplayMode: 'word' },
+    study: {
+        currentIndex: 0,
+        shuffledVocab: []
+    },
+    quiz: {
+        currentIndex: 0,
+        shuffledVocab: [],
+        quizDisplayMode: 'word'
+    },
+    flashcard: {
+        currentIndex: 0,
+        shuffledVocab: [],
+        flashcardDisplayMode: 'word'
+    },
     game: {
         currentTab: 'matching',
-        matching: { selectedKorean: null, selectedVietnamese: null, matchedPairs: [], shuffledVocab: [] },
-        fill: { currentSentence: '', correctWord: null, options: [] }
+        matching: {
+            selectedKorean: null,
+            selectedVietnamese: null,
+            matchedPairs: [],
+            shuffledVocab: []
+        },
+        fill: {
+            currentSentence: '',
+            correctWord: null,
+            options: []
+        }
     }
 };
 

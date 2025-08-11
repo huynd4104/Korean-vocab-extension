@@ -75,7 +75,7 @@ async function saveCategory(category) {
         throw error;
     }
 }
- 
+
 async function deleteCategory(id) {
     try {
         const transaction = db.transaction(['categories', 'vocabulary'], 'readwrite');
@@ -166,35 +166,7 @@ function saveState() {
                 },
                 selectedCategory: window.selectedCategory,
                 currentMode: window.currentMode,
-                modalState: {
-                    wordModal: {
-                        isOpen: !document.getElementById('word-modal')?.classList.contains('hidden') || false,
-                        inputs: {
-                            korean: document.getElementById('korean-input')?.value || '',
-                            pronunciation: document.getElementById('pronunciation-input')?.value || '',
-                            vietnamese: document.getElementById('vietnamese-input')?.value || '',
-                            example: document.getElementById('example-input')?.value || '',
-                            note: document.getElementById('note-input')?.value || '',
-                            category: document.getElementById('category-input')?.value || ''
-                        },
-                        lookupOptions: {
-                            pronunciation: document.getElementById('lookup-pronunciation')?.checked || true,
-                            vietnamese: document.getElementById('lookup-vietnamese')?.checked || true,
-                            example: document.getElementById('lookup-example')?.checked || true
-                        },
-                        editingWordId: window.editingWordId,
-                        saveButtonText: document.getElementById('save-word-btn')?.textContent || 'Lưu'
-                    },
-                    apiKeyModal: {
-                        isOpen: !document.getElementById('api-key-modal')?.classList.contains('hidden') || false,
-                        input: document.getElementById('api-key-input')?.value || ''
-                    },
-                    categoryModal: {
-                        isOpen: !document.getElementById('category-modal')?.classList.contains('hidden') || false,
-                        input: document.getElementById('category-name-input')?.value || '',
-                        editingCategoryId: window.editingCategoryId
-                    }
-                }
+                modalState: window.modalState
             };
             const transaction = db.transaction(['settings'], 'readwrite');
             const store = transaction.objectStore('settings');
@@ -244,50 +216,45 @@ function loadState() {
                 }
 
                 // Khôi phục trạng thái modal
-                window.modalState = {
-                    isModalOpen: savedState.modalState?.wordModal?.isOpen || false,
-                    modalInputs: savedState.modalState?.wordModal?.inputs || { korean: '', pronunciation: '', vietnamese: '', example: '', category: '', note: '' },
-                    lookupOptions: savedState.modalState?.wordModal?.lookupOptions || { pronunciation: true, vietnamese: true, example: true },
-                    editingWordId: savedState.modalState?.wordModal?.editingWordId || null,
-                    saveButtonText: savedState.modalState?.wordModal?.saveButtonText || 'Lưu'
-                };
-                window.editingWordId = window.modalState.editingWordId;
+                if (savedState.modalState) {
+                    window.modalState = savedState.modalState;
 
-                // Khôi phục modal Thêm/Sửa Từ Vựng
-                if (savedState.modalState?.wordModal?.isOpen) {
-                    const modal = document.getElementById('word-modal');
-                    if (modal) {
-                        modal.classList.remove('hidden');
-                        document.getElementById('korean-input').value = savedState.modalState.wordModal.inputs.korean;
-                        document.getElementById('pronunciation-input').value = savedState.modalState.wordModal.inputs.pronunciation;
-                        document.getElementById('vietnamese-input').value = savedState.modalState.wordModal.inputs.vietnamese;
-                        document.getElementById('example-input').value = savedState.modalState.wordModal.inputs.example;
-                        document.getElementById('note-input').value = savedState.modalState.wordModal.inputs.note || '';
-                        document.getElementById('category-input').value = savedState.modalState.wordModal.inputs.category;
-                        document.getElementById('lookup-pronunciation').checked = savedState.modalState.wordModal.lookupOptions.pronunciation;
-                        document.getElementById('lookup-vietnamese').checked = savedState.modalState.wordModal.lookupOptions.vietnamese;
-                        document.getElementById('lookup-example').checked = savedState.modalState.wordModal.lookupOptions.example;
-                        document.getElementById('save-word-btn').textContent = savedState.modalState.wordModal.saveButtonText;
+                    // Khôi phục modal Thêm/Sửa Từ Vựng
+                    if (savedState.modalState.wordModal?.isOpen) {
+                        const modal = document.getElementById('word-modal');
+                        if (modal) {
+                            modal.classList.remove('hidden');
+                            document.getElementById('korean-input').value = savedState.modalState.wordModal.inputs.korean;
+                            document.getElementById('pronunciation-input').value = savedState.modalState.wordModal.inputs.pronunciation;
+                            document.getElementById('vietnamese-input').value = savedState.modalState.wordModal.inputs.vietnamese;
+                            document.getElementById('example-input').value = savedState.modalState.wordModal.inputs.example;
+                            document.getElementById('note-input').value = savedState.modalState.wordModal.inputs.note || '';
+                            document.getElementById('category-input').value = savedState.modalState.wordModal.inputs.category;
+                            document.getElementById('lookup-pronunciation').checked = savedState.modalState.wordModal.lookupOptions.pronunciation;
+                            document.getElementById('lookup-vietnamese').checked = savedState.modalState.wordModal.lookupOptions.vietnamese;
+                            document.getElementById('lookup-example').checked = savedState.modalState.wordModal.lookupOptions.example;
+                            document.getElementById('save-word-btn').textContent = savedState.modalState.wordModal.saveButtonText;
+                        }
                     }
-                }
 
-                // Khôi phục modal Quản Lý API Key Gemini
-                if (savedState.modalState?.apiKeyModal?.isOpen) {
-                    const apiKeyModal = document.getElementById('api-key-modal');
-                    if (apiKeyModal) {
-                        apiKeyModal.classList.remove('hidden');
-                        document.getElementById('api-key-input').value = savedState.modalState.apiKeyModal.input;
+                    // Khôi phục modal API Key
+                    if (savedState.modalState?.apiKeyModal?.isOpen) {
+                        const apiKeyModal = document.getElementById('api-key-modal');
+                        if (apiKeyModal) {
+                            apiKeyModal.classList.remove('hidden');
+                            document.getElementById('api-key-input').value = savedState.modalState.apiKeyModal.input;
+                        }
                     }
-                }
 
-                // Khôi phục modal Quản Lý Danh Mục
-                if (savedState.modalState?.categoryModal?.isOpen) {
-                    const categoryModal = document.getElementById('category-modal');
-                    if (categoryModal) {
-                        categoryModal.classList.remove('hidden');
-                        document.getElementById('category-name-input').value = savedState.modalState.categoryModal.input;
-                        window.editingCategoryId = savedState.modalState.categoryModal.editingCategoryId || null;
-                        document.getElementById('save-category-btn').textContent = window.editingCategoryId !== null ? 'Cập Nhật' : 'Thêm Danh Mục';
+                    // Khôi phục modal Category
+                    if (savedState.modalState?.categoryModal?.isOpen) {
+                        const categoryModal = document.getElementById('category-modal');
+                        if (categoryModal) {
+                            categoryModal.classList.remove('hidden');
+                            document.getElementById('category-name-input').value = savedState.modalState.categoryModal.input;
+                            window.editingCategoryId = savedState.modalState.categoryModal.editingCategoryId || null;
+                            document.getElementById('save-category-btn').textContent = window.editingCategoryId !== null ? 'Cập Nhật' : 'Thêm Danh Mục';
+                        }
                     }
                 }
 
@@ -327,7 +294,7 @@ async function loadVocabulary() {
             promisifyRequest(categoryStore.getAll()),
             promisifyRequest(vocabStore.getAll())
         ]);
-        
+
         const categoryMap = new Map(categories.map(cat => [cat.id, cat.name]));
 
         window.allVocab = vocabulary.map(word => ({
@@ -336,8 +303,8 @@ async function loadVocabulary() {
             category: categoryMap.get(word.categoryId) || 'Khác'
         }));
     } catch (error) {
-         window.showToast('Lỗi khi tải danh sách từ vựng!', 'error');
-         throw error;
+        window.showToast('Lỗi khi tải danh sách từ vựng!', 'error');
+        throw error;
     }
 }
 
@@ -473,7 +440,7 @@ async function saveApiKey(key) {
     if (!key) {
         throw new Error('API Key không hợp lệ!');
     }
-    
+
     const transaction = db.transaction(['apiKeys'], 'readwrite');
     const store = transaction.objectStore('apiKeys');
     let keys = await promisifyRequest(store.get('geminiApiKeys')) || [];
@@ -485,7 +452,7 @@ async function saveApiKey(key) {
 
     keys.push({ key, requestCount: 0, lastRateLimit: 0, dateAdded: Date.now() });
     window.apiKeys = keys;
-    
+
     await promisifyRequest(store.put(keys, 'geminiApiKeys'));
     if (window.apiKeys.length === 1) window.currentApiKeyIndex = 0;
 }

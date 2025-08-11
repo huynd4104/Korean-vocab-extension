@@ -3,7 +3,9 @@ function setupWordModal(word = {}) {
     const isEditing = !!word.id;
 
     // Cập nhật trạng thái global
-    window.editingWordId = word.id || null;
+    window.modalState.wordModal.isOpen = true;
+    window.modalState.wordModal.editingWordId = word.id || null;
+    window.modalState.wordModal.saveButtonText = isEditing ? 'Cập Nhật' : 'Lưu';
 
     // Lấy các element của form
     const elements = {
@@ -17,27 +19,31 @@ function setupWordModal(word = {}) {
         modal: document.getElementById('word-modal'),
     };
 
-    // Điền dữ liệu vào form
-    if (elements.korean) elements.korean.value = word.korean || '';
-    if (elements.pronunciation) elements.pronunciation.value = word.pronunciation || '';
-    if (elements.vietnamese) elements.vietnamese.value = word.vietnamese || '';
-    if (elements.example) elements.example.value = word.example || '';
-    if (elements.note) elements.note.value = word.note || '';
-    if (elements.category) elements.category.value = word.category || '';
-    if (elements.saveBtn) elements.saveBtn.textContent = isEditing ? 'Cập Nhật' : 'Lưu';
-    
-    // Cập nhật các checkbox tra cứu (mặc định là true khi mở)
-    const lookupPronunciation = document.getElementById('lookup-pronunciation');
-    if (lookupPronunciation) lookupPronunciation.checked = true;
-    const lookupVietnamese = document.getElementById('lookup-vietnamese');
-    if (lookupVietnamese) lookupVietnamese.checked = true;
-    const lookupExample = document.getElementById('lookup-example');
-    if (lookupExample) lookupExample.checked = true;
+    // Điền dữ liệu vào form VÀ cập nhật trực tiếp vào state
+    elements.korean.value = word.korean || '';
+    window.modalState.wordModal.inputs.korean = elements.korean.value;
 
-    // Hiển thị modal
+    elements.pronunciation.value = word.pronunciation || '';
+    window.modalState.wordModal.inputs.pronunciation = elements.pronunciation.value;
+
+    elements.vietnamese.value = word.vietnamese || '';
+    window.modalState.wordModal.inputs.vietnamese = elements.vietnamese.value;
+
+    elements.example.value = word.example || '';
+    window.modalState.wordModal.inputs.example = elements.example.value;
+
+    elements.note.value = word.note || '';
+    window.modalState.wordModal.inputs.note = elements.note.value;
+
+    elements.category.value = word.category || '';
+    window.modalState.wordModal.inputs.category = elements.category.value;
+
+    elements.saveBtn.textContent = window.modalState.wordModal.saveButtonText;
+
+    // Hiển thị modal và các thao tác khác
     if (elements.modal) elements.modal.classList.remove('hidden');
     window.updateCategorySuggestions();
-    window.saveState(); 
+    window.saveState();  
 }
 
 function openAddWordModal() {
@@ -63,21 +69,26 @@ function closeModal() {
     clearWordModalForm();
     const wordModal = document.getElementById('word-modal');
     if (wordModal) wordModal.classList.add('hidden');
+    window.modalState.wordModal.isOpen = false; 
     window.saveState();
 }
 
 // API Key modal functions
 function openApiKeyModal() {
     document.getElementById('api-key-modal')?.classList.remove('hidden');
+    window.modalState.apiKeyModal.isOpen = true;
     window.updateApiKeyList();
+    window.saveState();
 }
 
 function closeApiKeyModal() {
     const apiKeyInput = document.getElementById('api-key-input');
     if (apiKeyInput) apiKeyInput.value = '';
     document.getElementById('api-key-modal')?.classList.add('hidden');
+    window.modalState.apiKeyModal.isOpen = false; 
+    window.modalState.apiKeyModal.input = '';  
+    window.saveState();
 }
-
 
 async function handleSaveApiKey() {
     const apiKeyInput = document.getElementById('api-key-input');
@@ -101,6 +112,20 @@ async function handleSaveApiKey() {
 }
 
 // Category modal functions
+function resetCategoryModal() {
+    const categoryInput = document.getElementById('category-name-input');
+    if (categoryInput) categoryInput.value = '';
+    const saveCategoryBtn = document.getElementById('save-category-btn');
+    if (saveCategoryBtn) saveCategoryBtn.textContent = 'Thêm Danh Mục';
+
+    window.editingCategoryId = null; 
+    
+    window.modalState.categoryModal.input = '';
+    window.modalState.categoryModal.editingCategoryId = null;
+    
+    window.saveState(); 
+}
+
 function clearCategoryModalForm() {
     const categoryInput = document.getElementById('category-name-input');
     if (categoryInput) categoryInput.value = '';
@@ -110,14 +135,21 @@ function clearCategoryModalForm() {
 }
 
 function openCategoryModal() {
-    clearCategoryModalForm();
+    resetCategoryModal();
     document.getElementById('category-modal')?.classList.remove('hidden');
+    window.modalState.categoryModal.isOpen = true; 
     window.updateCategoryList();
+    window.saveState();
 }
 
 function closeCategoryModal() {
-    clearCategoryModalForm();
-    document.getElementById('category-modal')?.classList.add('hidden');
+    if (window.modalState.categoryModal.editingCategoryId !== null) {
+        resetCategoryModal();
+    } else {
+        document.getElementById('category-modal')?.classList.add('hidden');
+        window.modalState.categoryModal.isOpen = false;
+        resetCategoryModal(); 
+    }
 }
 
 async function handleSaveCategory() {
@@ -150,7 +182,7 @@ async function handleSaveCategory() {
         const successMessage = window.editingCategoryId !== null ? 'Cập nhật danh mục thành công!' : 'Thêm danh mục thành công!';
         window.showToast(successMessage, 'success');
 
-        clearCategoryModalForm();
+        resetCategoryModal();
         
         await Promise.all([window.loadVocabulary(), window.loadCategories()]);
         
@@ -174,7 +206,12 @@ function editCategory(category) {
     categoryInput.value = category.name;
     saveCategoryBtn.textContent = 'Cập Nhật';
     window.editingCategoryId = category.id;
+    // Cập nhật state
+    window.modalState.categoryModal.isOpen = true;
+    window.modalState.categoryModal.input = category.name;
+    window.modalState.categoryModal.editingCategoryId = category.id;
     categoryModal.classList.remove('hidden');
+    window.saveState();
 }
 
 // Form handlers
@@ -207,8 +244,8 @@ async function handleSaveWord() {
         note: elements.note.value.trim(),
     };
 
-    if (window.editingWordId !== null) {
-        word.id = window.editingWordId;
+    if (window.modalState.wordModal.editingWordId !== null) {  
+        word.id = window.modalState.wordModal.editingWordId;
     }
 
     try {
@@ -595,39 +632,6 @@ function initializeEventListeners() {
     const saveApiKeyBtn = document.getElementById('save-api-key-btn');
     if (saveApiKeyBtn) saveApiKeyBtn.addEventListener('click', handleSaveApiKey);
 
-    // Modal input listeners for state saving
-    ['korean-input', 'pronunciation-input', 'vietnamese-input', 'example-input', 'category-input'].forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', () => {
-                window.modalState.modalInputs = {
-                    korean: document.getElementById('korean-input')?.value || '',
-                    pronunciation: document.getElementById('pronunciation-input')?.value || '',
-                    vietnamese: document.getElementById('vietnamese-input')?.value || '',
-                    note: document.getElementById('note-input')?.value || '',
-                    example: document.getElementById('example-input')?.value || '',
-                    category: document.getElementById('category-input')?.value || ''
-                };
-                window.saveState();
-            });
-        }
-    });
-
-    // Modal checkbox listeners for state saving
-    ['lookup-pronunciation', 'lookup-vietnamese', 'lookup-example'].forEach(id => {
-        const checkbox = document.getElementById(id);
-        if (checkbox) {
-            checkbox.addEventListener('change', () => {
-                window.modalState.lookupOptions = {
-                    pronunciation: document.getElementById('lookup-pronunciation')?.checked || true,
-                    vietnamese: document.getElementById('lookup-vietnamese')?.checked || true,
-                    example: document.getElementById('lookup-example')?.checked || true
-                };
-                window.saveState();
-            });
-        }
-    });
-
     // Keyboard navigation
     document.addEventListener('keydown', (event) => {
         const activeElement = document.activeElement;
@@ -680,6 +684,59 @@ function initializeEventListeners() {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('korean-input')?.addEventListener('input', (e) => {
+        window.modalState.wordModal.inputs.korean = e.target.value;
+        window.saveState();  
+    });
+    document.getElementById('pronunciation-input')?.addEventListener('input', (e) => {
+        window.modalState.wordModal.inputs.pronunciation = e.target.value;
+        window.saveState();
+    });
+    document.getElementById('vietnamese-input')?.addEventListener('input', (e) => {
+        window.modalState.wordModal.inputs.vietnamese = e.target.value;
+        window.saveState();
+    });
+    document.getElementById('example-input')?.addEventListener('input', (e) => {
+        window.modalState.wordModal.inputs.example = e.target.value;
+        window.saveState();
+    });
+    document.getElementById('note-input')?.addEventListener('input', (e) => {
+        window.modalState.wordModal.inputs.note = e.target.value;
+        window.saveState();
+    });
+    document.getElementById('category-input')?.addEventListener('input', (e) => {
+        window.modalState.wordModal.inputs.category = e.target.value;
+        window.saveState();
+    });
+
+    // Lookup options
+    document.getElementById('lookup-pronunciation')?.addEventListener('change', (e) => {
+        window.modalState.wordModal.lookupOptions.pronunciation = e.target.checked;
+        window.saveState();
+    });
+    document.getElementById('lookup-vietnamese')?.addEventListener('change', (e) => {
+        window.modalState.wordModal.lookupOptions.vietnamese = e.target.checked;
+        window.saveState();
+    });
+    document.getElementById('lookup-example')?.addEventListener('change', (e) => {
+        window.modalState.wordModal.lookupOptions.example = e.target.checked;
+        window.saveState();
+    });
+
+    // API Key Modal
+    document.getElementById('api-key-input')?.addEventListener('input', (e) => {
+        window.modalState.apiKeyModal.input = e.target.value;
+        window.saveState();
+    });
+
+    // Category Modal
+    document.getElementById('category-name-input')?.addEventListener('input', (e) => {
+        window.modalState.categoryModal.input = e.target.value;
+        window.saveState();
+    });
+});
 
 // Export functions to global scope
 window.openAddWordModal = openAddWordModal;
