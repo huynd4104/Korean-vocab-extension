@@ -75,7 +75,7 @@ body {
 }
 
 .toast.error {
-    background: linear-gradient(135deg,#ff6b6b 0%,#ee5a52 100%);
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
     border-left: 6px solid #b91c1c;
     color: #ffffff;
 }
@@ -1664,4 +1664,22 @@ datalist#category-suggestions option:hover {
     color: var(--color-dark);
     font-weight: 600;
     font-size: 1.2em;
+}
+
+#confirmation-message {
+    margin-bottom: 35px;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: #2c3e50;
+    text-align: center;
+    white-space: pre-line;
+}
+
+/* Button Container */
+.confirmation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }

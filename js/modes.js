@@ -74,6 +74,7 @@ function handleGameMode() {
             }
         }
     }
+    window.updateStats(); 
 }
 
 function setMode(mode) {

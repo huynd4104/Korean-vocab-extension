@@ -92,7 +92,7 @@ async function deleteCategory(id) {
                 if (cursor) {
                     const word = cursor.value;
                     word.categoryId = null;
-                    cursor.update(word); // Không cần await vì nó diễn ra trong cùng transaction
+                    cursor.update(word);  
                     cursor.continue();
                 } else {
                     resolve();
@@ -341,7 +341,6 @@ async function saveWord(word, options = {}) {
             await promisifyRequest(vocabStore.add(vocabData));
         }
 
-        // Chỉ cập nhật giao diện nếu không có tùy chọn skipUIUpdates
         if (!options.skipUIUpdates) {
             await Promise.all([loadVocabulary(), loadCategories()]);
             window.updateCategorySelector();

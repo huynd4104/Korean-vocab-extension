@@ -43,6 +43,35 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
+// Hiển thị popup xác nhận chung
+function showConfirmationModal(message, onConfirm) {
+    const modal = document.getElementById('confirmation-modal');
+    const messageEl = document.getElementById('confirmation-message');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    if (!modal || !messageEl || !confirmBtn || !cancelBtn) return;
+
+    messageEl.textContent = message;
+    modal.classList.remove('hidden');
+
+    const confirmHandler = () => {
+        onConfirm();
+        modal.classList.add('hidden');
+        confirmBtn.removeEventListener('click', confirmHandler);
+        cancelBtn.removeEventListener('click', cancelHandler);
+    };
+
+    const cancelHandler = () => {
+        modal.classList.add('hidden');
+        confirmBtn.removeEventListener('click', confirmHandler);
+        cancelBtn.removeEventListener('click', cancelHandler);
+    };
+
+    confirmBtn.addEventListener('click', confirmHandler);
+    cancelBtn.addEventListener('click', cancelHandler);
+}
+
 // Update category selector dropdown
 function updateCategorySelector() {
     const select = document.getElementById('category-select');
@@ -164,7 +193,7 @@ function updateVocabList() {
         vocabActions.querySelector('.edit-btn').addEventListener('click', () => window.editWord(word));
         
         vocabActions.querySelector('.delete-btn').addEventListener('click', () => {
-            if (confirm(`Bạn có chắc muốn xóa từ "${word.korean}"?`)) {
+            window.showConfirmationModal(`Bạn có chắc muốn xóa từ "${word.korean}"?`, () => {
                 window.deleteWord(word.id).then(() => {
                     showToast('Xóa từ thành công!', 'success');
                     vocabItem.remove(); 
@@ -175,7 +204,7 @@ function updateVocabList() {
                     console.error('Error deleting word:', err);
                     showToast('Lỗi khi xóa từ!', 'error');
                 });
-            }
+            });
         });
 
         vocabActions.querySelector('.example-btn').addEventListener('click', () => {
@@ -232,7 +261,7 @@ function updateUnknownList() {
                 </div>`;
             
             item.querySelector('.delete-unknown-btn').addEventListener('click', () => {
-                if (confirm(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chưa biết không?`)) {
+                window.showConfirmationModal(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chưa biết không?`, () => {
                     window.deleteUnknownWord(word.id).then(() => {
                         showToast('Đã xóa từ khỏi danh sách chú ý!', 'success');
                         window.loadUnknownWords();
@@ -240,7 +269,7 @@ function updateUnknownList() {
                         console.error('Error deleting unknown word:', err);
                         showToast('Lỗi khi xóa từ chưa biết!', 'error');
                     });
-                }
+                });
             });
             fragment.appendChild(item);
         });
@@ -250,16 +279,15 @@ function updateUnknownList() {
     const clearButton = document.getElementById('clear-unknown-btn');
     if (clearButton) {
         clearButton.onclick = () => {
-            if (confirm('Bạn có chắc muốn xóa tất cả từ chưa biết?')) {
+            window.showConfirmationModal('Bạn có chắc muốn xóa tất cả từ chưa biết?', () => {
                 window.deleteAllUnknownWords().then(() => {
                     showToast('Đã xóa tất cả từ khỏi danh sách chú ý!', 'success');
                     window.loadUnknownWords();
                 });
-            }
+            });
         };
     }
 }
-
 
 // Update API key list
 function updateApiKeyList() {
@@ -309,18 +337,17 @@ function updateApiKeyList() {
             </div>`;
 
         apiKeyItem.querySelector('.delete-key-btn').addEventListener('click', () => {
-            if (confirm('Bạn có chắc chắn muốn xóa API Key này không?')) {
+            window.showConfirmationModal('Bạn có chắc chắn muốn xóa API Key này không?', () => {
                 window.deleteApiKey(index).catch(error => {
                     console.error('Lỗi khi xóa API Key:', error);
-                    alert('Không thể xóa API Key. Vui lòng thử lại.');
+                    showToast('Không thể xóa API Key. Vui lòng thử lại.', 'error');
                 });
-            }
+            });
         });
         fragment.appendChild(apiKeyItem);
     });
     apiKeyListDiv.appendChild(fragment);
 }
-
 
 // Hiển thị từ hiện tại dựa trên chế độ
 function displayCurrentWord() {
@@ -475,7 +502,6 @@ function toggleEmptyState(mode, isEmpty) {
     }
 }
 
-
 function updateCategoryList() {
     const categoryListDiv = document.getElementById('category-list');
     if (!categoryListDiv) return;
@@ -508,11 +534,11 @@ function updateCategoryList() {
         categoryItem.querySelector('.edit-category-btn').addEventListener('click', () => window.editCategory(category));
         
         categoryItem.querySelector('.delete-category-btn').addEventListener('click', () => {
-            if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"? Các từ vựng thuộc danh mục này sẽ không còn danh mục.`)) {
+            window.showConfirmationModal(`Bạn có chắc chắn muốn xóa danh mục\n "${category.name}"`, () => {
                 window.deleteCategory(category.id).catch(err => {
                     showToast('Lỗi khi xóa danh mục!', 'error');
                 });
-            }
+            });
         });
         
         fragment.appendChild(categoryItem);
@@ -520,7 +546,6 @@ function updateCategoryList() {
     
     categoryListDiv.appendChild(fragment);
 }
-
 
 // Export functions to global scope
 window.showToast = showToast;
