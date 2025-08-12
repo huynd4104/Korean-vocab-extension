@@ -355,7 +355,7 @@ body {
 
 .game-content,
 .quiz-content,
-.unknown-content {
+.attention-content {
     background: transparent;
     border-radius: 24px;
     padding: 22px;
@@ -1614,7 +1614,7 @@ datalist#category-suggestions option:hover {
     margin-bottom: 15px;
 }
 
-.unknown-header {
+.attention-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1623,7 +1623,7 @@ datalist#category-suggestions option:hover {
     border-bottom: 2px solid #f0f0f0;
 }
 
-.unknown-count {
+.attention-count {
     background: linear-gradient(135deg, var(--color-warning) 0%, #dc972e 100%, #ffb74d 50%);
     color: white;
     padding: 8px 16px;
@@ -1632,7 +1632,7 @@ datalist#category-suggestions option:hover {
     font-weight: 600;
 }
 
-.vocab-item.unknown-item {
+.vocab-item.attention-item {
     background: white;
     border: 1px solid #ffcdd2;
     border-radius: 12px;
@@ -1642,25 +1642,25 @@ datalist#category-suggestions option:hover {
     transition: all 0.3s ease;
 }
 
-.vocab-item.unknown-item:hover {
+.vocab-item.attention-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
 }
 
-.vocab-info.unknown-info .korean-text {
+.vocab-info.attention-info .korean-text {
     font-size: 1.5em;
     font-weight: bold;
     color: #d32f2f;
     margin-bottom: 8px;
 }
 
-.vocab-info.unknown-info .pronunciation-text {
+.vocab-info.attention-info .pronunciation-text {
     color: #666;
     font-style: italic;
     margin-bottom: 8px;
 }
 
-.vocab-info.unknown-info .vietnamese-text {
+.vocab-info.attention-info .vietnamese-text {
     color: var(--color-dark);
     font-weight: 600;
     font-size: 1.2em;

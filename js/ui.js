@@ -230,63 +230,56 @@ function updateVocabList() {
     vocabList.appendChild(fragment);  
 }
 
-// Update unknown words list
-function updateUnknownList() {
-    const unknownList = document.getElementById('unknown-list');
-    const unknownHeader = document.getElementById('unknown-header');
-    if (!unknownList || !unknownHeader) return;
+// Update attention words list
+function updateAttentionList() {
+    const attentionList = document.getElementById('attention-list');
+    const attentionHeader = document.getElementById('attention-header');
+    if (!attentionList || !attentionHeader) return;
 
-    unknownHeader.innerHTML = `
-        ${window.unknownWords.length > 0 ? `<span class="unknown-count">📌 ${window.unknownWords.length} từ</span>` : ''}
-        <button class="btn btn-secondary" id="clear-unknown-btn" style="${window.unknownWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
+    attentionHeader.innerHTML = `
+        ${window.attentionWords.length > 0 ? `<span class="attention-count">📌 ${window.attentionWords.length} từ</span>` : ''}
+        <button class="btn btn-secondary" id="clear-attention-btn" style="${window.attentionWords.length === 0 ? 'display:none;' : ''}">🗑️ Xóa Tất Cả</button>
     `;
 
-    unknownList.innerHTML = '';
+    attentionList.innerHTML = '';
     const fragment = document.createDocumentFragment(); 
     
-    window.toggleEmptyState('unknown', window.unknownWords.length === 0);
+    window.toggleEmptyState('attention', window.attentionWords.length === 0);
 
-    if (window.unknownWords.length > 0) {
-        window.unknownWords.forEach(word => {
+    if (window.attentionWords.length > 0) {
+        window.attentionWords.forEach(word => {
             const item = document.createElement('div');
-            item.className = 'vocab-item unknown-item';
+            item.className = 'vocab-item attention-item';
             item.innerHTML = `
-                <div class="vocab-info unknown-info">
+                <div class="vocab-info attention-info">
                     <div class="korean-text">${word.korean}</div>
                     <div class="pronunciation-text">(${word.pronunciation})</div>
                     <div class="vietnamese-text">${word.vietnamese}</div>
                 </div>
                 <div class="vocab-actions">
-                    <button class="btn btn-secondary delete-unknown-btn">Xóa</button>
+                    <button class="btn btn-secondary delete-attention-btn">Xóa</button>
                 </div>`;
             
-            item.querySelector('.delete-unknown-btn').addEventListener('click', () => {
-                window.showConfirmationModal(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chưa biết không?`, () => {
-                    window.deleteUnknownWord(word.id).then(() => {
+            item.querySelector('.delete-attention-btn').addEventListener('click', () => {
+                window.showConfirmationModal(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chú ý không?`, () => {
+                    window.deleteAttentionWord(word.id).then(() => {
                         showToast('Đã xóa từ khỏi danh sách chú ý!', 'success');
-                        window.loadUnknownWords();
+                        window.loadAttentionWords();
                     }).catch(err => {
-                        console.error('Error deleting unknown word:', err);
-                        showToast('Lỗi khi xóa từ chưa biết!', 'error');
+                        console.error('Error deleting attention word:', err);
+                        showToast('Lỗi khi xóa từ!', 'error');
                     });
                 });
             });
             fragment.appendChild(item);
         });
     }
-    unknownList.appendChild(fragment);
+    attentionList.appendChild(fragment);
 
-    const clearButton = document.getElementById('clear-unknown-btn');
+    const clearButton = document.getElementById('clear-attention-btn');
     if (clearButton) {
-        clearButton.onclick = () => {
-            window.showConfirmationModal('Bạn có chắc muốn xóa tất cả từ chưa biết?', () => {
-                window.deleteAllUnknownWords().then(() => {
-                    showToast('Đã xóa tất cả từ khỏi danh sách chú ý!', 'success');
-                    window.loadUnknownWords();
-                });
-            });
-        };
-    }
+    clearButton.onclick = window.handleDeleteAllAttention; 
+}
 }
 
 // Update API key list
@@ -351,12 +344,12 @@ function updateApiKeyList() {
 
 // Hiển thị từ hiện tại dựa trên chế độ
 function displayCurrentWord() {
-    if (!window.modeStates[window.currentMode] && window.currentMode !== 'unknown' && window.currentMode !== 'manage') {
+    if (!window.modeStates[window.currentMode] && window.currentMode !== 'attention' && window.currentMode !== 'manage') {
         return;
     }
 
-    if (window.currentMode === 'unknown') {
-        window.toggleEmptyState('unknown', window.unknownWords.length === 0);
+    if (window.currentMode === 'attention') {
+        window.toggleEmptyState('attention', window.attentionWords.length === 0);
         updateStats();
         return;
     }
@@ -485,7 +478,7 @@ function toggleEmptyState(mode, isEmpty) {
         flashcard: ['#flashcard', '#flashcard-mode .controls'],
         matching: ['#matching-game'],
         fill: ['#fill-game'],
-        unknown: ['#unknown-mode .card'],
+        attention: ['#attention-mode .card'],
     };
 
     if (UIMap[mode]) {
@@ -553,7 +546,7 @@ window.updateCategorySelector = updateCategorySelector;
 window.updateCategorySuggestions = updateCategorySuggestions;
 window.updateStats = updateStats;
 window.updateVocabList = updateVocabList;
-window.updateUnknownList = updateUnknownList;
+window.updateAttentionList = updateAttentionList;
 window.updateApiKeyList = updateApiKeyList;
 window.displayCurrentWord = displayCurrentWord;
 window.toggleEmptyState = toggleEmptyState;

@@ -111,7 +111,7 @@ function markWrong() {
     if (window.modeStates[window.currentMode]?.shuffledVocab.length > 0) {
         const currentState = window.modeStates[window.currentMode];
         const word = currentState.shuffledVocab[currentState.currentIndex];
-        window.saveUnknownWord(word).then(() => {
+        window.saveAttentionWord(word).then(() => {
             nextWord();
             window.saveState();
         }).catch(err => {

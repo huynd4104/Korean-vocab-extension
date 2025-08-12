@@ -30,8 +30,8 @@ function initDB() {
             if (!db.objectStoreNames.contains('settings')) {
                 db.createObjectStore('settings');
             }
-            if (!db.objectStoreNames.contains('unknownWords')) {
-                db.createObjectStore('unknownWords', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('attentionWords')) {
+                db.createObjectStore('attentionWords', { keyPath: 'id' });
             }
             if (!db.objectStoreNames.contains('apiKeys')) {
                 db.createObjectStore('apiKeys');
@@ -415,29 +415,29 @@ async function deleteAllWords() {
     }
 }
 
-// Load unknown words from IndexedDB
-async function loadUnknownWords() {
-    const transaction = db.transaction(['unknownWords'], 'readonly');
-    const store = transaction.objectStore('unknownWords');
-    window.unknownWords = await promisifyRequest(store.getAll());
-    window.updateUnknownList();
+// Load attention words from IndexedDB
+async function loadAttentionWords() {
+    const transaction = db.transaction(['attentionWords'], 'readonly');
+    const store = transaction.objectStore('attentionWords');
+    window.attentionWords = await promisifyRequest(store.getAll());
+    window.updateAttentionList();
 }
 
-async function saveUnknownWord(word) {
-    const transaction = db.transaction(['unknownWords'], 'readwrite');
-    const store = transaction.objectStore('unknownWords');
+async function saveAttentionWord(word) {
+    const transaction = db.transaction(['attentionWords'], 'readwrite');
+    const store = transaction.objectStore('attentionWords');
     await promisifyRequest(store.put(word));
 }
 
-async function deleteUnknownWord(id) {
-    const transaction = db.transaction(['unknownWords'], 'readwrite');
-    const store = transaction.objectStore('unknownWords');
+async function deleteAttentionWord(id) {
+    const transaction = db.transaction(['attentionWords'], 'readwrite');
+    const store = transaction.objectStore('attentionWords');
     await promisifyRequest(store.delete(id));
 }
 
-async function deleteAllUnknownWords() {
-    const transaction = db.transaction(['unknownWords'], 'readwrite');
-    const store = transaction.objectStore('unknownWords');
+async function deleteAllAttentionWords() {
+    const transaction = db.transaction(['attentionWords'], 'readwrite');
+    const store = transaction.objectStore('attentionWords');
     await promisifyRequest(store.clear());
 }
 
@@ -496,10 +496,10 @@ window.loadVocabulary = loadVocabulary;
 window.saveWord = saveWord;
 window.deleteWord = deleteWord;
 window.deleteAllWords = deleteAllWords;
-window.loadUnknownWords = loadUnknownWords;
-window.saveUnknownWord = saveUnknownWord;
-window.deleteUnknownWord = deleteUnknownWord;
-window.deleteAllUnknownWords = deleteAllUnknownWords;
+window.loadAttentionWords = loadAttentionWords;
+window.saveAttentionWord = saveAttentionWord;
+window.deleteAttentionWord = deleteAttentionWord;
+window.deleteAllAttentionWords = deleteAllAttentionWords;
 window.saveApiKey = saveApiKey;
 window.loadApiKey = loadApiKey;
 window.deleteApiKey = deleteApiKey;

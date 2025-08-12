@@ -447,17 +447,17 @@ function handleDeleteAll() {
     });
 }
 
-function handleDeleteAllUnknown() {
-    if (window.unknownWords.length === 0) {
-        window.showToast('Không có từ chưa biết để xóa!', 'error');
+function handleDeleteAllAttention() {
+    if (window.attentionWords.length === 0) {
+        window.showToast('Không có từ để xóa!', 'error');
         return;
     }
 
-    window.showConfirmationModal('Bạn có chắc muốn xóa tất cả từ chưa biết?', () => {
-        window.deleteAllUnknownWords().then(() => {
-            window.unknownWords = [];
-            window.updateUnknownList();
-            window.showToast('Đã xóa tất cả từ chưa biết!', 'success');
+    window.showConfirmationModal('Bạn có chắc muốn xóa tất cả từ trong danh sách chú ý?', () => {
+        window.deleteAllAttentionWords().then(() => {
+            window.attentionWords = [];
+            window.updateAttentionList();
+            showToast('Đã xóa tất cả từ khỏi danh sách chú ý!', 'success');
         }).catch(err => {
             window.showToast('Lỗi khi xóa tất cả từ!', 'error');
         });
@@ -482,7 +482,7 @@ function initializeEventListeners() {
         'study': document.getElementById('study-mode-btn'),
         'quiz': document.getElementById('quiz-mode-btn'),
         'flashcard': document.getElementById('flashcard-mode-btn'),
-        'unknown': document.getElementById('unknown-mode-btn'),
+        'attention': document.getElementById('attention-mode-btn'),
         'manage': document.getElementById('manage-mode-btn')
     };
     Object.entries(modeButtons).forEach(([mode, button]) => {
@@ -565,8 +565,8 @@ function initializeEventListeners() {
     if (categorySelect) categorySelect.addEventListener('change', handleCategoryChange);
     const vocabSearch = document.getElementById('vocab-search');
     if (vocabSearch) vocabSearch.addEventListener('input', handleSearch);
-    const clearUnknownBtn = document.getElementById('clear-unknown-btn');
-    if (clearUnknownBtn) clearUnknownBtn.addEventListener('click', handleDeleteAllUnknown);
+    const clearAttentionBtn = document.getElementById('clear-attention-btn');
+    if (clearAttentionBtn) clearAttentionBtn.addEventListener('click', handleDeleteAllAttention);
     const flashcardDisplayMode = document.getElementById('flashcard-display-mode');
     if (flashcardDisplayMode) flashcardDisplayMode.addEventListener('change', handleFlashcardDisplayModeChange);
     const quizDisplayMode = document.getElementById('quiz-display-mode');
@@ -762,7 +762,7 @@ window.handleImportFile = handleImportFile;
 window.handleSearch = handleSearch;
 window.handleFlashcardDisplayModeChange = handleFlashcardDisplayModeChange;
 window.handleDeleteAll = handleDeleteAll;
-window.handleDeleteAllUnknown = handleDeleteAllUnknown;
+window.handleDeleteAllAttention = handleDeleteAllAttention;
 window.handleCategoryChange = handleCategoryChange;
 window.initializeEventListeners = initializeEventListeners;
 window.openCategoryModal = openCategoryModal;

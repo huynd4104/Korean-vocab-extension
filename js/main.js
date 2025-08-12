@@ -1,7 +1,7 @@
 window.db = null;
 window.currentMode = 'study';
 window.allVocab = [];
-window.unknownWords = [];
+window.attentionWords = [];
 window.selectedCategory = 'all';
 window.searchQuery = '';
 window.apiKeys = [];
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await Promise.all([
             window.loadVocabulary(),
-            window.loadUnknownWords(),
+            window.loadAttentionWords(),
             window.loadApiKey(),
             window.loadCategories()
         ]);

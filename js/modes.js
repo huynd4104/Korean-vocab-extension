@@ -12,7 +12,7 @@ function updateControlButtonsVisibility(mode) {
     const controlButtons = document.getElementById('control-buttons');
     if (!controlButtons) return;
 
-    const isSpecialMode = ['unknown', 'manage', 'game'].includes(mode);
+    const isSpecialMode = ['attention', 'manage', 'game'].includes(mode);
     let isVocabEmpty = false;
 
     if (['study', 'quiz', 'flashcard'].includes(mode)) {
@@ -78,7 +78,7 @@ function handleGameMode() {
 }
 
 function setMode(mode) {
-    const validModes = ['study', 'quiz', 'flashcard', 'game', 'unknown', 'manage'];
+    const validModes = ['study', 'quiz', 'flashcard', 'game', 'attention', 'manage'];
     window.currentMode = validModes.includes(mode) ? mode : 'study';
 
     document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
@@ -104,8 +104,8 @@ function setMode(mode) {
             window.clearUploadForm();
             window.clearImportForm();
             break;
-        case 'unknown':
-            window.loadUnknownWords();
+        case 'attention':
+            window.loadAttentionWords();
             break;
         case 'game':
             handleGameMode();
