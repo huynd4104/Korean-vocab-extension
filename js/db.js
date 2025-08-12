@@ -128,13 +128,13 @@ async function loadCategories() {
 }
 
 // Save state to IndexedDB with debounce
-function saveState() {
+function saveState(options = {}) {
     return new Promise((resolve, reject) => {
-        if (saveStateTimeout) {
+        if (saveStateTimeout && !options.skipDebounce) {
             clearTimeout(saveStateTimeout);
         }
 
-        saveStateTimeout = setTimeout(() => {
+        const save = () => {
             const state = {
                 study: {
                     currentIndex: window.modeStates.study.currentIndex,
@@ -177,7 +177,13 @@ function saveState() {
                 console.error('Error saving state:', request.error);
                 reject(request.error);
             };
-        }, 100);
+        };
+
+        if (options.skipDebounce) {
+            save();
+        } else {
+            saveStateTimeout = setTimeout(save, 100);
+        }
     });
 }
 
@@ -309,7 +315,7 @@ async function loadVocabulary() {
 }
 
 // Save a word to IndexedDB
-async function saveWord(word) {
+async function saveWord(word, options = {}) {
     try {
         const transaction = db.transaction(['vocabulary', 'categories'], 'readwrite');
         const vocabStore = transaction.objectStore('vocabulary');
@@ -323,12 +329,11 @@ async function saveWord(word) {
         if (category) {
             categoryId = category.id;
         } else {
-            // Nếu danh mục không tồn tại, tạo mới và lấy ID
             categoryId = await promisifyRequest(categoryStore.add({ name: normalizedCategory }));
         }
 
         const vocabData = { ...word, categoryId };
-        delete vocabData.category; // Xóa trường category dạng chuỗi
+        delete vocabData.category;
 
         if (vocabData.id) {
             await promisifyRequest(vocabStore.put(vocabData));
@@ -336,16 +341,18 @@ async function saveWord(word) {
             await promisifyRequest(vocabStore.add(vocabData));
         }
 
-        // Tải lại dữ liệu và cập nhật UI
-        await Promise.all([loadVocabulary(), loadCategories()]);
-        window.updateCategorySelector();
-        window.updateCategorySuggestions();
-        window.updateCategoryList();
-        window.filterVocabByCategory();
-        if (window.currentMode === 'manage') {
-            window.updateVocabList();
+        // Chỉ cập nhật giao diện nếu không có tùy chọn skipUIUpdates
+        if (!options.skipUIUpdates) {
+            await Promise.all([loadVocabulary(), loadCategories()]);
+            window.updateCategorySelector();
+            window.updateCategorySuggestions();
+            window.updateCategoryList();
+            window.filterVocabByCategory();
+            if (window.currentMode === 'manage') {
+                window.updateVocabList();
+            }
+            await saveState();
         }
-        await saveState();
     } catch (error) {
         console.error('Error saving word:', error);
         window.showToast('Lỗi khi lưu từ vựng!', 'error');

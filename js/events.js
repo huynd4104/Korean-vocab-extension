@@ -347,60 +347,76 @@ function handleExportAll() {
     window.showToast('Đã xuất danh sách từ!', 'success');
 }
 
-function handleImportFile() {
-    const fileInput = document.getElementById('import-file');
-    if (!fileInput) return;
-
-    const file = fileInput.files[0];
-    if (!file) {
+async function handleImportFile() {
+    const importFile = document.getElementById('import-file');
+    if (!importFile || !importFile.files.length) {
         window.showToast('Vui lòng chọn file để nhập!', 'error');
         return;
     }
 
+    const file = importFile.files[0];
     const reader = new FileReader();
-    reader.onload = function (e) {
-        const text = e.target.result;
-        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
-        const valid = [];
-        const errors = [];
 
-        lines.forEach((line, idx) => {
-            const parts = line.split('`');
+    reader.onload = async (e) => {
+        try {
+            const lines = e.target.result.split('\n').filter(line => line.trim());
+            const validWords = [];
+            const formatErrors = [];
 
-            if (parts.length >= 3 && parts.slice(0, 3).every(p => p)) {
-                valid.push({
-                    korean: parts[0],
-                    pronunciation: parts[1],
-                    vietnamese: parts[2],
-                    category: window.normalizeCategory(parts[3] || 'Khác'),
-                    example: parts[4] || '',
-                    note: parts[5] || ''
-                });
-            } else {
-                errors.push(`Dòng ${idx + 1}: Định dạng không hợp lệ (${line})`);
-            }
-        });
-
-        if (valid.length === 0) {
-            window.showToast('Không có từ vựng hợp lệ để nhập!\n' + errors.join('\n'), 'error');
-            return;
-        }
-
-        Promise.all(valid.map(window.saveWord)).then(() => {
-            window.clearImportForm();
-            Promise.all([window.loadVocabulary(), window.loadCategories()]).then(() => {
-                window.updateCategorySelector();
-                window.updateCategorySuggestions();
-                window.updateCategoryList();
-                window.filterVocabByCategory();
-                window.setMode(window.currentMode);
-                window.showToast(`Đã nhập ${valid.length} từ thành công!` + (errors.length ? '\nLỗi:\n' + errors.join('\n') : ''), 'success');
-                window.saveState();
+            // Xử lý từng dòng
+            lines.forEach((line, index) => {
+                const parts = line.split('`').map(part => part.trim());
+                if (parts.length >= 3 && parts.slice(0, 3).every(p => p)) {
+                    validWords.push({
+                        korean: parts[0],
+                        pronunciation: parts[1],
+                        vietnamese: parts[2],
+                        category: window.normalizeCategory(parts[3] || 'Khác'),
+                        example: parts[4] || '',
+                        note: parts[5] || ''
+                    });
+                } else {
+                    formatErrors.push(index + 1);
+                }
             });
-        }).catch(err => {
-            window.showToast('Lỗi khi nhập danh sách từ: ' + err.message, 'error');
-        });
+
+            if (validWords.length === 0) {
+                window.showToast('Không có từ vựng hợp lệ để nhập!' + (formatErrors.length ? `\nLỗi tại dòng: ${formatErrors.join(', ')}` : ''), 'error');
+                return;
+            }
+
+            // Lưu tất cả từ song song
+            await Promise.all(validWords.map(word => window.saveWord(word, { skipUIUpdates: true })));
+
+            // Cập nhật giao diện một lần duy nhất
+            await Promise.all([window.loadVocabulary(), window.loadCategories()]);
+            window.updateCategorySelector();
+            window.updateCategorySuggestions();
+            window.updateCategoryList();
+            window.filterVocabByCategory();
+            window.setMode(window.currentMode);
+
+            // Thông báo kết quả
+            const successful = validWords.length;
+            const message = formatErrors.length > 0
+                ? `Nhập thành công ${successful} từ, lỗi định dạng tại dòng: ${formatErrors.join(', ')}`
+                : `Nhập thành công ${successful} từ!`;
+            window.showToast(message, successful > 0 ? 'success' : 'error');
+
+            // Lưu trạng thái
+            await window.saveState({ skipDebounce: true });
+
+            // Xóa form nhập
+            window.clearImportForm();
+        } catch (err) {
+            window.showToast('Lỗi khi nhập file: ' + err.message, 'error');
+        }
     };
+
+    reader.onerror = () => {
+        window.showToast('Lỗi khi đọc file!', 'error');
+    };
+
     reader.readAsText(file);
 }
 
