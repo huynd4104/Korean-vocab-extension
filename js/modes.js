@@ -118,15 +118,28 @@ function setMode(mode) {
 
 function displayQuiz(correctWord) {
     const currentState = window.modeStates.quiz;
-    const {
-        quizDisplayMode
-    } = currentState;
+    const { quizDisplayMode } = currentState;
 
     document.getElementById('quiz-category').textContent = correctWord.category;
 
     const isWordMode = quizDisplayMode === 'word';
-    document.getElementById('quiz-korean').textContent = isWordMode ? correctWord.korean : '';
-    document.getElementById('quiz-vietnamese').textContent = isWordMode ? '' : correctWord.vietnamese;
+    const quizKoreanEl = document.getElementById('quiz-korean');
+    const quizVietnameseEl = document.getElementById('quiz-vietnamese');
+
+    quizKoreanEl.textContent = isWordMode ? correctWord.korean : '';
+    quizVietnameseEl.textContent = isWordMode ? '' : correctWord.vietnamese;
+
+    if (isWordMode) {
+        quizKoreanEl.classList.remove('hidden');
+        quizVietnameseEl.classList.add('hidden');
+        quizKoreanEl.classList.add('korean-word');
+        quizVietnameseEl.classList.remove('vietnamese');
+    } else {
+        quizKoreanEl.classList.add('hidden');
+        quizVietnameseEl.classList.remove('hidden');
+        quizKoreanEl.classList.remove('korean-word');
+        quizVietnameseEl.classList.add('vietnamese'); 
+    }
 
     const wrongOptions = currentState.shuffledVocab
         .filter(w => w.id !== correctWord.id)

@@ -78,8 +78,16 @@ function updateCategorySelector() {
     if (!select) return;
 
     const categories = window.allCategories.map(cat => cat.name).sort();
-    const currentValue = select.value;
+    
+    // Lấy category đã lưu từ state, thay vì từ HTML
+    const savedCategory = window.selectedCategory;
 
+    // Tìm lại tên category chưa được chuẩn hóa để hiển thị trên dropdown
+    const categoryNameToSelect = savedCategory === 'all' 
+        ? 'all' 
+        : window.allCategories.find(cat => window.normalizeCategory(cat.name) === savedCategory)?.name || 'all';
+
+    // Xóa các option cũ và thêm các option mới
     select.innerHTML = '<option value="all">Tất cả</option>';
     categories.forEach(category => {
         const option = document.createElement('option');
@@ -88,10 +96,12 @@ function updateCategorySelector() {
         select.appendChild(option);
     });
 
-    select.value = categories.includes(currentValue) || currentValue === 'all' ? currentValue : 'all';
+    // Đặt giá trị cho dropdown từ category đã lưu
+    select.value = categoryNameToSelect;
+
+    // Cập nhật lại state và filter (để đảm bảo tính nhất quán)
     window.selectedCategory = select.value === 'all' ? 'all' : window.normalizeCategory(select.value);
     window.filterVocabByCategory();
-    window.saveState();
 }
 
 // Update category suggestions datalist

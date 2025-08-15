@@ -92,7 +92,7 @@ async function deleteCategory(id) {
                 if (cursor) {
                     const word = cursor.value;
                     word.categoryId = null;
-                    cursor.update(word);  
+                    cursor.update(word);
                     cursor.continue();
                 } else {
                     resolve();
@@ -264,11 +264,25 @@ function loadState() {
                     }
                 }
 
+                // Khôi phục giá trị select cho quiz và flashcard display mode
+                const quizDisplaySelect = document.getElementById('quiz-display-mode');
+                if (quizDisplaySelect) {
+                    quizDisplaySelect.value = window.modeStates.quiz.quizDisplayMode || 'word'; // Default nếu chưa có
+                }
+
+                const flashcardDisplaySelect = document.getElementById('flashcard-display-mode');
+                if (flashcardDisplaySelect) {
+                    flashcardDisplaySelect.value = window.modeStates.flashcard.flashcardDisplayMode || 'word'; // Default nếu chưa có
+                }
+
                 // Cập nhật giao diện
-                window.setMode(window.currentMode);
+                window.setMode(window.currentMode || 'study');
+                window.updateCategorySelector();
+                window.updateCategorySuggestions();
+                window.updateCategoryList();
+                window.updateApiKeyList();
                 window.filterVocabByCategory();
                 window.updateStats();
-                window.updateCategorySelector();
 
                 // Cập nhật trạng thái cho tab game
                 if (window.currentMode === 'game') {

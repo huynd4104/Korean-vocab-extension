@@ -83,14 +83,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await window.loadState();
 
-        window.updateCategorySelector();
-        window.updateCategorySuggestions();
-        window.updateCategoryList();
-        window.updateApiKeyList();
-        window.filterVocabByCategory();
-
-        window.setMode(window.currentMode || 'study');
-
     } catch (err) {
         console.error('Initialization failed:', err);
         window.showToast('Lỗi nghiêm trọng khi khởi động ứng dụng!', 'error');
