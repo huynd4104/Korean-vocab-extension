@@ -42,16 +42,16 @@ async function lookupWord(koreanWord) {
     const fields = [];
     if (lookupPronunciation) fields.push('- Phiên âm (romaja, ngăn cách nhau bởi gạch ngang) (Chỉ hiển thị phiên âm, không giải thích thì thêm)');
     if (lookupVietnamese) fields.push('- Nghĩa tiếng Việt (chỉ hiển thị 1 nghĩa phổ biến được dùng khi dịch, nhưng nếu nó có nhiều nghĩa do phụ thuộc văn cảnh, bối cảnh trò chuyện khác nhau thì chỉ lấy tối đa 3 nghĩa được sử dụng nhiều nhất, các nghĩa ngăn cách nhau bởi dấu phẩy, không dùng dấu ngoặc vuông hoặc ký tự trang trí, viết hoa chữ cái đầu, không thêm giải thích mở rộng, không phân biệt giới tính, giai cấp, vai vế, địa vị trừ khi bản chất từ vựng yêu cầu)');
-    if (lookupExample) fields.push('- Một câu ví dụ đơn giản phổ biến trong văn nói bằng tiếng Hàn kèm nghĩa tiếng Việt');
+    if (lookupExample) fields.push('- Một câu ví dụ đơn giản phổ biến trong văn nói bằng tiếng Hàn kèm nghĩa tiếng Việt, không thêm giải thích, không thêm phiên âm');
     if (document.getElementById('lookup-note')?.checked) {
-        fields.push('- Chú ý (giải thích ngắn gọn nếu từ có nhiều nghĩa khác, hoặc nghĩa thay đổi theo sắc thái, văn cảnh, giới tính,... nhưng phải ghi rõ nếu đó chỉ là truyền thống chứ không phải quy định cố định)');
+        fields.push('- Chú ý (giải thích ngắn gọn nếu từ có nhiều nghĩa khác, hoặc nghĩa thay đổi theo sắc thái, văn cảnh, giới tính, tuổi tác, vai vế, địa vị... nhưng phải ghi rõ nếu đó chỉ là truyền thống chứ không phải quy định cố định)');
     }
     requestText += fields.join('\n');
     requestText += '\nĐịnh dạng trả về:\n';
     if (lookupPronunciation) requestText += 'Phiên âm: [romaja]\n';
     if (lookupVietnamese) requestText += 'Nghĩa: [nghĩa 1, nghĩa 2, nghĩa 3]\n';
     if (lookupExample) requestText += 'Câu ví dụ: [câu tiếng Hàn] - [nghĩa tiếng Việt]\n';
-    if (document.getElementById('lookup-note')?.checked) requestText += 'Chú ý: [chỉ ghi nếu có những lưu ý đặc biệt, hoặc ý nghĩa đặc biệt, hay trường hợp cụ thể, tránh diễn giải thiên lệch hoặc lỗi thời. Nếu có thì chỉ diễn giải ngắn gọn thôi, không có thì bỏ qua không cần trả lời]';
+    if (document.getElementById('lookup-note')?.checked) requestText += 'Chú ý: [chỉ ghi nếu có những lưu ý đặc biệt, hoặc ý nghĩa đặc biệt, hay trường hợp cụ thể, tránh diễn giải thiên lệch hoặc lỗi thời. Nếu có thì chỉ diễn giải ngắn gọn thôi, không có thì bỏ qua trường "chú ỳ" này]';
 
     while (currentKey) {
         try {
@@ -222,7 +222,7 @@ async function initFillGame() {
                     if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
                     return;
                 }
-                window.showToast('Tra cứu thành công!', 'success');
+                window.showToast('Tạo câu hỏi thành công!', 'success');
             } else {
                 window.showToast('Không thể tạo câu hỏi!', 'error');
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được dữ liệu từ API!</span>';
