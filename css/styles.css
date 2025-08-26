@@ -130,6 +130,7 @@ body {
     color: var(--color-gray);
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    resize: none;
 }
 
 .form-input:focus,
@@ -154,22 +155,27 @@ body {
     font-weight: 500;
 }
 
-.vocab-list::-webkit-scrollbar {
+.vocab-list::-webkit-scrollbar,
+.form-textarea::-webkit-scrollbar {
     width: 6px;
 }
 
-.vocab-list::-webkit-scrollbar-track {
+.vocab-list::-webkit-scrollbar-track,
+.form-textarea::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 3px;
 }
 
-.vocab-list::-webkit-scrollbar-thumb {
+.vocab-list::-webkit-scrollbar-thumb,
+.form-textarea::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 3px;
 }
 
-.vocab-list::-webkit-scrollbar-thumb:hover {
+.vocab-list::-webkit-scrollbar-thumb:hover,
+.form-textarea::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+    cursor: pointer;
 }
 
 /* ===== layout.css ===== */
@@ -585,6 +591,11 @@ select.form-input option {
     border-radius: 12px;
     font-size: 1em;
     font-weight: 600;
+}
+
+.category-input-container {
+    display: flex;
+    gap: 10px;  
 }
 
 .search-group {
@@ -1327,16 +1338,6 @@ select.form-input option {
     padding: 6px 12px;
     font-size: 1em;
     border-radius: 15px;
-}
-
-datalist#category-suggestions option {
-    font-size: 0.95em;
-    padding: 5px;
-    background-color: #f9f9f9;
-}
-
-datalist#category-suggestions option:hover {
-    background-color: #e0e0e0;
 }
 
 /* ===== quiz.css ===== */

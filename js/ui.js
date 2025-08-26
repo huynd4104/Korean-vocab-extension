@@ -505,25 +505,39 @@ function toggleEmptyState(mode, isEmpty) {
     }
 }
 
-function updateCategoryList() {
+function updateCategoryList(searchTerm = '') {
     const categoryListDiv = document.getElementById('category-list');
     if (!categoryListDiv) return;
 
     categoryListDiv.innerHTML = ''; 
+    
+    const normalizedSearchTerm = searchTerm.toLowerCase();
+    const filteredCategories = (window.allCategories || []).filter(category => 
+        category.name.toLowerCase().includes(normalizedSearchTerm)
+    );
 
-    if (!window.allCategories || window.allCategories.length === 0) {
-        categoryListDiv.innerHTML = `
-            <div class="empty-state-api">
-                <div class="empty-state-icon">📋</div>
-                <div class="empty-state-message">Chưa có danh mục nào. Hãy thêm danh mục mới!</div>
-            </div>`;
+    if (filteredCategories.length === 0) {
+        if (searchTerm === '') {
+            categoryListDiv.innerHTML = `
+                <div class="empty-state-api">
+                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-message">Chưa có danh mục nào. Hãy thêm danh mục mới!</div>
+                </div>`;
+        } else {
+            categoryListDiv.innerHTML = `
+                <div class="empty-state-api">
+                    <div class="empty-state-icon">🧐</div>
+                    <div class="empty-state-message">Không tìm thấy danh mục nào khớp với "${searchTerm}".</div>
+                </div>`;
+        }
         return;
     }
     
     const fragment = document.createDocumentFragment(); 
-    window.allCategories.forEach(category => {
+    filteredCategories.forEach(category => {
         const categoryItem = document.createElement('div');
-        categoryItem.className = 'category-item vocab-item';
+        categoryItem.className = 'category-item vocab-item';  
+        categoryItem.dataset.categoryId = category.id; 
 
         categoryItem.innerHTML = `
             <div class="vocab-info">
@@ -533,7 +547,7 @@ function updateCategoryList() {
                 <button class="btn btn-primary btn-small edit-category-btn">Sửa</button>
                 <button class="btn btn-secondary btn-small delete-category-btn">Xóa</button>
             </div>`;
-        
+
         categoryItem.querySelector('.edit-category-btn').addEventListener('click', () => window.editCategory(category));
         
         categoryItem.querySelector('.delete-category-btn').addEventListener('click', () => {

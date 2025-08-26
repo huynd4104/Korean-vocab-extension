@@ -72,8 +72,8 @@
                 <div class="form-group">
                     <div class="form-input-group">
                         <textarea id="example-input" class="form-textarea"
-                            placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false"
-                            rows="3" style="min-height: 60px;"></textarea>
+                            placeholder="Nhập câu ví dụ (tiếng Hàn và nghĩa tiếng Việt)" spellcheck="false" rows="3"
+                            style="min-height: 60px;"></textarea>
                         <label><input type="checkbox" id="lookup-example" checked></label>
                     </div>
                 </div>
@@ -251,7 +251,7 @@
                 <h2>Danh Sách Từ Vựng</h2>
                 <div class="vocab-controls">
                     <div class="search-group">
-                        <input type="text" id="vocab-search" class="form-input" placeholder="Tìm kiếm từ vựng..."
+                        <input type="text" id="vocab-search" class="form-input" placeholder="🔍 Tìm kiếm từ vựng..."
                             spellcheck="false">
                     </div>
                     <button class="btn btn-secondary" id="delete-all-btn">🗑️ Xóa Tất Cả</button>
@@ -269,7 +269,7 @@
                     <label for="vocab-list-input">
                         Danh sách từ (từ tiếng Hàn`phiên âm`nghĩa tiếng Việt`ví dụ - tùy chọn`chú ý - tùy chọn)
                     </label>
-                    <textarea id="vocab-list-input" class="form-textarea" rows="5"></textarea>
+                    <textarea id="vocab-list-input" class="form-textarea" rows="7"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="list-category-input">Danh mục cho danh sách:</label>
@@ -295,7 +295,8 @@
             </div>
 
             <div class="form-group">
-                <button class="btn btn-accent" id="open-api-key-modal-btn" style="margin-right: 10px;">֎ Cài Đặt API Key</button>
+                <button class="btn btn-accent" id="open-api-key-modal-btn" style="margin-right: 10px;">֎ Cài Đặt API
+                    Key</button>
                 <button class="btn btn-accent" id="open-category-modal-btn">☰ Cài Đặt Danh Mục</button>
             </div>
         </div>
@@ -305,7 +306,7 @@
                 <h2><a href="https://aistudio.google.com/apikey" target="_blank"
                         style="text-decoration: none; color: inherit;">Quản Lý API Key Gemini</a></h2>
                 <div class="form-group">
-                    <input type="text" id="api-key-input" class="form-input" placeholder="Thêm API Key">
+                    <input type="text" id="api-key-input" class="form-input" placeholder="💡 Thêm API Key">
                 </div>
                 <div id="api-key-list" class="vocab-list"></div>
                 <div class="form-controls">
@@ -318,8 +319,10 @@
         <div id="category-modal" class="modal hidden">
             <div class="modal-content">
                 <h2>Quản Lý Danh Mục</h2>
-                <div class="form-group">
-                    <input type="text" id="category-name-input" class="form-input" placeholder="Thêm/Sửa Tên Danh Mục">
+                <div class="form-group category-input-container">
+                    <input type="text" id="category-name-input" class="form-input" placeholder="🛠️ Thêm/Sửa danh mục">
+                    <input type="text" id="category-search-input" class="form-input"
+                        placeholder="🔍 Tìm kiếm danh mục...">
                 </div>
                 <div id="category-list" class="vocab-list"></div>
                 <div class="form-controls">
@@ -339,7 +342,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="./js/events.js"></script>
     <script src="./js/db.js"></script>
     <script src="./js/utils.js"></script>

@@ -746,6 +746,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.modalState.categoryModal.input = e.target.value;
         window.saveState();
     });
+
+    // Category search
+    document.getElementById('category-search-input')?.addEventListener('input', (e) => {
+        const searchTerm = e.target.value;
+        window.updateCategoryList(searchTerm);
+    });
 });
 
 // Export functions to global scope

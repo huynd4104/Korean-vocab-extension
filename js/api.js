@@ -176,7 +176,6 @@ async function initFillGame() {
             apiKeys[currentApiKeyIndex].requestCount++;
             window.showToast('🌀 Đang tạo câu hỏi', 'success');
 
-            resultDiv.innerHTML = '<div style="color: #4ecdc4; margin: 15px 0; text-align: center; font-size: 1.1em;"><span>🌀</span> Đang tạo câu hỏi...</div>';
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
                 method: 'POST',
                 headers: {
@@ -246,7 +245,6 @@ async function initFillGame() {
                 }
             } else {
                 window.showToast('Không thể tạo câu hỏi!', 'error');
-                resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: ' + error.message + '</span>';
                 if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu có lỗi khác
                 return;
             }
