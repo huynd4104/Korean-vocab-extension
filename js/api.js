@@ -163,8 +163,33 @@ async function initFillGame() {
 
     let currentKey = getAvailableApiKey();
     if (!currentKey) {
-        openApiKeyModal();
-        resultDiv.innerHTML = '<span style="color: #ff6b6b;">Không có API Key khả dụng! Vui lòng thêm API Key mới.</span>';
+        // openApiKeyModal();
+
+        resultDiv.innerHTML = `
+        <div class="api-key-error">
+            <div class="error-icon">
+                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.2679 4L3.33975 16C2.56995 17.3333 3.53223 19 5.07183 19Z" 
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="error-content">
+                <h3 class="error-title">Không có API Key khả dụng!</h3>
+                <p class="error-description">Bạn cần có API Key để sử dụng tính năng này.</p>
+                <div class="error-actions">
+                    <a href="https://aistudio.google.com/apikey" target="_blank" class="get-api-key-btn">
+                        🔑 Lấy API Key 
+                    </a>
+                    <button id="addKeyBtn" class="add-key-btn">
+                        ➕ Thêm API Key
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+        document.getElementById('addKeyBtn')?.addEventListener('click', openApiKeyModal);
+
         if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
         return;
     }
