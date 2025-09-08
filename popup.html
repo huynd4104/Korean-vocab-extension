@@ -303,14 +303,16 @@
 
         <div id="api-key-modal" class="modal hidden">
             <div class="modal-content">
-                <h2><a href="https://aistudio.google.com/apikey" target="_blank"
-                        style="text-decoration: none; color: inherit;">Quản Lý API Key Gemini</a></h2>
+                <h2>Quản Lý API Key Gemini</h2>
                 <div class="form-group">
-                    <input type="text" id="api-key-input" class="form-input" placeholder="💡 Thêm API Key">
+                    <div class="form-input-group" style="display: flex; align-items: center;">
+                        <input type="text" id="api-key-input" class="form-input" placeholder="💡Nhập API Key" style="flex: 1;">
+                        <a href="https://aistudio.google.com/apikey" target="_blank" role="button" class="get-api-key-btn">🧩 Lấy API Key</a>
+                    </div>
                 </div>
                 <div id="api-key-list" class="vocab-list"></div>
                 <div class="form-controls">
-                    <button id="save-api-key-btn" class="btn btn-secondary">Lưu</button>
+                    <button id="save-api-key-btn" class="btn btn-secondary">Thêm API Key</button>
                     <button id="close-api-key-modal-btn" class="btn btn-primary">✖</button>
                 </div>
             </div>

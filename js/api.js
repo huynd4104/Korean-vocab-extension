@@ -177,11 +177,8 @@ async function initFillGame() {
                 <h3 class="error-title">Không có API Key khả dụng!</h3>
                 <p class="error-description">Bạn cần có API Key để sử dụng tính năng này.</p>
                 <div class="error-actions">
-                    <a href="https://aistudio.google.com/apikey" target="_blank" class="get-api-key-btn">
-                        🔑 Lấy API Key 
-                    </a>
-                    <button id="addKeyBtn" class="add-key-btn">
-                        ➕ Thêm API Key
+                    <button id="addKeyBtn" class="get-api-key-btn">
+                        🔑 Thêm API Key
                     </button>
                 </div>
             </div>

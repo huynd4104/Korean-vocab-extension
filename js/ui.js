@@ -304,7 +304,6 @@ function updateApiKeyList() {
             <div class="empty-state-api">
                 <div class="empty-state-icon">🔑</div>
                 <div class="empty-state-message">Chưa có API Key nào. Hãy thêm key mới!</div>
-                <div class="empty-state-message"><a href="https://aistudio.google.com/apikey" target="_blank" style="text-decoration: none;">Nhấn vào đây hoặc tiêu đề để lấy API Key</a></div>
             </div>`;
         return;
     }
