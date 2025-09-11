@@ -340,7 +340,10 @@ function updateApiKeyList() {
 
         apiKeyItem.querySelector('.delete-key-btn').addEventListener('click', () => {
             window.showConfirmationModal('Bạn có chắc chắn muốn xóa API Key này không?', () => {
-                window.deleteApiKey(index).catch(error => {
+                window.deleteApiKey(index).then(() => {
+                    showToast('Xóa API Key thành công!', 'success');
+                })
+                .catch(error => {
                     console.error('Lỗi khi xóa API Key:', error);
                     showToast('Không thể xóa API Key. Vui lòng thử lại.', 'error');
                 });

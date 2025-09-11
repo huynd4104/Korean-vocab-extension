@@ -105,6 +105,8 @@ async function handleSaveApiKey() {
         window.showToast('Lưu API Key thành công!', 'success');
         apiKeyInput.value = '';
         window.updateApiKeyList();
+        window.modalState.apiKeyModal.input = '';
+        window.saveState();
         await window.saveApiKeysToDB();
     } catch (err) {
         window.showToast('Lỗi khi lưu API Key: ' + err.message, 'error');
