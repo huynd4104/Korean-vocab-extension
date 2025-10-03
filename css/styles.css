@@ -596,7 +596,7 @@ select.form-input option {
 
 .category-input-container {
     display: flex;
-    gap: 10px;  
+    gap: 10px;
 }
 
 .search-group {
@@ -1697,7 +1697,7 @@ select.form-input option {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    box-shadow: 
+    box-shadow:
         0 4px 6px -1px rgba(0, 0, 0, 0.1),
         0 2px 4px -1px rgba(0, 0, 0, 0.06),
         0 0 0 1px rgba(255, 255, 255, 0.05) inset;
@@ -1754,4 +1754,23 @@ select.form-input option {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0a0a0a;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #525252;
 }
