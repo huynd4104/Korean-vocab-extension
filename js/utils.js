@@ -30,11 +30,20 @@ function nextWord() {
     }
 }
 
-// Shuffle vocabulary
+// Shuffle vocabulary using Fisher-Yates algorithm
+function fisherYatesShuffle(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
 function shuffleWords() {
     const currentState = window.modeStates[window.currentMode];
     if (currentState?.shuffledVocab.length > 0) {
-        currentState.shuffledVocab = [...currentState.shuffledVocab].sort(() => Math.random() - 0.5);
+        currentState.shuffledVocab = fisherYatesShuffle(currentState.shuffledVocab);
         currentState.currentIndex = 0;
         window.displayCurrentWord();
         window.saveState();
@@ -99,7 +108,7 @@ function filterVocabByCategory() {
             if (window.modeStates.game.fill.currentSentence && window.modeStates.game.fill.correctWord && window.modeStates.game.fill.options.length > 0) {
                 window.displayFillGame();
             } else {
-                window.initFillGame();  
+                window.initFillGame();
             }
         }
     }
@@ -188,6 +197,7 @@ window.normalizeCategory = normalizeCategory;
 window.playTTS = playTTS;
 window.prevWord = prevWord;
 window.nextWord = nextWord;
+window.fisherYatesShuffle = fisherYatesShuffle;
 window.shuffleWords = shuffleWords;
 window.resetProgress = resetProgress;
 window.filterVocabByCategory = filterVocabByCategory;

@@ -58,7 +58,9 @@ async function lookupWord(koreanWord) {
             apiKeys[currentApiKeyIndex].requestCount++;
             window.showToast('🌀 Đang tra cứu', 'success');
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${currentKey}`, {
+            const modelName = window.currentModel || 'gemini-1.5-flash';
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${currentKey}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -113,7 +115,6 @@ async function lookupWord(koreanWord) {
             } else {
                 window.showToast('Không nhận được dữ liệu từ API!', 'error');
             }
-            // Lưu trạng thái apiKeys
             const transaction = db.transaction(['apiKeys'], 'readwrite');
             const store = transaction.objectStore('apiKeys');
             store.put(apiKeys, 'geminiApiKeys');
@@ -135,58 +136,31 @@ async function lookupWord(koreanWord) {
     }
 }
 
-// Initialize fill game with Gemini API
-async function initFillGame() {
+// HÀM MỚI: Tách logic gọi API ra riêng để dùng khi bấm nút
+async function fetchFillGameQuestion(correctWord) {
     const sentenceDiv = document.getElementById('fill-sentence');
-    const optionsContainer = document.getElementById('fill-options');
     const resultDiv = document.getElementById('fill-result');
     const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
-    if (!sentenceDiv || !optionsContainer || !resultDiv) return;
+    const optionsContainer = document.getElementById('fill-options');
 
-    let gameVocab = selectedCategory === 'all' ? [...allVocab] : allVocab.filter(word => normalizeCategory(word.category) === selectedCategory);
-    window.toggleEmptyState('fill', gameVocab.length === 0);
-    if (gameVocab.length === 0) {
-        optionsContainer.innerHTML = '';
-        resultDiv.innerHTML = '';
-        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
-        return;
-    }
-
-    const correctWord = gameVocab[Math.floor(Math.random() * gameVocab.length)];
-    modeStates.game.fill.correctWord = correctWord;
-
-    const wrongOptions = gameVocab
-        .filter(w => w.id !== correctWord.id)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
-    modeStates.game.fill.options = [correctWord, ...wrongOptions].sort(() => Math.random() - 0.5);
+    // Hiển thị loading
+    sentenceDiv.innerHTML = '<div style="text-align:center; padding: 20px;">⏳ Đang tạo câu hỏi với AI...</div>';
 
     let currentKey = getAvailableApiKey();
     if (!currentKey) {
-        // openApiKeyModal();
-
+        // Hiển thị lỗi thiếu key như cũ
         resultDiv.innerHTML = `
         <div class="api-key-error">
-            <div class="error-icon">
-                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.2679 4L3.33975 16C2.56995 17.3333 3.53223 19 5.07183 19Z" 
-                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
+            <div class="error-icon">🔑</div>
             <div class="error-content">
                 <h3 class="error-title">Không có API Key khả dụng!</h3>
                 <p class="error-description">Bạn cần có API Key để sử dụng tính năng này.</p>
                 <div class="error-actions">
-                    <button id="addKeyBtn" class="get-api-key-btn">
-                        🔑 Thêm API Key
-                    </button>
+                    <button id="addKeyBtn" class="get-api-key-btn">Thêm API Key</button>
                 </div>
             </div>
-        </div>
-    `;
-
+        </div>`;
         document.getElementById('addKeyBtn')?.addEventListener('click', openApiKeyModal);
-
         if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
         return;
     }
@@ -198,14 +172,12 @@ async function initFillGame() {
             apiKeys[currentApiKeyIndex].requestCount++;
             window.showToast('🌀 Đang tạo câu hỏi', 'success');
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${currentKey}`, {
+            const modelName = window.currentModel || 'gemini-1.5-flash';
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${currentKey}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: requestText }] }]
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: requestText }] }] })
             });
 
             if (response.status === 429) {
@@ -213,8 +185,7 @@ async function initFillGame() {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
                 currentKey = getAvailableApiKey();
                 if (!currentKey) {
-                    window.showToast('Không thể tạo câu hỏi!', 'error');
-                    resultDiv.innerHTML = '<span style="color: #ff6b6b;">Tất cả API Key đều đạt giới hạn yêu cầu!</span>';
+                    window.showToast('Tất cả API Key đều đạt giới hạn yêu cầu!', 'error');
                     if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
                     return;
                 }
@@ -229,27 +200,24 @@ async function initFillGame() {
 
                 if (sentenceMatch && translationMatch) {
                     modeStates.game.fill.currentSentence = `${sentenceMatch[1]} (${translationMatch[1]})`;
-                    sentenceDiv.innerHTML = `
-                        <div class="fill-sentence-display">
-                            <div class="fill-korean-sentence">${sentenceMatch[1]}</div>
-                            <div class="fill-vietnamese-sentence">${translationMatch[1]}</div>
-                        </div>
-                    `;
-                    resultDiv.innerHTML = '';
+
+                    // Hiển thị câu hỏi
+                    window.displayFillGame();
+
+                    // Mở khóa các nút bấm
+                    const optionButtons = optionsContainer.querySelectorAll('button');
+                    optionButtons.forEach(btn => btn.disabled = false);
+
                     if (resetFillGameBtn) resetFillGameBtn.classList.remove('hidden');
+                    window.showToast('Tạo câu hỏi thành công!', 'success');
+                    window.saveState();
                 } else {
-                    window.showToast('Không thể tạo câu hỏi!', 'error');
-                    resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được câu hỏi hợp lệ từ API!</span>';
-                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
-                    return;
+                    window.showToast('Không nhận được câu hỏi hợp lệ từ API!<', 'error');
                 }
-                window.showToast('Tạo câu hỏi thành công!', 'success');
             } else {
-                window.showToast('Không thể tạo câu hỏi!', 'error');
-                resultDiv.innerHTML = '<span style="color: #ff6b6b;">Lỗi: Không nhận được dữ liệu từ API!</span>';
-                if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
-                return;
+                window.showToast('Không nhận được dữ liệu từ API!', 'error');
             }
+
             const transaction = db.transaction(['apiKeys'], 'readwrite');
             const store = transaction.objectStore('apiKeys');
             store.put(apiKeys, 'geminiApiKeys');
@@ -260,29 +228,77 @@ async function initFillGame() {
                 currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
                 currentKey = getAvailableApiKey();
                 if (!currentKey) {
-                    window.showToast('Không thể tạo câu hỏi!', 'error');
-                    resultDiv.innerHTML = '<span style="color: #ff6b6b;">Tất cả API Key đều đạt giới hạn yêu cầu!</span>';
-                    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu API bị giới hạn
+                    window.showToast('Tất cả API Key đều đạt giới hạn yêu cầu!', 'error');
                     return;
                 }
             } else {
-                window.showToast('Không thể tạo câu hỏi!', 'error');
-                if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden'); // Ẩn nút nếu có lỗi khác
-                return;
+                window.showToast('Lỗi: ' + error.message, 'error');
+                break;
             }
         }
     }
+}
 
+// Initialize fill game with Manual Button (SỬA ĐỔI LỚN)
+async function initFillGame() {
+    const sentenceDiv = document.getElementById('fill-sentence');
+    const optionsContainer = document.getElementById('fill-options');
+    const resultDiv = document.getElementById('fill-result');
+    const resetFillGameBtn = document.getElementById('reset-fill-game-btn');
+
+    if (!sentenceDiv || !optionsContainer || !resultDiv) return;
+
+    let gameVocab = selectedCategory === 'all' ? [...allVocab] : allVocab.filter(word => normalizeCategory(word.category) === selectedCategory);
+    window.toggleEmptyState('fill', gameVocab.length === 0);
+
+    if (gameVocab.length === 0) {
+        optionsContainer.innerHTML = '';
+        resultDiv.innerHTML = '';
+        if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
+        return;
+    }
+
+    // Reset UI
+    resultDiv.innerHTML = '';
     optionsContainer.innerHTML = '';
+    if (resetFillGameBtn) resetFillGameBtn.classList.add('hidden');
+
+    // Chọn từ đúng ngẫu nhiên
+    const correctWord = gameVocab[Math.floor(Math.random() * gameVocab.length)];
+    modeStates.game.fill.correctWord = correctWord;
+
+    const wrongOptions = window.fisherYatesShuffle
+        ? window.fisherYatesShuffle(gameVocab.filter(w => w.id !== correctWord.id)).slice(0, 3)
+        : gameVocab.filter(w => w.id !== correctWord.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+
+    const allOptions = window.fisherYatesShuffle
+        ? window.fisherYatesShuffle([correctWord, ...wrongOptions])
+        : [correctWord, ...wrongOptions].sort(() => 0.5 - Math.random());
+
+    modeStates.game.fill.options = allOptions;
+
+    // Hiện nút bấm thay vì gọi API ngay
+    sentenceDiv.innerHTML = `
+        <div style="text-align: center; padding: 30px;">
+            <button id="start-fill-btn" class="btn btn-primary" style="font-size: 1.1em; padding: 10px 25px;">
+                ✨ Tạo câu hỏi với AI
+            </button>
+        </div>
+    `;
+
+    // Gán sự kiện cho nút vừa tạo
+    document.getElementById('start-fill-btn').addEventListener('click', () => {
+        fetchFillGameQuestion(correctWord);
+    });
+
+    // Hiển thị các lựa chọn (nhưng disable)
     modeStates.game.fill.options.forEach(word => {
         const button = document.createElement('button');
         button.className = 'btn btn-secondary';
         button.textContent = word.korean;
-        button.addEventListener('click', () => checkFillAnswer(word));
+        button.disabled = true; // Khóa nút lại
         optionsContainer.appendChild(button);
     });
-
-    saveState();
 }
 
 // Export functions to global scope

@@ -13,7 +13,6 @@
   },
   "permissions": [
     "windows",
-    "webRequest",
     "tabs"
   ],
   "icons": {

@@ -74,7 +74,7 @@ function handleGameMode() {
             }
         }
     }
-    window.updateStats(); 
+    window.updateStats();
 }
 
 function setMode(mode) {
@@ -100,6 +100,7 @@ function setMode(mode) {
             }
             break;
         case 'manage':
+            window.vocabLimit = 30;
             window.updateVocabList();
             window.clearUploadForm();
             window.clearImportForm();
@@ -138,15 +139,13 @@ function displayQuiz(correctWord) {
         quizKoreanEl.classList.add('hidden');
         quizVietnameseEl.classList.remove('hidden');
         quizKoreanEl.classList.remove('korean-word');
-        quizVietnameseEl.classList.add('vietnamese'); 
+        quizVietnameseEl.classList.add('vietnamese');
     }
 
-    const wrongOptions = currentState.shuffledVocab
-        .filter(w => w.id !== correctWord.id)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
+    const otherWords = currentState.shuffledVocab.filter(w => w.id !== correctWord.id);
+    const wrongOptions = window.fisherYatesShuffle(otherWords).slice(0, 3);
 
-    const allOptions = [correctWord, ...wrongOptions].sort(() => 0.5 - Math.random());
+    const allOptions = window.fisherYatesShuffle([correctWord, ...wrongOptions]);
     const optionsContainer = document.getElementById('quiz-options');
     optionsContainer.innerHTML = '';
 
@@ -206,7 +205,7 @@ function flipStudyCard() {
 
 function setGameTab(tab) {
     window.modeStates.game.currentTab = tab;
-    handleGameMode(); 
+    handleGameMode();
     window.saveState();
 }
 
@@ -215,7 +214,7 @@ function initMatchingGame() {
     window.toggleEmptyState('matching', gameVocab.length === 0);
 
     if (gameVocab.length > 0) {
-        const slicedVocab = gameVocab.sort(() => 0.5 - Math.random()).slice(0, Math.min(4, gameVocab.length));
+        const slicedVocab = window.fisherYatesShuffle(gameVocab).slice(0, Math.min(4, gameVocab.length));
         window.modeStates.game.matching = {
             ...window.modeStates.game.matching,
             shuffledVocab: slicedVocab,
@@ -264,7 +263,7 @@ function displayMatchingGame() {
         matchedPairs
     } = window.modeStates.game.matching;
     const remainingVocab = shuffledVocab.filter(word => !matchedPairs.includes(word.id));
-    const vietnameseWords = [...remainingVocab].sort(() => 0.5 - Math.random());
+    const vietnameseWords = window.fisherYatesShuffle([...remainingVocab]);
 
     remainingVocab.forEach(word => koreanColumn.appendChild(createMatchingItem(word, 'korean')));
     vietnameseWords.forEach(word => vietnameseColumn.appendChild(createMatchingItem(word, 'vietnamese')));

@@ -5,6 +5,7 @@ window.attentionWords = [];
 window.selectedCategory = 'all';
 window.searchQuery = '';
 window.apiKeys = [];
+window.currentModel = 'gemini-1.5-flash';
 window.allCategories = [];
 window.currentApiKeyIndex = 0;
 window.modalState = {
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.loadVocabulary(),
             window.loadAttentionWords(),
             window.loadApiKey(),
+            window.loadGenAIModel(),
             window.loadCategories()
         ]);
 

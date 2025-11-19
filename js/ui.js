@@ -39,7 +39,7 @@ function showToast(message, type = 'success') {
 
     setTimeout(() => {
         toast.style.animation = 'fadeOut 0.5s forwards';
-        toast.addEventListener('animationend', () => toast.remove());  
+        toast.addEventListener('animationend', () => toast.remove());
     }, 3000);
 }
 
@@ -78,13 +78,13 @@ function updateCategorySelector() {
     if (!select) return;
 
     const categories = window.allCategories.map(cat => cat.name).sort();
-    
+
     // Lấy category đã lưu từ state, thay vì từ HTML
     const savedCategory = window.selectedCategory;
 
     // Tìm lại tên category chưa được chuẩn hóa để hiển thị trên dropdown
-    const categoryNameToSelect = savedCategory === 'all' 
-        ? 'all' 
+    const categoryNameToSelect = savedCategory === 'all'
+        ? 'all'
         : window.allCategories.find(cat => window.normalizeCategory(cat.name) === savedCategory)?.name || 'all';
 
     // Xóa các option cũ và thêm các option mới
@@ -110,8 +110,8 @@ function updateCategorySuggestions() {
     if (!datalist) return;
 
     const categories = window.allCategories.map(cat => cat.name).sort();
-    datalist.innerHTML = '';  
-    const fragment = document.createDocumentFragment();  
+    datalist.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
@@ -148,7 +148,7 @@ function updateStats() {
             current = total > 0 ? modeState.currentIndex + 1 : 0;
         }
     }
-    
+
     const progress = total > 0 ? (current / total) * 100 : 0;
 
     currentCountEl.textContent = current;
@@ -158,15 +158,17 @@ function updateStats() {
 
 
 // Update vocabulary list in manage mode
+window.vocabLimit = 30;
+
 function updateVocabList() {
     const vocabList = document.getElementById('vocab-list');
     if (!vocabList) return;
 
     vocabList.innerHTML = '';
-    const fragment = document.createDocumentFragment();  
+    const fragment = document.createDocumentFragment();
 
-    let filteredVocab = window.selectedCategory === 'all' 
-        ? [...window.allVocab] 
+    let filteredVocab = window.selectedCategory === 'all'
+        ? [...window.allVocab]
         : window.allVocab.filter(word => window.normalizeCategory(word.category) === window.selectedCategory);
 
     filteredVocab = filteredVocab.filter(word =>
@@ -176,7 +178,10 @@ function updateVocabList() {
 
     window.toggleEmptyState('manage', filteredVocab.length === 0);
 
-    filteredVocab.forEach(word => {
+    // SỬA: Chỉ render số lượng giới hạn (Lazy Loading)
+    const displayVocab = filteredVocab.slice(0, window.vocabLimit);
+
+    displayVocab.forEach(word => {
         const vocabItem = document.createElement('div');
         vocabItem.className = 'vocab-item';
 
@@ -199,16 +204,16 @@ function updateVocabList() {
                 <button class="btn btn-accent example-btn">Ví dụ</button>
                 <button class="btn btn-info note-btn">Note</button>
             </div>`;
-        
+
         vocabActions.querySelector('.edit-btn').addEventListener('click', () => window.editWord(word));
-        
+
         vocabActions.querySelector('.delete-btn').addEventListener('click', () => {
             window.showConfirmationModal(`Bạn có chắc muốn xóa từ "${word.korean}"?`, () => {
                 window.deleteWord(word.id).then(() => {
                     showToast('Xóa từ thành công!', 'success');
-                    vocabItem.remove(); 
-                    window.allVocab = window.allVocab.filter(w => w.id !== word.id);
-                    updateStats();
+                    // Không xóa trực tiếp DOM để tránh lỗi index, load lại list
+                    window.updateVocabList();
+                    window.updateStats();
                     window.saveState();
                 }).catch(err => {
                     console.error('Error deleting word:', err);
@@ -226,7 +231,7 @@ function updateVocabList() {
                 </div>`;
             createFlipContent(exampleHTML, 'Quay lại', '#fffbe6', 'flipped', vocabItem, vocabInfo, vocabActions);
         });
-        
+
         vocabActions.querySelector('.note-btn').addEventListener('click', () => {
             const noteHTML = `<div class="example"><div style="color:black; font-size: 1.3em;">${word.note || 'Chưa có ghi chú'}</div></div>`;
             createFlipContent(noteHTML, 'Quay lại', '#e3f2fd', 'flipped-note', vocabItem, vocabInfo, vocabActions);
@@ -237,7 +242,20 @@ function updateVocabList() {
         fragment.appendChild(vocabItem);
     });
 
-    vocabList.appendChild(fragment);  
+    vocabList.appendChild(fragment);
+
+    //  Thêm nút "Xem thêm" nếu còn từ
+    if (filteredVocab.length > window.vocabLimit) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'btn btn-secondary';
+        loadMoreBtn.textContent = `👇 Xem thêm (${filteredVocab.length - window.vocabLimit} từ)`;
+        loadMoreBtn.style.cssText = "display: block; width: 100%; margin-top: 15px; padding: 10px;";
+        loadMoreBtn.onclick = () => {
+            window.vocabLimit += 30; // Tăng giới hạn thêm 30 từ
+            window.updateVocabList(); // Render lại
+        };
+        vocabList.appendChild(loadMoreBtn);
+    }
 }
 
 // Update attention words list
@@ -252,8 +270,8 @@ function updateAttentionList() {
     `;
 
     attentionList.innerHTML = '';
-    const fragment = document.createDocumentFragment(); 
-    
+    const fragment = document.createDocumentFragment();
+
     window.toggleEmptyState('attention', window.attentionWords.length === 0);
 
     if (window.attentionWords.length > 0) {
@@ -269,7 +287,7 @@ function updateAttentionList() {
                 <div class="vocab-actions">
                     <button class="btn btn-secondary delete-attention-btn">Xóa</button>
                 </div>`;
-            
+
             item.querySelector('.delete-attention-btn').addEventListener('click', () => {
                 window.showConfirmationModal(`Bạn có chắc muốn xóa từ "${word.korean}" khỏi danh sách chú ý không?`, () => {
                     window.deleteAttentionWord(word.id).then(() => {
@@ -288,8 +306,8 @@ function updateAttentionList() {
 
     const clearButton = document.getElementById('clear-attention-btn');
     if (clearButton) {
-    clearButton.onclick = window.handleDeleteAllAttention; 
-}
+        clearButton.onclick = window.handleDeleteAllAttention;
+    }
 }
 
 // Update API key list
@@ -297,10 +315,10 @@ function updateApiKeyList() {
     const apiKeyListDiv = document.getElementById('api-key-list');
     if (!apiKeyListDiv) return;
 
-    apiKeyListDiv.innerHTML = ''; 
-    
+    apiKeyListDiv.innerHTML = '';
+
     if (!window.apiKeys || window.apiKeys.length === 0) {
-         apiKeyListDiv.innerHTML = `
+        apiKeyListDiv.innerHTML = `
             <div class="empty-state-api">
                 <div class="empty-state-icon">🔑</div>
                 <div class="empty-state-message">Chưa có API Key nào. Hãy thêm key mới!</div>
@@ -308,20 +326,20 @@ function updateApiKeyList() {
         return;
     }
 
-    const fragment = document.createDocumentFragment(); 
+    const fragment = document.createDocumentFragment();
     window.apiKeys.forEach((keyData, index) => {
         const apiKeyItem = document.createElement('div');
         apiKeyItem.className = 'api-key-item vocab-item';
 
         const dateObj = keyData.dateAdded ? new Date(keyData.dateAdded) : null;
         const formattedDate = dateObj ? `${dateObj.toLocaleDateString('vi-VN')} ${dateObj.toLocaleTimeString('vi-VN')}` : 'N/A';
-        
+
         const isRateLimited = keyData.lastRateLimit && (Date.now() - keyData.lastRateLimit < 60000);
         const statusText = isRateLimited
             ? '<span style="color: #ff6b6b; font-weight: 600;">Giới hạn truy cập</span>'
             : '<span style="color: #4ecdc4; font-weight: 600;">Hoạt động</span>';
-        
-        const requestCountText = `Số yêu cầu: ${keyData.requestCount ?? 'N/A'}`; 
+
+        const requestCountText = `Số yêu cầu: ${keyData.requestCount ?? 'N/A'}`;
 
         apiKeyItem.innerHTML = `
             <div class="vocab-info">
@@ -343,10 +361,10 @@ function updateApiKeyList() {
                 window.deleteApiKey(index).then(() => {
                     showToast('Xóa API Key thành công!', 'success');
                 })
-                .catch(error => {
-                    console.error('Lỗi khi xóa API Key:', error);
-                    showToast('Không thể xóa API Key. Vui lòng thử lại.', 'error');
-                });
+                    .catch(error => {
+                        console.error('Lỗi khi xóa API Key:', error);
+                        showToast('Không thể xóa API Key. Vui lòng thử lại.', 'error');
+                    });
             });
         });
         fragment.appendChild(apiKeyItem);
@@ -498,7 +516,7 @@ function toggleEmptyState(mode, isEmpty) {
             const element = document.querySelector(selector);
             if (element) {
                 if (selector.endsWith('-game')) {
-                     element.style.display = isEmpty ? 'none' : '';
+                    element.style.display = isEmpty ? 'none' : '';
                 } else {
                     element.classList.toggle('hidden', isEmpty);
                 }
@@ -511,10 +529,10 @@ function updateCategoryList(searchTerm = '') {
     const categoryListDiv = document.getElementById('category-list');
     if (!categoryListDiv) return;
 
-    categoryListDiv.innerHTML = ''; 
-    
+    categoryListDiv.innerHTML = '';
+
     const normalizedSearchTerm = searchTerm.toLowerCase();
-    const filteredCategories = (window.allCategories || []).filter(category => 
+    const filteredCategories = (window.allCategories || []).filter(category =>
         category.name.toLowerCase().includes(normalizedSearchTerm)
     );
 
@@ -534,12 +552,12 @@ function updateCategoryList(searchTerm = '') {
         }
         return;
     }
-    
-    const fragment = document.createDocumentFragment(); 
+
+    const fragment = document.createDocumentFragment();
     filteredCategories.forEach(category => {
         const categoryItem = document.createElement('div');
-        categoryItem.className = 'category-item vocab-item';  
-        categoryItem.dataset.categoryId = category.id; 
+        categoryItem.className = 'category-item vocab-item';
+        categoryItem.dataset.categoryId = category.id;
 
         categoryItem.innerHTML = `
             <div class="vocab-info">
@@ -551,7 +569,7 @@ function updateCategoryList(searchTerm = '') {
             </div>`;
 
         categoryItem.querySelector('.edit-category-btn').addEventListener('click', () => window.editCategory(category));
-        
+
         categoryItem.querySelector('.delete-category-btn').addEventListener('click', () => {
             window.showConfirmationModal(`Bạn có chắc chắn muốn xóa danh mục\n "${category.name}"`, () => {
                 window.deleteCategory(category.id).catch(err => {
@@ -559,10 +577,10 @@ function updateCategoryList(searchTerm = '') {
                 });
             });
         });
-        
+
         fragment.appendChild(categoryItem);
     });
-    
+
     categoryListDiv.appendChild(fragment);
 }
 

@@ -77,6 +77,12 @@ function closeModal() {
 function openApiKeyModal() {
     document.getElementById('api-key-modal')?.classList.remove('hidden');
     window.modalState.apiKeyModal.isOpen = true;
+
+    const modelInput = document.getElementById('api-model-input');
+    if (modelInput) {
+        modelInput.value = window.currentModel || 'gemini-1.5-flash';
+    }
+
     window.updateApiKeyList();
     window.saveState();
 }
@@ -643,6 +649,21 @@ function initializeEventListeners() {
     if (closeApiKeyModalBtn) closeApiKeyModalBtn.addEventListener('click', closeApiKeyModal);
     const saveApiKeyBtn = document.getElementById('save-api-key-btn');
     if (saveApiKeyBtn) saveApiKeyBtn.addEventListener('click', handleSaveApiKey);
+
+    // Sự kiện lưu Model mới
+    const updateModelBtn = document.getElementById('update-model-btn');
+    if (updateModelBtn) {
+        updateModelBtn.addEventListener('click', async () => {
+            const modelInput = document.getElementById('api-model-input');
+            const newModel = modelInput.value.trim();
+            if (newModel) {
+                await window.saveGenAIModel(newModel);
+                window.showToast(`Đã cập nhật model thành: ${newModel}`, 'success');
+            } else {
+                window.showToast('Vui lòng nhập tên model!', 'error');
+            }
+        });
+    }
 
     // Keyboard navigation
     document.addEventListener('keydown', (event) => {

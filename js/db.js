@@ -279,7 +279,6 @@ function loadState() {
                 window.setMode(window.currentMode || 'study');
                 window.updateCategorySelector();
                 window.updateCategorySuggestions();
-                window.updateCategoryList();
                 window.updateApiKeyList();
                 window.filterVocabByCategory();
                 window.updateStats();
@@ -502,6 +501,27 @@ async function saveApiKeysToDB() {
     await promisifyRequest(store.put(window.apiKeys, 'geminiApiKeys'));
 }
 
+// Hàm lưu Model vào DB
+async function saveGenAIModel(modelName) {
+    const transaction = db.transaction(['settings'], 'readwrite');
+    const store = transaction.objectStore('settings');
+    await promisifyRequest(store.put(modelName, 'genAIModel'));
+    window.currentModel = modelName;
+}
+
+// Hàm tải Model từ DB
+async function loadGenAIModel() {
+    try {
+        const transaction = db.transaction(['settings'], 'readonly');
+        const store = transaction.objectStore('settings');
+        const savedModel = await promisifyRequest(store.get('genAIModel'));
+        // Nếu có trong DB thì lấy, không thì dùng mặc định
+        window.currentModel = savedModel || 'gemini-1.5-flash';
+    } catch (e) {
+        window.currentModel = 'gemini-1.5-flash';
+    }
+}
+
 // Export functions to global scope
 window.initDB = initDB;
 window.saveState = saveState;
@@ -521,3 +541,5 @@ window.saveApiKeysToDB = saveApiKeysToDB;
 window.deleteCategory = deleteCategory;
 window.saveCategory = saveCategory;
 window.loadCategories = loadCategories;
+window.saveGenAIModel = saveGenAIModel;
+window.loadGenAIModel = loadGenAIModel;
