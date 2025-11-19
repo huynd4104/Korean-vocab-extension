@@ -58,7 +58,7 @@ async function lookupWord(koreanWord) {
             apiKeys[currentApiKeyIndex].requestCount++;
             window.showToast('🌀 Đang tra cứu', 'success');
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${currentKey}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -198,7 +198,7 @@ async function initFillGame() {
             apiKeys[currentApiKeyIndex].requestCount++;
             window.showToast('🌀 Đang tạo câu hỏi', 'success');
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${currentKey}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
